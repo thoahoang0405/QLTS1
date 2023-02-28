@@ -1,0 +1,1 @@
+export const URL_Department = "https://localhost:44335/api/v1/Departments";
