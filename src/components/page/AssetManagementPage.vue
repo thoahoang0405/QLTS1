@@ -327,7 +327,7 @@ export default {
     },
     /**
      * hàm chọn 1 item
-     * 
+     * AUTHOR: HTTHOA(28/02/2023)
      */
     selectItem(property) {
       this.selectedProperties = [];
@@ -336,7 +336,7 @@ export default {
     },
     /**
      * hàm chọn tất cả item
-     * 
+     * AUTHOR: HTTHOA(28/02/2023)
      */
     selectedAllItem() {
       try {
