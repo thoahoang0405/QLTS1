@@ -151,7 +151,6 @@
 import { Table } from "../../js/common/table"
 import Form from "../base/BaseForm.vue";
 import Combobox from "../base/BaseCombobox.vue";
-
 import axios from "axios";
 export default {
   data() {
@@ -180,6 +179,10 @@ export default {
 
   },
   methods: {
+    /**
+     * xử lý check box 
+     * AUTHOR: HTTHOA(28/02/2023)
+     */
     check(){
       var listCheck = this.$refs.checkbox;
       
@@ -202,6 +205,10 @@ export default {
     
     
     },
+     /**
+     * xử lý checkall
+     * AUTHOR: HTTHOA(28/02/2023)
+     */
     checkAll() {
       var listCheck = this.$refs.checkbox;
       
@@ -226,8 +233,13 @@ export default {
       
       
     },
+    /**
+     * lấy thông tin tài sản
+     * AUTHOR: HTTHOA(28/02/2023)
+     */
     getData() {
-      axios
+      try {
+        axios
         .get("https://apidemo.laptrinhweb.edu.vn/api/v1/Employees")
         .then((res) => {
           this.employee = res.data;
@@ -237,19 +249,35 @@ export default {
             
           }
         });
+      } catch (error) {
+        console.log(error);
+      }
+      
     },
+    /**
+     * hiển thị form
+     * AUTHOR: HTTHOA(28/02/2023)
+     */
     showForm() {
       
       this.formode=0
       this.name="Thêm tài sản"
       this.isShow = true;
     },
+    /**
+     * đóng form
+     * AUTHOR: HTTHOA(28/02/2023)
+     */
     closeForm() {
       this.isShow = false;
     },
     hideForm(value) {
       this.isShow = value;
     },
+    /**
+     * hiển thị form chỉnh sửa
+     * AUTHOR: HTTHOA(28/02/2023)
+     */
     showFormEdit(emp) {
       this.formode=1
       this.name="Sửa tài sản"
@@ -258,14 +286,22 @@ export default {
       this.employeeId = emp.EmployeeId;
       console.log(emp);
     },
+    /**
+     * hiển thị form nhân bản
+     * AUTHOR: HTTHOA(28/02/2023)
+     */
     showDuplicate() {
       this.formode=2
       this.name="Nhân bản tài sản"
       this.isShow = true;
       
     },
+     /**
+     * format tiền
+     * AUTHOR: HTTHOA(28/02/2023)
+     */
     formatMoney(money) {
-    //  return money.toLocaleString('vi', { style: "currency", currency: "VND" });
+   
      return new Intl.NumberFormat(["ban", "id"]).format(money)
      
     },
@@ -291,7 +327,7 @@ export default {
     },
     /**
      * hàm chọn 1 item
-     * Author: TTDuc ( 04/10/2022)
+     * 
      */
     selectItem(property) {
       this.selectedProperties = [];
@@ -300,7 +336,7 @@ export default {
     },
     /**
      * hàm chọn tất cả item
-     * Author: TTDuc (06/08/2022)
+     * 
      */
     selectedAllItem() {
       try {

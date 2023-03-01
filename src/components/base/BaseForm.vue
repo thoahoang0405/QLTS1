@@ -247,6 +247,10 @@ export default {
   },
 
   watch: {
+    /**
+     * lấy thông tin nhân viên từ component cha
+     * AUTHOR: HTTHOA(28/02/2023)
+     */
     employeeDetail: function (value) {
       this.employee = value;
       this.oldEmp = { ...value };
@@ -256,15 +260,28 @@ export default {
   props: ["employeeDetail", "employeeSlId", "item","formName"],
 
   methods: {
+    /**
+     * lấy thông tin phòng ban từ combobox
+     * AUTHOR: HTTHOA(28/02/2023)
+     */
     selectItemCbb(value){
       this.departmentName=value.DepartmentName
       console.log(value);
     },
+    /**
+     * đóng form chi tiết
+     * AUTHOR: HTTHOA(28/02/2023)
+     */
     closeForm() {
       this.$emit("close", false);
     },
+    /**
+     * lấy thông tin phòng ban
+     * AUTHOR: HTTHOA(28/02/2023)
+     */
     getDepartments() {
-      axios
+      try {
+        axios
         .get("https://apidemo.laptrinhweb.edu.vn/api/v1/Departments")
         .then((response) => {
           this.departments = response.data;
@@ -273,10 +290,18 @@ export default {
         .catch((err) => {
           console.log(err);
         });
+        
+      } catch (error) {
+        console.log(error);
+      }
+      
     },
+    /**
+     * lấy thông tin phòng ban
+     * AUTHOR: HTTHOA(28/02/2023)
+     */
     setDepartment(department) {
       if (this.disabled) return;
-
       for (const item of department) {
         this.departmentName = item.DepartmentName;
         this.departmentCode = item.DepartmentCode;
@@ -284,12 +309,24 @@ export default {
         console.log(this.departmentCode);
       }
     },
+    /**
+     * hiển thị popup
+     * AUTHOR: HTTHOA(28/02/2023)
+     */
     showPopup(){
       this.isShowPopup=!this.Popup
     },
+    /**
+     * đóng popup
+     * AUTHOR: HTTHOA(28/02/2023)
+     */
     hidePopup(value){
       this.isShowPopup=value
     },
+    /**
+     * đóng popup, form
+     * AUTHOR: HTTHOA(28/02/2023)
+     */
     hidePopupAndForm(value){
       this.isShowPopup=value;
       this.closeForm()
