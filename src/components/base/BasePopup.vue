@@ -4,37 +4,38 @@
       <div class="popup-body">
         <div class="icon icon-warning"></div>
         <div class="content-popup">
-          Bạn có muốn hủy bỏ khai báo tài sản này?
+         {{ msg }}
         </div>
       </div>
       <div class="popup-footer">
-        <button class="no btn-hover-outline" @click="onClickBtnNo">Không</button>
-        <button class="cancel btn-hover-blue" @click="onClickCancel">Hủy</button>
+        <!-- <button class="no btn-hover-outline" @click="onClickBtnNo">
+          Không
+        </button> -->
+        <button class="cancel btn-hover-blue" @click="onClickCancel">
+          Đồng ý
+        </button>
       </div>
     </div>
   </div>
 </template>
 <script>
-export default{
-    data(){
-        return{
-
-        }
+export default {
+  data() {
+    return {};
+  },
+  props:["msg"],
+  methods: {
+    // tắt popup
+    onClickBtnNo() {
+      console.log(1);
+      this.$emit("hidePopup", false);
     },
-    methods: {
-        // tắt popup
-        onClickBtnNo(){
-            console.log(1);
-            this.$emit("hidePopup",false)
-
-        },
-        //tắt popup, form
-        onClickCancel(){
-            this.$emit("hidePopAndForm",false)
-
-        }
-    }
-}
+    //tắt popup, form
+    onClickCancel() {
+      this.$emit("hidePopup", false);
+    },
+  },
+};
 </script>
 <style>
 #popup {

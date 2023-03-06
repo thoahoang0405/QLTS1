@@ -13,7 +13,7 @@
     width: fit-content;
     height: fit-content;
     background-color: #fff;
-    margin: 25px auto;
+    margin: auto auto;
     border-radius: 5px;
     /* display: none; */
   }
@@ -61,6 +61,7 @@
   }
   .row-input-right {
     margin-left: 16px;
+    position: relative;
   }
   .form input::placeholder {
     
@@ -249,4 +250,16 @@
   }
   .form-input{
     margin-top: 8px;
+  }
+  .error {
+    position: absolute;
+    top: calc(81% + 1px);
+    left: 0;
+    color: #e03232;
+    white-space: nowrap;
+    font-size: 11px;
+  }
+  
+  .border-red {
+    border-color: #e03232 !important;
   }

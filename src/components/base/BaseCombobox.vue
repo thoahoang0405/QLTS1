@@ -5,7 +5,6 @@
     @keyup.enter="selectItem"
     @keyup.down.stop="keyDown"
     @keyup.up.stop="keyUp"
-   
   >
     <input
       class="input"
@@ -13,7 +12,6 @@
       :placeholder="this.placeholder"
       :tabindex="tab"
       :class="border"
-      
       @blur="onBlur"
       @keydown="keyTab"
       :ref="refName"
@@ -39,7 +37,6 @@
           class="drop-down-item"
           :class="item[fieldCode] == currentItem[fieldCode] ? 'active' : ''"
           @click.exact.stop="onClickItem(item)"
-         
           :key="item"
         >
           <div class="drop-down-code">{{ item[fieldCode] }}</div>
@@ -77,18 +74,21 @@ export default {
     refName: {
       type: String,
     },
+    value: {
+      type: String,
+    },
   },
   data() {
     return {
-  
       currentItem: {}, // item hiện tại
       isShowCbb: false, // show drop-down
       placeholder: "Nhập giá trị ", // playholder
       dataItems: [],
       keyword: "",
-      i:-1,
+      i: -1,
       hOfItem: 35,
       hOfBody: 135,
+     
     };
   },
   methods: {
@@ -100,18 +100,20 @@ export default {
       setTimeout(() => {
         this.isShowCbb = false;
       }, 200);
-
+      this.$emit("keyword", this.keyword)
+      console.log(this.keyword);
       this.$emit("onBlur");
+    
     },
     /**
      * hàm chọn item khi nhấn enter
      *
      */
-    keyTab(){
+    keyTab() {
       var code = event.keyCode || event.which;
-        if (code === 9) {
-         this.onFocus()
-        }
+      if (code === 9) {
+        this.onFocus();
+      }
     },
     selectItem() {
       this.$emit("selectedItem", this.currentItem);
@@ -119,7 +121,7 @@ export default {
       this.keyword = this.currentItem[this.fieldCode];
       this.placeholder = this.currentItem[this.fieldCode];
       this.isShowCbb = false;
-      this.i=0;
+      this.i = 0;
       this.$el.querySelector(".input").focus();
       this.dataItems = this.items;
     },
@@ -130,8 +132,6 @@ export default {
     onClickItem(item) {
       this.currentItem = item;
       this.selectItem();
-      
-    
     },
 
     toggleCombobox() {
@@ -139,30 +139,27 @@ export default {
       if (this.isShowCbb == true) {
         this.scrollItem((this.i - 1) * this.hOfItem);
       }
-     
     },
 
-    scrollItem(position){
-      if(position >=0){
-        this.$el.querySelector(".drop-down-body").scrollTo(0,position) //cuộn đến tọa độ (0,position)
+    scrollItem(position) {
+      if (position >= 0) {
+        this.$el.querySelector(".drop-down-body").scrollTo(0, position); //cuộn đến tọa độ (0,position)
       }
     },
-    keyDown(){
+    keyDown() {
       try {
-        if(!this.isShowCbb){
-          this.isShowCbb=true;
-        }else{
+        if (!this.isShowCbb) {
+          this.isShowCbb = true;
+        } else {
           this.i++;
-          if(this.i>this.dataItems.length-1){
+          if (this.i > this.dataItems.length - 1) {
             this.i = this.dataItems.length - 1;
           }
           this.currentItem = this.dataItems[this.i];
           this.scrollItem((this.i - 1) * this.hOfItem);
         }
-        
       } catch (error) {
         console.log(error);
-        
       }
     },
     keyUp() {
@@ -176,7 +173,7 @@ export default {
         console.log(error);
       }
     },
-   
+
     /**
      * hàm xử lý sự kiện focus
      *
@@ -187,30 +184,28 @@ export default {
   },
   created() {
     // this.placeholder = this.label;
-    
   },
   watch: {
     items: function (value) {
       // nhận mảng item để hiển thị
       this.dataItems = value;
     },
-   
-
+    value: function (vl) {
+      this.keyword = vl;
+    },
+    
     keyword() {
       if (this.keyword != this.currentItem[this.fieldCode]) {
-        this.isShowCbb = true;
-      }
-      else if(this.keyword){
-       
-        this.dataItems.forEach(item=>{
-          let valueSearch=item[this.fieldCode].trim().toLowerCase();
+        // this.isShowCbb = true;
+      } else if (this.keyword) {
+        // this.isShowCbb=!this.isShowCbb
+        this.dataItems.forEach((item) => {
+          let valueSearch = item[this.fieldCode].trim().toLowerCase();
           if (valueSearch.includes(this.keyword.trim().toLowerCase())) {
-          return item;
-      }
-        })
-     
-      }
-      else {
+            return item;
+          }
+        });
+      } else {
         this.dataItems = this.items;
       }
     },
@@ -224,11 +219,13 @@ export default {
     //     this.i=index
     //   }
     // })
-    
   },
 };
 </script>
 
 <style scoped>
 @import url(../../css/layout/combobox.css);
+.border-red{
+  border-color: #e03232 !important;
+}
 </style>
