@@ -189,6 +189,7 @@ table:focus {
 
 table tr {
   height: 40px;
+  max-height: 40px;
   box-sizing: border-box;
   text-align: left;
   white-space: nowrap;

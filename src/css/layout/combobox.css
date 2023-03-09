@@ -10,7 +10,7 @@
 .m-combobox .icon {
     position: absolute;
     left: 6px;
-    top: 50%;
+    top: 75%;
     transform: translateY(-50%);
     cursor: pointer;
 }
@@ -101,7 +101,7 @@
 }
 
 .m-combobox-2 .input {
-    padding: 0 10px 0 14px;
+   padding: 0 10px 0 14px;
     width: 260px;
     margin-top: 15px;
 }
@@ -185,4 +185,7 @@
 .m-combobox .input:read-only:focus,
 .m-combobox .input:read-only {
     background-color: #ffffff;
+}
+#paddingCbb {
+    padding: 0 10px 0 32px !important;
 }

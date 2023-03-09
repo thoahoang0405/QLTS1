@@ -8,11 +8,11 @@
         </div>
       </div>
       <div class="popup-footer">
-        <!-- <button class="no btn-hover-outline" @click="onClickBtnNo">
-          Không
-        </button> -->
-        <button class="cancel btn-hover-blue" @click="onClickCancel">
-          Đồng ý
+        <button v-if="closeStatus==1" class="no btn-hover-outline" @click="onClickBtnNo">
+        Không
+        </button>
+        <button  class="cancel btn-hover-blue" @click="onClickCancel">
+         {{ name }}
         </button>
       </div>
     </div>
@@ -21,9 +21,17 @@
 <script>
 export default {
   data() {
-    return {};
+    return {
+      closeStatus: 0,
+    };
   },
-  props:["msg"],
+  watch: {
+    close:function(value){
+      this.closeStatus=value
+      console.log(value);
+    }
+  },
+  props:["msg","name","close"],
   methods: {
     // tắt popup
     onClickBtnNo() {
@@ -32,8 +40,20 @@ export default {
     },
     //tắt popup, form
     onClickCancel() {
-      this.$emit("hidePopup", false);
+    
+      if(this.closeStatus != 1){
+        this.$emit("hidePopup",false)
+       
+      } else{
+        this.$emit("hidePopupAndForm", false);
+       
+      }
+    
+      
     },
+  },
+  created() {
+    console.log(this.close);
   },
 };
 </script>

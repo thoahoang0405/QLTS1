@@ -10,7 +10,7 @@
           />
           <div class="icon-search icon"></div>
         </div>
-        <div class="input">
+        <!-- <div class="input">
           <input
             type="text"
             id="filter"
@@ -21,8 +21,18 @@
           <div class="icon-cbb" onclick="comboboxShow()">
             <div class="icon icon-down-bold hiddenCbb"></div>
           </div>
-        </div>
-        <div class="input">
+        </div> -->
+        <Combobox
+        :items="departments"
+              :code="'DepartmentName'"
+              
+              :fieldName="'DepartmentName'"
+              :value="fixedAsset.DepartmentName"
+              @selectedItem="selectItemCbb"
+           
+            
+        ></Combobox>
+        <!-- <div class="input">
           <input
             type="text"
             class="filter"
@@ -30,7 +40,18 @@
           />
           <div class="icon-filter icon"></div>
           <div class="icon icon-down-bold"></div>
-        </div>
+        </div> -->
+        <Combobox
+               :items="fixedAssetCategory"
+            
+              :fieldCode="'FixedAssetCategoryCode'"
+              :fieldName="'FixedAssetCategoryName'"
+              @selectedItem="selectItemCategory"
+              :value="fixedAsset.FixedAssetCategoryName"
+              refName="'FixedAssetCategoryCode'"
+             
+             
+        ></Combobox>
       </div>
       <div class="button-function">
         <div class="add">
@@ -50,7 +71,7 @@
         <button class="btn-excel">
           <div
             class="icon icon-delete"
-          
+          @click="onClickDelete"
           >
             <div class="tooltip-delete">{{ tableInfo.btnDeleteTooltip }}</div>
           </div>
@@ -92,14 +113,14 @@
               class="rowCheck"
               ref="rowCheck"
               @click="check"
-              v-for="asset in fixedAssets"
+              v-for="(asset,index) of fixedAssets"
               :key="asset.FixedAssetId"
-              @dblclick="showFormEdit(emp)"
+              @dblclick="showFormEdit(asset)"
             >
               <td class="text-center">
-                <input type="checkbox" ref="checkbox" @click="check" />
+                <input type="checkbox" ref="checkbox" @click="check(asset)" />
               </td>
-              <td class="text-center">1</td>
+              <td class="text-center">{{ index+1 }}</td>
               <td>{{ asset.FixedAssetCode }}</td>
               <td>{{ asset.FixedAssetName }}</td>
               <td>{{ asset.FixedAssetCategoryName }}</td>
@@ -134,10 +155,10 @@
                     @click="getPageDefault">
                     10 
                   </div>
-                  <div class="item-dropup" :class="{act: isActive=='20'}" :value="pageDefault" pageSize="20" @click="getPageDefault">
+                  <div class="item-dropup" :class="{act: isActive=='20'}" :value="pageDefault"  pageSize="20" @click="getPageDefault">
                     20 
                   </div>
-                  <div class="item-dropup" :class="{act: isActive =='30'}" pageSize="30" @click="getPageDefault">
+                  <div class="item-dropup" :class="{act: isActive =='30'}"  pageSize="30" @click="getPageDefault">
                     30 
                   </div>
                   <div class="item-dropup" :class="{act: isActive=='50'}" pageSize="50" @click="getPageDefault">
@@ -193,20 +214,40 @@
     :fixedAssetDetail="assetSelected"
     :fixedAssetIdSelected="fixedAssetId"
     :newCodeForm="newCode"
+    :FormMode="formode"
   ></Form>
-  <Combobox></Combobox>
+  <Popup
+      v-show="isShowPopup"
+      @hidePopup="hidePopup"
+    
+      :msg="msgError"
+      :name="btnName"
+      :close="closeStatus"
+    ></Popup>
+<Load v-show="isShowLoad"></Load>
 </template>
 <script>
 import { Table } from "../../js/common/table";
 import Form from "../base/BaseForm.vue";
-import Combobox from "../base/BaseCombobox.vue";
+import Popup from "../base/BasePopup.vue";
 import Paginate from "vuejs-paginate-next";
 import axios from "axios";
+import Load from "../base/BaseLoading.vue";
+import Combobox from "../base/BaseCombobox2.vue"
+import { ErrorMsg,btnPopup,TitlePopup } from "../../js/common/resource";
+import { FormDetailMode} from "../../js/common/enumeration";
+import { URL_FixedAssetPaging, URL_Category,URL_Department } from "@/js/common/urlAsset";
 export default {
   data() {
     return {
+      numeric:0,
       employee: [],
+      msgError:"",
       isShow: false,
+      btnName:"",
+      isShowLoad:false,
+      closeStatus:0,
+      isShowPopup:false,
       isShowPage:false,
       assetSelected: [],
       fixedAssetId: "",
@@ -226,17 +267,139 @@ export default {
       fixedAssets:[],
       page: 1,
       newCode: "",
+      listFixedAsset:[],
+      fixedAsset:{},
+      fixedAssetCategory: [],
+      fixedAssetCategoryCode: "",
+      fixedAssetCategoryId: "",
+      fixedAssetCategoryName: "",
+      departments: [],
+      departmentCode: "",
+      departmentId: "",
+      departmentName: "",
+      
     };
   },
   components: {
     Form,
-    Combobox,
-    Paginate
+    Popup,
+    Paginate,
+    Load,Combobox
   },
   created() {
     this.filterEmployee();
+    this.getDepartments();
+    this.getCategory();
   },
   methods: {
+    /**
+     * lấy thông tin phòng ban
+     * AUTHOR: HTTHOA(28/02/2023)
+     */
+    getDepartments() {
+      try {
+        axios
+          .get(`${URL_Department}`)
+          .then((response) => {
+            this.departments = response.data;
+            console.log(this.departments);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    /**
+     * lấy thông tin bộ phận
+     * AUTHOR: HTTHOA(28/02/2023)
+     */
+    getCategory() {
+      try {
+        axios
+          .get(`${URL_Category}`)
+          .then((response) => {
+            this.fixedAssetCategory = response.data;
+            console.log(this.departments);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    /**
+     * lấy thông tin phòng ban
+     * AUTHOR: HTTHOA(28/02/2023)
+     */
+    setDepartment(department) {
+      if (this.disabled) return;
+      for (const item of department) {
+        this.departmentName = item.DepartmentName;
+        this.departmentCode = item.DepartmentCode;
+        this.departmentID = item.DepartmentID;
+        console.log(this.departmentCode);
+      }
+    },
+    /**
+     * lấy thông tin bộ phận
+     * AUTHOR: HTTHOA(28/02/2023)
+     */
+    setCategory(fixedAssetCategory) {
+      if (this.disabled) return;
+      for (const item of fixedAssetCategory) {
+        this.fixedAssetCategoryCode = item.FixedAssetCategoryCode;
+        this.fixedAssetCategoryName = item.FixedAssetCategoryName;
+        this.fixedAssetCategoryId = item.FixedAssetCategoryId;
+      }
+    },
+     /**
+     * lấy thông tin phòng ban từ combobox
+     * AUTHOR: HTTHOA(28/02/2023)
+     */
+     selectItemCbb(value) {
+      this.departmentName = value.DepartmentName;
+      this.fixedAsset.DepartmentCode = value.DepartmentCode;
+      this.fixedAsset.DepartmentName = value.DepartmentName;
+      this.fixedAsset.DepartmentId = value.DepartmentId;
+      console.log(this.fixedAsset.DepartmentCode);
+    },
+    selectItemCategory(value) {
+      this.fixedAsset.FixedAssetCategoryName = value.FixedAssetCategoryName;
+      this.fixedAsset.FixedAssetCategoryCode = value.FixedAssetCategoryCode;
+      this.fixedAsset.FixedAssetCategoryId = value.FixedAssetCategoryId;
+    },
+     /**
+     * hiển thị popup
+     * AUTHOR: HTTHOA(28/02/2023)
+     */
+     showPopup() {
+      this.isShowPopup = !this.isShowPopup;
+    },
+    /**
+     * đóng popup
+     * AUTHOR: HTTHOA(28/02/2023)
+     */
+    hidePopup(value) {
+      this.isShowPopup = value;
+    },
+    /**
+     * nhấn nút xóa
+     * AUTHOR: HTTHOA(88/03/2023)
+     */
+    onClickDelete(){
+      if(this.listFixedAsset.length <1){
+        this.showPopup(true)
+       this.msgError=ErrorMsg.NotChooseProperty
+       this.closeStatus=2
+       this.btnName=btnPopup.Agree
+      }else{
+        this.showPopup(false)
+      }
+      
+    },
     /**
      * tính tổng cột tiền
      */
@@ -296,9 +459,11 @@ export default {
         // const toast = useToast();
          var me = this;
         // this.showLoading(true);
+        me.isShowLoad=true;
         axios
-          .get(`https://localhost:44371/api/FixedAsset/Filter?keyword= &pageSize=${this.pageDefault}&pageNumber=${this.pageNumber}`)
+          .get(`${URL_FixedAssetPaging}?keyword= &pageSize=${this.pageDefault}&pageNumber=${this.pageNumber}`)
           .then(function (res) {
+            me.isShowLoad=false
             me.totalPage = res.data.TotalPages;
             me.totalRecord = res.data.TotalRecords;
             me.fixedAssets = res.data.Data;
@@ -345,20 +510,23 @@ export default {
      * xử lý check box
      * AUTHOR: HTTHOA(28/02/2023)
      */
-    check() {
+    check(asset) {
+      this.listFixedAsset=[]
       var listCheck = this.$refs.checkbox;
-
       var rowCheck = this.$refs.rowCheck;
 
       for (var i = 0; i < listCheck.length; i++) {
         if (listCheck[i].checked == true) {
           rowCheck[i].classList.add("rowActive");
+          this.listFixedAsset.push(asset.FixedAssetId)
         } else {
           rowCheck[i].classList.remove("rowActive");
           this.$refs.checkall.checked = false;
+          
         }
       }
       console.log(listCheck.length);
+      console.log(this.listFixedAsset.length);
     },
     /**
      * xử lý checkall
@@ -380,32 +548,14 @@ export default {
         }
       }
     },
-    /**
-     * lấy thông tin tài sản
-     * AUTHOR: HTTHOA(28/02/2023)
-     */
-    getData() {
-      try {
-        axios
-          .get("https://apidemo.laptrinhweb.edu.vn/api/v1/Employees")
-          .then((res) => {
-            this.employee = res.data;
-            console.log(this.employee);
-            for (const item of res.data) {
-              item.Salary = this.formatMoney(item.Salary);
-            }
-          });
-      } catch (error) {
-        console.log(error);
-      }
-    },
+   
     /**
      * hiển thị form
      * AUTHOR: HTTHOA(28/02/2023)
      */
     btnAddOnclick() {
-      this.formode = 0;
-      this.name = "Thêm tài sản";
+      this.formode = FormDetailMode.Add;
+      this.name = TitlePopup.Add;
       this.showForm()
       this.getMaxCode();
     },
@@ -427,8 +577,8 @@ export default {
      * AUTHOR: HTTHOA(28/02/2023)
      */
     showFormEdit(asset) {
-      this.formode = 1;
-      this.name = "Sửa tài sản";
+      this.formode = FormDetailMode.Edit;
+      this.name = TitlePopup.Edit;
       this.isShow = true;
       this.assetSelected = asset;
       this.fixedAssetId = asset.FixedAssetId;
@@ -439,8 +589,8 @@ export default {
      * AUTHOR: HTTHOA(28/02/2023)
      */
     showDuplicate() {
-      this.formode = 2;
-      this.name = "Nhân bản tài sản";
+      this.formode = FormDetailMode.Replication;
+      this.name = TitlePopup.Replication;
       this.isShow = true;
     },
     /**
@@ -457,17 +607,17 @@ export default {
         return parseInt(money);
       }
     },
-    selectItemToList(property) {
+    selectItemToList(asset) {
       try {
-        this.currentProperty = property;
+        this.currentProperty = asset;
 
-        if (!this.selectedProperties.includes(property)) {
+        if (!this.selectedProperties.includes(asset)) {
           //thực hiện chọn
-          this.selectedProperties.push(property);
+          this.selectedProperties.push(asset);
         } else {
           //thực hiện bỏ chọn
           this.selectedProperties = this.selectedProperties.filter((a) => {
-            return a !== property;
+            return a !== asset;
           });
 
           this.currentProperty =

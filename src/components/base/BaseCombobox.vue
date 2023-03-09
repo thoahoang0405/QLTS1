@@ -13,10 +13,12 @@
       :tabindex="tab"
       :class="border"
       @blur="onBlur"
-      @keydown="keyTab"
+      @keydown="keyTab"   
+     
       :ref="refName"
+     
     />
-
+   
     <div class="up-down">
       <div class="down">
         <div class="btn icon-down-bold"></div>
@@ -48,6 +50,7 @@
 </template>
 <!-- :class="item[fieldCode] == currentItem[fieldCode] ? 'active' : ''" -->
 <script>
+
 export default {
   props: {
     label: {
@@ -77,6 +80,10 @@ export default {
     value: {
       type: String,
     },
+    Filter: {
+      type: Int16Array,
+    },
+
   },
   data() {
     return {
@@ -88,9 +95,10 @@ export default {
       i: -1,
       hOfItem: 35,
       hOfBody: 135,
-     
+      filter:0,
     };
   },
+  
   methods: {
     /**
      * hàm xử lý sự kiện khi blur
@@ -186,6 +194,10 @@ export default {
     // this.placeholder = this.label;
   },
   watch: {
+    Filter: function(value){
+      this.filter=value
+      console.log(value);
+    },
     items: function (value) {
       // nhận mảng item để hiển thị
       this.dataItems = value;
