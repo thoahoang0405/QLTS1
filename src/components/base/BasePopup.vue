@@ -2,13 +2,16 @@
   <div id="popup">
     <div class="popup">
       <div class="popup-body">
-        <div class="icon icon-warning"></div>
+        <div class="icon-popup">
+           <div class="icon icon-warning"></div>
+        </div>
+       
         <div class="content-popup">
-         {{ msg }}
+       <strong v-if="closeStatus==3 ||closeStatus==4">{{ item }}</strong>  {{ msg }}
         </div>
       </div>
       <div class="popup-footer">
-        <button v-if="closeStatus==1" class="no btn-hover-outline" @click="onClickBtnNo">
+        <button v-if="closeStatus==1||closeStatus==3||closeStatus==4 " class="no btn-hover-outline" @click="onClickBtnNo">
         Không
         </button>
         <button  class="cancel btn-hover-blue" @click="onClickCancel">
@@ -28,23 +31,34 @@ export default {
   watch: {
     close:function(value){
       this.closeStatus=value
-      console.log(value);
+  
     }
   },
-  props:["msg","name","close"],
+  props:["msg","name","close","item"],
   methods: {
     // tắt popup
     onClickBtnNo() {
-      console.log(1);
+     
       this.$emit("hidePopup", false);
     },
     //tắt popup, form
     onClickCancel() {
+      console.log(this.closeStatus);
     
       if(this.closeStatus != 1){
         this.$emit("hidePopup",false)
+        if(this.closeStatus == 3){
        
-      } else{
+       this.$emit("isDelete")
+     }
+     if(this.closeStatus == 4){
+      
+       this.$emit("isDelete")
+     
+       
+      } 
+      }
+      else{
         this.$emit("hidePopupAndForm", false);
        
       }
@@ -53,7 +67,6 @@ export default {
     },
   },
   created() {
-    console.log(this.close);
   },
 };
 </script>
@@ -93,6 +106,8 @@ export default {
 }
 .content-popup {
   margin-top: 10px;
+  display: flex;
+  justify-content: flex-start;
 }
 
 .popup-footer {

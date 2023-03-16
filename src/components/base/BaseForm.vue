@@ -11,52 +11,52 @@
         <div class="row-input">
           <div class="row-input-left">
             <div class="lb">
-              <label for="item-input">{{ formInfo.fixedAssetCode }} </label>
+              <label for="item-input">{{ formInfo.fixed_asset_code }} </label>
               <span>*</span>
             </div>
 
             <br />
             <input
-              v-model="fixedAsset.FixedAssetCode"
+              v-model="fixedAsset.fixed_asset_code"
               type="text"
               id="txtAssetCode"
               placeholder="Nhập mã tài sản"
               class="item-input check-input"
-              ref="FixedAssetCode"
-              :class="error.FixedAssetCode != '' ? 'border-red' : ''"
-              @blur="validate('FixedAssetCode')"
+              ref="fixed_asset_code"
+              :class="error.fixed_asset_code != '' ? 'border-red' : ''"
+              @blur="validate('fixed_asset_code')"
             />
-            <p class="error" v-if="error.FixedAssetCode != ''">
-              <span>{{ formInfo.fixedAssetCode }} </span
-              >{{ error.FixedAssetCode }}
+            <p class="error" v-if="error.fixed_asset_code != ''">
+              <span>{{ formInfo.fixed_asset_code }} </span
+              >{{ error.fixed_asset_code }}
             </p>
           </div>
           <div class="row-input-right">
             <div class="lb">
-              <label for="item-input">{{ formInfo.fixedAssetName }} </label>
+              <label for="item-input">{{ formInfo.fixed_asset_name }} </label>
               <span>*</span>
             </div>
             <br />
             <input
-              v-model="fixedAsset.FixedAssetName"
+              v-model="fixedAsset.fixed_asset_name"
               id="assetName"
               placeholder="Nhập tên tài sản"
               type="text"
               class="item-input check-input"
-              ref="FixedAssetName"
-              :class="error.FixedAssetName != '' ? 'border-red' : ''"
-              @blur="validate('FixedAssetName')"
+              ref="fixed_asset_name"
+              :class="error.fixed_asset_name != '' ? 'border-red' : ''"
+              @blur="validate('fixed_asset_name')"
             />
-            <p class="error" v-if="error.FixedAssetName != ''">
-              <span>{{ formInfo.fixedAssetName }} </span
-              >{{ error.FixedAssetName }}
+            <p class="error" v-if="error.fixed_asset_name != ''">
+              <span>{{ formInfo.fixed_asset_name }} </span
+              >{{ error.fixed_asset_name }}
             </p>
           </div>
         </div>
         <div class="row-input">
           <div class="row-input-left">
             <div class="lb">
-              <label for="item-input">{{ formInfo.departmentCode }}</label
+              <label for="item-input">{{ formInfo.department_code }}</label
               ><span>*</span>
             </div>
 
@@ -64,29 +64,29 @@
               class="item-input check-input"
               style="margin-top: 14px"
               :items="departments"
-              :code="'DepartmentCode'"
-              :fieldCode="'DepartmentCode'"
-              :fieldName="'DepartmentName'"
-              :value="fixedAsset.DepartmentCode"
+              :code="'department_code'"
+              :fieldCode="'department_code'"
+              :fieldName="'department_name'"
+              :value="fixedAsset.department_code"
               @selectedItem="selectItemCbb"
-              refName="'DepartmentCode'"
-              :border="error.DepartmentCode != '' ? 'border-red' : ''"
-              @onBlur="validate('DepartmentCode')"
+              refName="'department_code'"
+              :border="error.department_code != '' ? 'border-red' : ''"
+              @onBlur="validate('department_code')"
             />
 
-            <p class="error" v-if="error.DepartmentCode != ''">
-              <span>{{ formInfo.departmentCode }} </span
-              >{{ error.DepartmentCode }}
+            <p class="error" v-if="error.department_code != ''">
+              <span>{{ formInfo.department_code }} </span
+              >{{ error.department_code }}
             </p>
           </div>
           <div style="margin-left: 9px" class="row-input-right">
-            <label for="item-input">{{ formInfo.departmentName }}</label>
+            <label for="item-input">{{ formInfo.department_name }}</label>
             <br />
             <input
               readonly
               type="text"
               class="item-input"
-              v-model="fixedAsset.DepartmentName"
+              v-model="fixedAsset.department_name"
             />
           </div>
         </div>
@@ -94,7 +94,7 @@
           <div class="row-input-left">
             <div class="lb">
               <label for="item-input">{{
-                formInfo.fixedAssetCategoryCode
+                formInfo.fixed_asset_category_code
               }}</label>
               <span>*</span>
             </div>
@@ -103,29 +103,29 @@
             <Combobox
               class="combobox item-input check-input"
               :items="fixedAssetCategory"
-              :code="'FixedAssetCategoryCode'"
-              :fieldCode="'FixedAssetCategoryCode'"
-              :fieldName="'FixedAssetCategoryName'"
+              :code="'fixed_asset_category_code'"
+              :fieldCode="'fixed_asset_category_code'"
+              :fieldName="'fixed_asset_category_name'"
               @selectedItem="selectItemCategory"
-              :value="fixedAsset.FixedAssetCategoryCode"
-              refName="'FixedAssetCategoryCode'"
-              :border="error.FixedAssetCategoryCode != '' ? 'border-red' : ''"
-              @onBlur="validate('FixedAssetCategoryCode')"
+              :value="fixedAsset.fixed_asset_category_code"
+              refName="'fixed_asset_category_code'"
+              :border="error.fixed_asset_category_code != '' ? 'border-red' : ''"
+              @onBlur="validate('fixed_asset_category_code')"
             />
-            <p class="error" v-if="error.FixedAssetCategoryCode != ''">
-              <span>{{ formInfo.fixedAssetCategoryCode }} </span
-              >{{ error.FixedAssetCategoryCode }}
+            <p class="error" v-if="error.fixed_asset_category_code != ''">
+              <span>{{ formInfo.fixed_asset_category_code }} </span
+              >{{ error.fixed_asset_category_code }}
             </p>
 
             <!-- <div class="icon icon-down-bold"></div> -->
           </div>
           <div style="margin-left: 9px" class="row-input-right">
             <label for="item-input">{{
-              formInfo.fixedAssetCategoryName
+              formInfo.fixed_asset_category_name
             }}</label>
             <br />
             <input
-              v-model="fixedAsset.FixedAssetCategoryName"
+              v-model="fixedAsset.fixed_asset_category_name"
               readonly
               type="text"
               class="item-input"
@@ -140,18 +140,18 @@
             </div>
             <br />
             <el-input-number
-              v-model="fixedAsset.Quantity"
+              v-model="fixedAsset.quantity"
               :min="1"
               :max="100000"
               controls-position="right"
               size="large"
               @change="handleChange"
-              :class="error.Quantity != '' ? 'border-red' : ''"
-              @blur="validate('Quantity')"
+              :class="error.quantity != '' ? 'border-red' : ''"
+              @blur="validate('quantity')"
             />
 
-            <p class="error" v-if="error.Quantity != ''">
-              <span>{{ formInfo.quantity }} </span>{{ error.Quantity }}
+            <p class="error" v-if="error.quantity != ''">
+              <span>{{ formInfo.quantity }} </span>{{ error.quantity }}
             </p>
           </div>
           <div class="item-input-cl3">
@@ -160,36 +160,36 @@
             </div>
             <br />
             <input
-              v-model="fixedAsset.Cost"
+              v-model="fixedAsset.cost"
               type="text"
               id="price"
               class="check-input item-input text-right"
-              ref="Cost"
-              :class="error.Cost != '' ? 'border-red' : ''"
-              @blur="validate('Cost')"
+              ref="cost"
+              :class="error.cost != '' ? 'border-red' : ''"
+              @blur="validate('cost')"
             />
-            <p class="error" v-if="error.Cost != ''">
-              <span>{{ formInfo.cost }} </span>{{ error.Cost }}
+            <p class="error" v-if="error.cost != ''">
+              <span>{{ formInfo.cost }} </span>{{ error.cost }}
             </p>
           </div>
 
           <div class="item-input-cl3">
             <div class="lb">
-              <label for="item-input">{{ formInfo.usingYear }}</label
+              <label for="item-input">{{ formInfo.life_time }}</label
               ><span>*</span>
             </div>
             <br />
             <input
-              v-model="fixedAsset.LifeTime"
+              v-model="fixedAsset.life_time"
               id="yearNumber"
               type="text"
               class="check-input item-input text-right"
-              ref="LifeTime"
-              :class="error.LifeTime != '' ? 'border-red' : ''"
-              @blur="validate('LifeTime')"
+              ref="life_time"
+              :class="error.life_time != '' ? 'border-red' : ''"
+              @blur="validate('life_time')"
             />
-            <p class="error" v-if="error.LifeTime != ''">
-              <span>{{ formInfo.usingYear }} </span>{{ error.LifeTime }}
+            <p class="error" v-if="error.life_time != ''">
+              <span>{{ formInfo.life_time }} </span>{{ error.life_time }}
             </p>
             <div class="text-error"></div>
           </div>
@@ -197,52 +197,52 @@
         <div class="row-input-cl3 input-number">
           <div class="item-input-cl3">
             <div class="lb">
-              <label for="item-input">{{ formInfo.depreciationRate }}</label>
+              <label for="item-input">{{ formInfo.depreciation_rate }}</label>
               <span>*</span>
             </div>
             <br />
 
             <el-input-number
-              v-model="fixedAsset.DepreciationRate"
+              v-model="fixedAsset.depreciation_rate"
               :min="0"
               controls-position="right"
               size="large"
               @change="handleChange"
-              :class="error.DepreciationRate != '' ? 'border-red' : ''"
-              @blur="validate('DepreciationRate')"
+              :class="error.depreciation_rate != '' ? 'border-red' : ''"
+              @blur="validate('depreciation_rate')"
             />
 
-            <p class="error" v-if="error.DepreciationRate != ''">
-              <span>{{ formInfo.depreciationRate }} </span
-              >{{ error.DepreciationRate }}
+            <p class="error" v-if="error.depreciation_rate != ''">
+              <span>{{ formInfo.depreciation_rate }} </span
+              >{{ error.depreciation_rate }}
             </p>
           </div>
           <div class="item-input-cl3">
             <div class="lb">
-              <label for="item-input">{{ formInfo.depreciationYear }}</label>
+              <label for="item-input">{{ formInfo.depreciation_value }}</label>
               <span>*</span>
             </div>
             <br />
             <input
-              v-model="fixedAsset.DepreciationValue"
+              v-model="fixedAsset.depreciation_value"
               id="amorYear"
               type="text"
               class="check-input item-input text-right"
-              ref="DepreciationValue"
-              :class="error.DepreciationValue != '' ? 'border-red' : ''"
-              @blur="validate('DepreciationValue')"
+              ref="depreciation_value"
+              :class="error.depreciation_value != '' ? 'border-red' : ''"
+              @blur="validate('depreciation_value')"
             />
-            <p class="error" v-if="error.DepreciationValue != ''">
-              <span>{{ formInfo.depreciationYear }} </span
-              >{{ error.DepreciationValue }}
+            <p class="error" v-if="error.depreciation_value != ''">
+              <span>{{ formInfo.depreciation_value }} </span
+              >{{ error.depreciation_value }}
             </p>
           </div>
 
           <div class="item-input-cl3">
-            <label for="item-input">{{ formInfo.followYear }}</label>
+            <label for="item-input">{{ formInfo.production_year }}</label>
             <br />
             <input
-              v-model="fixedAsset.ProductionYear"
+              v-model="fixedAsset.production_year"
               readonly
               type="text"
               class="item-input text-right"
@@ -252,32 +252,32 @@
         <div class="row-input-end">
           <div class="item-input-cl3" style="margin-right: 16px">
             <label for="item-input" style="margin-bottom: 8px">{{
-              formInfo.purchaseDate
+              formInfo.purchase_date
             }}</label>
             <br />
             <!-- <input type="date" class="item-input" /> -->
             <div class="form-input">
               <el-date-picker
-                v-model="fixedAsset.PurchaseDate"
+                v-model="fixedAsset.purchase_date"
                 type="date"
                 :placeholder="dateConfig.Format"
                 :format="dateConfig.Format"
-                value-format="DD/MM/YYYY"
+                value-format="YYYY-MM-DD"
               />
             </div>
           </div>
           <div class="item-input-cl3">
             <label for="item-input" style="margin-bottom: 8px">{{
-              formInfo.startUsingDate
+              formInfo.tracked_year
             }}</label>
             <br />
             <div class="form-input">
               <el-date-picker
-                v-model="fixedAsset.StartUsingDate"
-                type="datetime"
+                v-model="fixedAsset.tracked_year"
+                type="date"
                 :placeholder="dateConfig.Format"
                 :format="dateConfig.Format"
-                value-format="DD/MM/YYYY"
+                value-format="YYYY-MM-DD"
               />
             </div>
           </div>
@@ -317,35 +317,37 @@ import vi from "element-plus/lib/locale/lang/vi";
 import { DateConfig } from "../../js/common/config";
 import { Form } from "../../js/common/form";
 import Popup from "../base/BasePopup.vue";
-import { ErrorMsg, btnPopup } from "../../js/common/resource";
+import { ErrorMsg, btnPopup,Msg,NoticeMsg } from "../../js/common/resource";
 import Notice from "./BasePopupNotice.vue";
+import { useToast } from "vue-toastification";
 import {
   URL_FixedAssets,
   URL_Category,
   URL_Department,
+  URL_FixedAssetsPut,
+  URL_GetNewCode,
+  URL_FixedAssetPaging
 } from "@/js/common/urlAsset";
 
 export default {
   data() {
     return {
       fixedAssetCategory: [],
-      fixedAssetCategoryCode: "",
-      fixedAssetCategoryId: "",
-      fixedAssetCategoryName: "",
+      fixed_asset_category_code: "",
+      fixed_asset_category_id: "",
+      fixed_asset_category_name: "",
       departments: [],
-      departmentCode: "",
-      departmentId: "",
-      departmentName: "",
+      department_code: "",
+      department_id: "",
+      department_name: "",
       ElDatePickerLocale: vi,
-      purchaseDate: "",
-      startUsingDate: "",
+      purchase_date: "",
+      tracked_year: "",
       dateConfig: DateConfig,
       formInfo: Form,
       itemSelectCbb: {},
       isShowPopup: false,
-      attritionRate: "",
-      usingYear: 10,
-      EmployeeCode: "",
+      life_time: 10,
       quantity: "",
       closeStatus: 0,
       keyWord: "",
@@ -354,38 +356,39 @@ export default {
       formMode: 0,
       isShowNotice: false,
       msgError: "",
+     oldDatta:{},
 
       fixedAsset: {
-        ProductionYear: 2023,
+        production_year: 2023,
       },
 
       listErrorRequired: [],
 
       error: {
-        FixedAssetCode: "",
-        FixedAssetName: "",
-        DepartmentCode: "",
-        FixedAssetCategoryCode: "",
-        Quantity: "",
-        Cost: "",
-        LifeTime: "",
-        DepreciationRate: "",
-        DepreciationValue: "",
-        // PurchaseDate: "",
+        fixed_asset_code: "",
+        fixed_asset_name: "",
+        department_code: "",
+        fixed_asset_category_code: "",
+        quantity: "",
+        cost: "",
+        life_time: "",
+        depreciation_rate: "",
+        depreciation_value: "",
+        // purchase_date: "",
       }, //  các thông báo lỗi
       rules: {
-        FixedAssetCode: { Required: true },
-        FixedAssetName: { Required: true },
-        FixedAssetCategoryCode: { Required: true },
-        DepreciationRate: { Required: true, Major: 1 },
-        DepreciationValue: { Required: true, Price: true },
+        fixed_asset_code: { Required: true },
+        fixed_asset_name: { Required: true },
+        fixed_asset_category_code: { Required: true },
+        depreciation_rate: { Required: true, Major: 100 },
+        depreciation_value: { Required: true, Price: true },
 
-        DepartmentCode: { Required: true },
+        department_code: { Required: true },
 
-        Cost: { Required: true, Price: true },
-        LifeTime: { Required: true, Major: 1 },
-        // PurchaseDate: {Required: true},
-        Quantity: { Required: true },
+        cost: { Required: true, Price: true },
+        life_time: { Required: true, Major: 100 },
+        // purchase_date: {Required: true},
+        quantity: { Required: true },
       },
     };
   },
@@ -408,25 +411,31 @@ export default {
         this.error[value] = "";
       }
   console.log(value);
-      if (this.fixedAsset.ProductionYear == "") {
-        this.fixedAsset.ProductionYear = 2023;
+      if (this.fixedAsset.production_year == "") {
+        this.fixedAsset.production_year = 2023;
       }
     },
-    
+    depreciation_value: function(){
+      this.depreciation_value=parseInt(this.fixedAsset.cost * this.fixedAsset.depreciation_rate)/100
+    },
     fixedAssetDetail: function (value) {
       this.fixedAsset = value;
-      this.departmentCode = value.DepartmentCode;
-      this.departmentName = value.DepartmentName;
-      value.PurchaseDate = this.formatDate(value.PurchaseDate);
-      value.StartUsingDate = this.formatDate(value.StartUsingDate);
-      this.fixedAsset.FixedAssetId = value.FixedAssetId;
-      this.fixedAsset.Quantity = value.Quantity;
-      this.fixedAsset.DepreciationRate = value.DepreciationRate;
+      this.department_code = value.department_code;
+      this.department_name = value.department_name;
+      console.log(value.purchase_date);
+      // value.purchase_date = this.formatDate(value.purchase_date);
+      // value.tracked_year = this.formatDate(value.tracked_year);
+      this.fixedAsset.purchase_date = value.purchase_date;
+      this.fixedAsset.tracked_year = value.tracked_year;
+      this.fixedAsset.fixed_asset_id = value.fixed_asset_id;
+      this.fixedAsset.quantity = value.quantity;
+      this.fixedAsset.depreciation_rate = value.depreciation_rate;
+      this.depreciation_value=parseInt(this.fixedAsset.cost * this.fixedAsset.depreciation_rate)/100
       this.oldData = { ...value };
       console.log(value);
     },
     newCodeForm: function (value) {
-      this.fixedAsset.FixedAssetCode = value;
+      this.fixedAsset.fixed_asset_code = value;
     },
     FormMode: function (value) {
       this.formMode = value;
@@ -447,6 +456,7 @@ export default {
   methods: {
     /**
      * click nút save
+     * AUTHOR: HTTHOA(10/03/2023)
      */
     onClickSave() {
       console.log(this.formMode);
@@ -456,7 +466,9 @@ export default {
         console.log("validate ok");
         if (this.formMode == 1) {
           this.editData();
-        } else {
+        } 
+       
+        else {
           this.saveData();
         }
       }
@@ -467,22 +479,11 @@ export default {
      */
     setFocus() {
       this.$nextTick(function () {
-        this.$refs["FixedAssetCode"].focus();
+        this.$refs["fixed_asset_code"].focus();
       });
     },
 
-    /**
-     *
-     * @param {chuyển sang dạng datetime} originalDateString
-     * AUTHOR: HTTHOA(9/03/2023)
-     */
-    convertDateFormat(originalDateString) {
-      if (originalDateString) {
-        const originalDate = new Date(originalDateString);
-        const formattedDateString = originalDate.toISOString();
-        return formattedDateString;
-      }
-    },
+    
 
     showNotice() {
       this.isShowNotice = !this.isShowNotice;
@@ -493,35 +494,28 @@ export default {
      */
     saveData() {
       var me = this;
-      console.log(me.fixedAsset.PurchaseDate);
-      if(me.fixedAsset.PurchaseDate){
-          me.fixedAsset.PurchaseDate = me.convertDateFormat(
-        me.fixedAsset.PurchaseDate );
-      }
-      if(me.fixedAsset.StartUsingDate){
-        me.fixedAsset.StartUsingDate = me.convertDateFormat(
-        me.fixedAsset.StartUsingDate
-      );
-      }
-     
-     
-      console.log(me.fixedAsset);
+      const toast = useToast();
       try {
         axios
           .post(`${URL_FixedAssets}`, me.fixedAsset)
           .then(function (res) {
             console.log("ok", res.data);
-
-            me.showNotice();
+            toast.success(Msg.AddSucces, { timeout: 2000 });
+            if(me.formMode == 0){
+              me.fixedAsset={},
+              me.getMaxCode();      
+            }else{             
+              me.getMaxCode(); 
+            }
+           
+            
           })
-          .then(function () {
-            setTimeout(() => {
-              me.isShowNotice = false;
-            }, 2000);
+          .then(function(){
+            me.getPagingAsset()
           })
-
+          
           .catch(function () {
-            console.log(1);
+            toast.error(Msg.AddError, { timeout: 2000 });
           });
       } catch (error) {
         console.log(error);
@@ -533,31 +527,68 @@ export default {
      */
     editData() {
       var me = this;
-
-      me.fixedAsset.PurchaseDate = me.convertDateFormat(
-        me.fixedAsset.PurchaseDate
-      );
-      me.fixedAsset.StartUsingDate = me.convertDateFormat(
-        me.fixedAsset.StartUsingDate
-      );
-
-      console.log(me.fixedAsset);
+    
+      const toast = useToast();
       try {
         axios
           .put(
-            `${URL_FixedAssets}/${me.fixedAsset.FixedAssetId}`,
+            `${URL_FixedAssetsPut}${me.fixedAsset.fixed_asset_id}`,
             me.fixedAsset
           )
-          .then(function (res) {
-            console.log("ok", res);
-            me.showNotice();
-          })
           .then(function () {
-            setTimeout(() => {
-              me.isShowNotice = false;
-            }, 2000);
+            me.$emit("close", false);
+            me.fixedAsset = {};
+            toast.success(Msg.EditSucces, { timeout: 2000 });
+            me.getPagingAsset()
           })
-
+         
+          .catch(function () {
+            toast.error(Msg.EditError, { timeout: 2000 });
+          });
+      } catch (error) {
+        console.log(error);
+      }
+    },
+       /*
+    lấy mã code  mới 
+    */
+    getMaxCode(){
+      try {
+        axios
+          .get(`${URL_GetNewCode}`)
+          .then((res) => {
+           this.fixedAsset.fixed_asset_code=res.data       
+          });
+      } catch (error) {
+        console.log(error);
+      }
+    },
+     /**
+     * lấy số bản ghi trên 1 trang số trang và tìm kiếm trên api
+     * AUTHOR: HTTHOA(11/03/2023)
+     */
+     getPagingAsset() {
+      try {
+        // const toast = useToast();
+        var me = this;
+        // this.showLoading(true);
+        me.isShowLoad = true;
+        axios
+          .get(
+            `${URL_FixedAssetPaging}?keyword=${this.txtSearch}&pageSize=${this.pageDefault}&pageNumber=${this.pageNumber}`
+          )
+          .then(function (res) {
+            me.isShowLoad = false;
+            me.totalPage = res.data.TotalPages;
+            me.totalRecord = res.data.TotalRecords;
+            me.fixedAssets = res.data.Data;
+            console.log(me.fixedAssets);
+            for (const item of res.data.Data) {
+              me.residualValue= me.residualValue+(item.cost-item.depreciation_value)
+             
+            }
+          })
+         
           .catch(function () {
             console.log(1);
           });
@@ -602,12 +633,11 @@ export default {
           isValidAll = isValid;
         }
       }
-
       return isValidAll;
     },
     /**
      *
-     * @param {validate duyệt từng hàm validate chi tiết} propName
+     * validate duyệt từng hàm validate chi tiết
      * AUTHOR: HTTHOA(9/03/2023)
      */
     validate(propName) {
@@ -624,8 +654,7 @@ export default {
     },
     /**
      *
-     * @param {validate bắt buộc nhập} value
-     * @param {*} propName
+     * validate bắt buộc nhập
      * AUTHOR: HTTHOA(9/03/2023)
      */
     validateRequired(value, propName) {
@@ -639,63 +668,64 @@ export default {
     },
     /**
      *
-     * @param {validate tỉ lệ với năm} value
-     * @param {*} propName
+     * validate tỉ lệ với năm
      * AUTHOR: HTTHOA(9/03/2023)
      */
     validateMajor(value, propName) {
       // số năm sử dụng thay đổi thì kiểm tra lại tỷ lệ hao mòn
-      if (propName == "LifeTime") {
-        this.fixedAsset.DepreciationRate = parseFloat(
-          (value / this.fixedAsset.LifeTime).toFixed(2)
+      if (propName == "life_time") {
+        this.fixedAsset.depreciation_rate = parseFloat(
+          (value/ this.fixedAsset.life_time).toFixed(2)
         );
         return true;
       }
 
       // tỷ lệ hao mòn thay đổi thì kiểm tra lại số năm sử dụng
-      if (propName == "DepreciationRate") {
+      if (propName == "depreciation_rate") {
         if (
-          this.fixedAsset.DepreciationRate !=
-          (value / this.fixedAsset.LifeTime).toFixed(2)
+          this.fixedAsset.depreciation_rate !=
+          (value / this.fixedAsset.life_time).toFixed(2)
         ) {
           this.msgError = ErrorMsg.UsedYear;
           this.btnName = "Đồng ý";
           this.closeStatus = 0;
           this.showPopup();
-          this.fixedAsset.DepreciationRate = parseFloat(
-            (value / this.fixedAsset.LifeTime).toFixed(2)
+          this.fixedAsset.depreciation_rate = parseFloat(
+            (value / this.fixedAsset.life_time).toFixed(2)
           );
 
           return false;
         } else {
+          this.msgError = "";
           return true;
         }
       }
     },
     /**
      *
-     * @param {validate nguyên giá với giá trị hao mòn năm} value
+     * validate nguyên giá với giá trị hao mòn năm
      * AUTHOR: HTTHOA(9/03/2023)
      */
     validatePrice(value, propName) {
-      var cost = parseInt(this.fixedAsset.Cost);
-      var rate = parseFloat(this.fixedAsset.DepreciationRate);
-      if (propName == "Cost") {
-        this.fixedAsset.DepreciationValue = parseInt(cost * rate);
+      var cost = parseInt(this.fixedAsset.cost);
+      var rate = parseInt(this.fixedAsset.depreciation_rate);
+      if (propName == "cost") {
+        this.fixedAsset.depreciation_value =parseInt(cost * rate/100);
         return true;
       }
-      if (propName == "DepreciationValue") {
-        if (this.fixedAsset.DepreciationValue > cost) {
+      if (propName == "depreciation_value") {
+        if (this.fixedAsset.depreciation_value > cost) {
           this.msgError = ErrorMsg.AttritionValueLessThanMarkedPrice;
           this.showPopup();
           this.closeStatus = 0;
-          this.fixedAsset.DepreciationValue = parseInt(cost * rate);
-          this.fixedAsset.DepreciationRate = parseFloat(
-            this.fixedAsset.DepreciationValue / cost
-          );
-          this.fixedAsset.LifeTime = 1 / this.fixedAsset.DepreciationRate;
+          this.fixedAsset.depreciation_value = parseInt(cost * rate/100) ;
+          this.fixedAsset.depreciation_rate = 
+            this.fixedAsset.depreciation_value / cost
+          
+          this.fixedAsset.life_time = 1 / this.fixedAsset.depreciation_rate;
           return false;
         } else {
+          this.msgError =" ";
           return true;
         }
       }
@@ -705,10 +735,19 @@ export default {
      * AUTHOR: HTTHOA(9/03/2023)
      */
     onClickBtnCancel() {
-      this.showPopup();
+      
+        let checkDataChange =
+          JSON.stringify(this.oldData) === JSON.stringify(this.fixedAsset);
+        if (checkDataChange) {
+          this.$emit("close", false);
+        } else {
+          this.showPopup();
       this.closeStatus = 1;
-      this.msgError = ErrorMsg.NotChooseProperty;
+      this.msgError = NoticeMsg.PropertyEdited;
       this.btnName = btnPopup.cancel;
+        }
+      
+     
     },
     /**
      * định dạng ngày
@@ -735,16 +774,23 @@ export default {
      * AUTHOR: HTTHOA(28/02/2023)
      */
     selectItemCbb(value) {
-      this.departmentName = value.DepartmentName;
-      this.fixedAsset.DepartmentCode = value.DepartmentCode;
-      this.fixedAsset.DepartmentName = value.DepartmentName;
-      this.fixedAsset.DepartmentId = value.DepartmentId;
-      console.log(this.fixedAsset.DepartmentCode);
+      this.department_name = value.department_name;
+      this.fixedAsset.department_code = value.department_code;
+      this.fixedAsset.department_name = value.department_name;
+      this.fixedAsset.department_id = value.department_id;
+     
+      console.log(this.fixedAsset.department_code);
     },
+    /**
+     * lấy thông tin tải sản từ combobox
+     * AUTHOR: HTTHOA(28/02/2023)
+     */
     selectItemCategory(value) {
-      this.fixedAsset.FixedAssetCategoryName = value.FixedAssetCategoryName;
-      this.fixedAsset.FixedAssetCategoryCode = value.FixedAssetCategoryCode;
-      this.fixedAsset.FixedAssetCategoryId = value.FixedAssetCategoryId;
+      this.fixedAsset.fixed_asset_category_name = value.fixed_asset_category_name;
+      this.fixedAsset.fixed_asset_category_code = value.fixed_asset_category_code;
+      this.fixedAsset.fixed_asset_category_id = value.fixed_asset_category_id;
+      this.fixedAsset.life_time=value.life_time
+      this.fixedAsset.depreciation_rate=value.depreciation_rate
     },
     /**
      * đóng form chi tiết
@@ -773,6 +819,10 @@ export default {
         console.log(error);
       }
     },
+    /**
+     * lấy thông tin loại tài sản
+     * AUTHOR: HTTHOA(28/02/2023)
+     */
     getCategory() {
       try {
         axios
@@ -795,18 +845,22 @@ export default {
     setDepartment(department) {
       if (this.disabled) return;
       for (const item of department) {
-        this.departmentName = item.DepartmentName;
-        this.departmentCode = item.DepartmentCode;
-        this.departmentID = item.DepartmentID;
-        console.log(this.departmentCode);
+        this.department_name = item.department_name;
+        this.department_code = item.department_code;
+        this.department_id = item.department_id;
+        console.log(this.department_code);
       }
     },
+    /**
+     * lấy thông tin loại tài sản
+     * AUTHOR: HTTHOA(28/02/2023)
+     */
     setCategory(fixedAssetCategory) {
       if (this.disabled) return;
       for (const item of fixedAssetCategory) {
-        this.fixedAssetCategoryCode = item.FixedAssetCategoryCode;
-        this.fixedAssetCategoryName = item.FixedAssetCategoryName;
-        this.fixedAssetCategoryId = item.FixedAssetCategoryId;
+        this.fixed_asset_category_code = item.fixed_asset_category_code;
+        this.fixed_asset_category_name = item.fixed_asset_category_name;
+        this.fixed_asset_category_id = item.fixed_asset_category_id;
       }
     },
     /**
@@ -835,11 +889,8 @@ export default {
   },
 
   created() {
-    
     this.getDepartments();
     this.getCategory();
- f
-    
   },
 };
 </script>

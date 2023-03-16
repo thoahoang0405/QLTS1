@@ -23,5 +23,9 @@
   };
   </script>
   
-  <style scoped></style>
+  <style scoped>
+  .container{
+    z-index: 0;
+  }
+</style>
   

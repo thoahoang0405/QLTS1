@@ -30,12 +30,15 @@
   
         <div class="drop-down-body">
           <div
-            v-for="item in dataItems"
+            v-for="(item,index) of dataItems"
             class="drop-down-item"
             :class="item[fieldName] == currentItem[fieldName] ? 'active' : ''"
             @click.exact.stop="onClickItem(item)"
             :key="item"
           >
+          <div class="icon-tick">
+            <div :id="index" v-show="item[fieldName] == currentItem[fieldName]" class=" tick"></div>
+          </div>
             <div class="drop-down-name">{{ item[fieldName] }}</div>
           </div>
         </div>
@@ -240,6 +243,9 @@
     height: fit-content;
     overflow: auto;
     overflow-x: hidden;
+}
+.icon-tick{
+ width: 8px;
 }
   .m-combobox-2 .input {
    padding: 0 20px 0 32px;

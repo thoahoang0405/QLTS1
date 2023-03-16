@@ -4,7 +4,7 @@
     <div class="menu-top">
       <router-link to="/" class="brand" @click="activeNumber = -1">
         <div class="icon-logo logo"></div>
-        <h1 class="brand-text" v-if="isZoomOut">MISA QLTS</h1>
+        <P class="brand-text" v-if="isZoomOut">MISA QLTS</P>
       </router-link>
       <ul class="navbar">
         <div v-for="item in items" :key="item" class="nav-item">
@@ -16,10 +16,12 @@
             "
             :to="item.to"
             :class="activeTo === item.to ? 'active' : ''"
+           :title="!isZoomOut ?item.name:''"
           >
             <div class="icon">
               <div :class="item.icon"></div>
             </div>
+            
             <!-- <div class="toolTip" v-if="!isZoomOut"> {{ item.name }}</div> -->
             <div class="nav-item-text" v-if="isZoomOut">{{ item.name }}</div>
             <div class="icon-down" v-if="item.dropdown==true && isZoomOut"></div>
@@ -30,8 +32,9 @@
     </div>
     <div class="menu-bottom">
       <button class="btn zoom-in" id="zoom" @click="zoomNavbar">
-        <div class="btn-icon center">
-          <div :class="isZoomOut ? 'icon-left' : 'icon-right'"></div>
+        <div class="btn-icon center" >
+         
+          <div  :class="isZoomOut ? 'icon-left' : 'icon-right'"> </div>
         </div>
       </button>
     </div>
@@ -104,11 +107,16 @@ export default {
   },
 };
 </script>
-<style>
-.toolTip{
-  position: absolute;
-  background-color: #fff;
-  color: #000;
-  min-width: 100px;
+<style scoped>
+
+.brand-text{
+  font-size: 24px;
+  font-weight: 700;
 }
+.menu{
+  position: relative;
+  
+  
+}
+
 </style>

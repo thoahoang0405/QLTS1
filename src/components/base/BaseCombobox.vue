@@ -25,27 +25,25 @@
       </div>
     </div>
 
-    <div class="drop-down" v-show="isShowCbb">
-      <div class="drop-down-header">
-        <div class="drop-down-item">
-          <div class="drop-down-code">Mã</div>
-          <div class="drop-down-name">Tên</div>
+    <div class="drop-down" v-show="isShowCbb" >
+        
+  
+        <div class="drop-down-body">
+          <div
+            v-for="(item,index) of dataItems"
+            class="drop-down-item "
+            :class="item[fieldCode] == currentItem[fieldCode] ? 'active' : ''"
+            @click.exact.stop="onClickItem(item)"
+            :key="item"
+          >
+          <div class="icon-tick">
+            <div :id="index" v-show="item[fieldCode] == currentItem[fieldCode]" class=" tick"></div>
+          </div>
+        
+            <div class="drop-down-name">   {{ item[fieldCode] }}</div>
+          </div>
         </div>
       </div>
-
-      <div class="drop-down-body">
-        <div
-          v-for="item in dataItems"
-          class="drop-down-item"
-          :class="item[fieldCode] == currentItem[fieldCode] ? 'active' : ''"
-          @click.exact.stop="onClickItem(item)"
-          :key="item"
-        >
-          <div class="drop-down-code">{{ item[fieldCode] }}</div>
-          <div class="drop-down-name">{{ item[fieldName] }}</div>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 <!-- :class="item[fieldCode] == currentItem[fieldCode] ? 'active' : ''" -->
@@ -237,7 +235,30 @@ export default {
 
 <style scoped>
 @import url(../../css/layout/combobox.css);
+.icon-tick{
+ width: 8px;
+}
+.drop-down-name {
+    padding-left: 0px;
+}
+
+.tick{
+  padding-top: 4px;
+  margin-top: 4px;
+  margin-left: 5px;
+
+}
+.drop-down-item{
+  display: flex;
+}
 .border-red{
   border-color: #e03232 !important;
+}
+.m-combobox-2 .drop-down .drop-down-body {
+    max-height: 110px;
+    height: -moz-fit-content;
+    height: fit-content;
+    overflow: auto;
+    overflow-x: hidden;
 }
 </style>

@@ -7,50 +7,26 @@
             type="text"
             class="search"
             :placeholder="tableInfo.searchFixedAsset"
+            v-model="txtSearch"   @keypress.enter="getPagingAsset"
           />
           <div class="icon-search icon"></div>
         </div>
-        <!-- <div class="input">
-          <input
-            type="text"
-            id="filter"
-            class="filter"
-            :placeholder="tableInfo.fixedAssetCategoryName"
-          />
-          <div class="icon-filter icon"></div>
-          <div class="icon-cbb" onclick="comboboxShow()">
-            <div class="icon icon-down-bold hiddenCbb"></div>
-          </div>
-        </div> -->
+       
         <Combobox
-        :items="departments"
-              :code="'DepartmentName'"
-              
-              :fieldName="'DepartmentName'"
-              :value="fixedAsset.DepartmentName"
-              @selectedItem="selectItemCbb"
-           
-            
+          :items="departments"
+          :code="'department_code'"
+          :fieldName="'department_name'"
+          :value="fixedAsset.department_name"
+          @selectedItem="selectItemCbb"
         ></Combobox>
-        <!-- <div class="input">
-          <input
-            type="text"
-            class="filter"
-            :placeholder="tableInfo.departmentName"
-          />
-          <div class="icon-filter icon"></div>
-          <div class="icon icon-down-bold"></div>
-        </div> -->
+      
         <Combobox
-               :items="fixedAssetCategory"
-            
-              :fieldCode="'FixedAssetCategoryCode'"
-              :fieldName="'FixedAssetCategoryName'"
-              @selectedItem="selectItemCategory"
-              :value="fixedAsset.FixedAssetCategoryName"
-              refName="'FixedAssetCategoryCode'"
-             
-             
+          :items="fixedAssetCategory"
+          :fieldCode="'fixed_asset_category_code'"
+          :fieldName="'fixed_asset_category_name'"
+          @selectedItem="selectItemCategory"
+          :value="fixedAsset.fixed_asset_category_name"
+          refName="'fixed_asset_category_code'"
         ></Combobox>
       </div>
       <div class="button-function">
@@ -61,30 +37,29 @@
         </div>
 
         <button class="btn-excel">
-          <div
-            class="icon icon-excel"
-          
-          >
+          <div class="icon icon-excel">
             <div class="tooltip-excel">{{ tableInfo.btnExcelTooltip }}</div>
           </div>
         </button>
         <button class="btn-excel">
-          <div
-            class="icon icon-delete"
-          @click="onClickDelete"
-          >
+          <div class="icon icon-delete" @click="onClickDeleteMultiple">
             <div class="tooltip-delete">{{ tableInfo.btnDeleteTooltip }}</div>
           </div>
         </button>
       </div>
     </div>
-    <div id="table">
+    <div id="table ">
       <div class="table">
         <table>
           <thead>
             <tr>
               <th class="text-center width-fit">
-                <input type="checkbox" @click="checkAll" ref="checkall" />
+                <input
+                  type="checkbox"
+                  @click="selectedAllItem"
+                  :checked="listFixedAsset.length == fixedAssets.length"
+                  ref="checkall"
+                />
               </th>
 
               <th class="stt">
@@ -92,10 +67,10 @@
                 <div class="tooltip-stt">{{ tableInfo.numericTooltip }}</div>
               </th>
 
-              <th>{{ tableInfo.fixedAssetCode }}</th>
-              <th>{{ tableInfo.fixedAssetName }}</th>
-              <th>{{ tableInfo.fixedAssetCategoryName }}</th>
-              <th>{{ tableInfo.departmentName }}</th>
+              <th>{{ tableInfo.fixed_asset_code }}</th>
+              <th>{{ tableInfo.fixed_asset_name }}</th>
+              <th>{{ tableInfo.fixed_asset_category_name }}</th>
+              <th>{{ tableInfo.department_name }}</th>
               <th>{{ tableInfo.quantity }}</th>
               <th class="text-right">{{ tableInfo.cost }}</th>
               <th class="text-right kh">
@@ -110,100 +85,173 @@
           </thead>
           <tbody>
             <tr
-              class="rowCheck"
               ref="rowCheck"
-              @click="check"
-              v-for="(asset,index) of fixedAssets"
-              :key="asset.FixedAssetId"
+              :class="listFixedAsset.includes(asset) ? 'active' : ''"
+              v-for="(asset, index) of fixedAssets"
+              :key="asset.fixed_asset_id"
+              @click.prevent.exact="selectItemToList(asset)"
               @dblclick="showFormEdit(asset)"
+              style="max-height: 38px; box-sizing: border-box;"
             >
               <td class="text-center">
-                <input type="checkbox" ref="checkbox" @click="check(asset)" />
+                <input
+                  type="checkbox"
+                  ref="checkbox"
+                  :checked="listFixedAsset.includes(asset) ? true : false"
+                  @click="selectItemToList(asset)"
+                />
               </td>
-              <td class="text-center">{{ index+1 }}</td>
-              <td>{{ asset.FixedAssetCode }}</td>
-              <td>{{ asset.FixedAssetName }}</td>
-              <td>{{ asset.FixedAssetCategoryName }}</td>
-              <td>{{asset.DepartmentName}}</td>
-              <td class="text-right">{{asset.Quantity}}</td>
-              <td class="text-right">{{formatMoney(asset.Cost) }}</td>
-              <td class="text-right">{{formatMoney(asset.DepreciationValue)}}</td>
-              <td class="text-right">{{ asset.Cost }}</td>
+              <td class="text-center">{{ index + 1 }}</td>
+              <td>{{ asset.fixed_asset_code }}</td>
+              <td>{{ asset.fixed_asset_name }}</td>
+              <td>{{ asset.fixed_asset_category_name }}</td>
+              <td>{{ asset.department_name }}</td>
+              <td class="text-right">{{ asset.quantity }}</td>
+              <td class="text-right">{{ formatMoney(asset.cost) }}</td>
+              <td class="text-right">{{ formatMoney(asset.depreciation_value) }}</td>
+              <td class="text-right">{{ formatMoney(asset.cost-asset.depreciation_value) }}</td>
               <td>
                 <div class="function-table">
-                  <div class="icon icon-edit" @click="showFormEdit(asset)"></div>
-                  <div class="icon icon-duplicate" @click="showDuplicate"></div>
+                  <div class="icon icon-edit" @click="showFormEdit(asset)">
+                    <div class="tooltip">Sửa</div>
+                  </div>
+                  <div class="icon icon-replicate" @click="showDuplicate(asset)">
+                    <div class="tooltip">Xóa</div>
+                  </div>
                 </div>
               </td>
             </tr>
+            
+           
           </tbody>
-        </table>
-        <div class="table-footer">
-          <div class="tb-footer-left">
-            <div class="total-record">
-              Tổng số: <strong>{{ totalRecord }}</strong> bản ghi
-            </div>
-          
-            <div class="page">
-              <div class="content-page">
-               {{pageDefault}}
-              </div>
-              <div class="dropup-page">
-                <div class="icon icon-down-bold" @click="btnDropUp"></div>
-                <div class="item-up" v-show="isShowPage">
-                  <div class="item-dropup" :class="{act: isActive == '10'}" pageSize="10" 
-                    @click="getPageDefault">
-                    10 
-                  </div>
-                  <div class="item-dropup" :class="{act: isActive=='20'}" :value="pageDefault"  pageSize="20" @click="getPageDefault">
-                    20 
-                  </div>
-                  <div class="item-dropup" :class="{act: isActive =='30'}"  pageSize="30" @click="getPageDefault">
-                    30 
-                  </div>
-                  <div class="item-dropup" :class="{act: isActive=='50'}" pageSize="50" @click="getPageDefault">
-                    50 
-                  </div>
-                  <div class="item-dropup" :class="{act: isActive=='100'}" pageSize="100" @click="getPageDefault">
-                    100 
+          <tfoot>
+             <tr class="tb-footer">
+              <td colspan="3">
+                <div>
+                  <div class="total-record">
+                    Tổng số: <strong>{{ totalRecord }}</strong> bản ghi
                   </div>
                 </div>
-              </div>
-            </div>
-            <div>
-             
-              <Paginate v-model="page" :page-count="totalPage" :page-range="3" :margin-pages="1"
-                :click-handler="clickCallback" :prev-link-class="'page-link'" :prev-text="'<'" :prev-class="'page-item'"   :next-link-class="'page-link'" :next-text="'>'" :next-class="'page-item'" :container-class="'pagination'"
-                :page-class="'page-item'">
-              </Paginate>
-            </div>
-          
-            <!-- <div class="paging-combobox">
-              <input type="text" class="page" placeholder="20" />
-              <div class="icon icon-down-bold"></div>
-            </div>
+              </td>
+              <td colspan="1">
+                <div style="margin-right: 0px; box-sizing: border-box">
+                  <div class="page">
+                    <div style="position: relative; width: 50px">
+                      <div class="content-page">
+                        {{ pageDefault }}
+                      </div>
+                      <div class="icon icon-down-bold" @click="btnDropUp"></div>
+                    </div>
 
-            <div class="paging">
-              <div class="icon icon-prev"></div>
-              <p>1</p>
-              <strong>2</strong>
-              <p>...</p>
-              <p>100</p>
-              <div class="icon icon-next"></div>
-            </div> -->
-          </div>
-          <div class="tb-footer-right">
-            <div class="total-count"  style="padding-right: 20px; width:50px;">
-              <strong>{{formatMoney(total(fixedAssets, "Quantity"))}}</strong>
-            </div>
-            <div class="total-price" style=" min-width: 120px; padding-right: 33px;"><strong>{{formatMoney(total(fixedAssets, "Cost"))}}</strong></div>
-            <div class="total-price" style="padding-right: 0px; padding-left: 20px; width: 100px;" >
-              <strong>{{formatMoney(total(fixedAssets, "DepreciationValue"))}}</strong>
-            </div>
-            <div class="total-price" style=" min-width: 100px;padding-right: 30px"> <strong>100.000.000</strong></div>
-          </div>
-        </div>
+                    <div class="dropup-page">
+                      <div class="item-up" v-show="isShowPage">
+                        <div
+                          class="item-dropup"
+                          :class="{ act: isActive == '10' }"
+                          pageSize="10"
+                          @click="getPageDefault"
+                        >
+                          10
+                        </div>
+                        <div
+                          class="item-dropup"
+                          :class="{ act: isActive == '20' }"
+                          :value="pageDefault"
+                          pageSize="20"
+                          @click="getPageDefault"
+                        >
+                          20
+                        </div>
+                        <div
+                          class="item-dropup"
+                          :class="{ act: isActive == '30' }"
+                          pageSize="30"
+                          @click="getPageDefault"
+                        >
+                          30
+                        </div>
+                        <div
+                          class="item-dropup"
+                          :class="{ act: isActive == '50' }"
+                          pageSize="50"
+                          @click="getPageDefault"
+                        >
+                          50
+                        </div>
+                        <div
+                          class="item-dropup"
+                          :class="{ act: isActive == '100' }"
+                          pageSize="100"
+                          @click="getPageDefault"
+                        >
+                          100
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </td>
+              <td colspan="2">
+                <div>
+                  <Paginate
+                    v-model="page"
+                    :page-count="totalPage"
+                    :page-range="2"
+                    :margin-pages="1"
+                    :click-handler="clickCallback"
+                    :prev-link-class="'page-link'"
+                    :prev-text="'<'"
+                    :prev-class="'page-item'"
+                    :next-link-class="'page-link'"
+                    :next-text="'>'"
+                    :next-class="'page-item'"
+                    :container-class="'pagination'"
+                    :page-class="'page-item'"
+                  >
+                  </Paginate>
+                </div>
+              </td>
+              <td colspan="1">
+                <div
+                  class="total-count"
+                  
+                >
+                  <strong>{{
+                    formatMoney(total(fixedAssets, "quantity"))
+                  }}</strong>
+                </div>
+              </td>
+              <td colspan="1">
+                <div
+                  class="total-price"
+                
+                >
+                  <strong>{{ formatMoney(total(fixedAssets, "cost")) }}</strong>
+                </div>
+              </td>
+              <td colspan="1">
+                <div
+                  class="total-price"
+                  
+                >
+                  <strong>{{ formatMoney(total(fixedAssets, "depreciation_value")) }}</strong>
+                </div>
+              </td>
+              <td colspan="1">
+                <div
+                  class="total-price"
+                  
+                >
+                  <strong>{{ formatMoney(residualValue) }}</strong>
+                </div>
+              </td>
+              <td colspan="1"></td>
+            </tr>
+          </tfoot>
+        </table>
       </div>
+     
+        
     </div>
   </div>
 
@@ -212,19 +260,25 @@
     v-show="isShow"
     @close="hideForm"
     :fixedAssetDetail="assetSelected"
-    :fixedAssetIdSelected="fixedAssetId"
+    :fixedAssetIdSelected="fixed_asset_id"
     :newCodeForm="newCode"
     :FormMode="formode"
   ></Form>
   <Popup
-      v-show="isShowPopup"
-      @hidePopup="hidePopup"
-    
-      :msg="msgError"
-      :name="btnName"
-      :close="closeStatus"
-    ></Popup>
-<Load v-show="isShowLoad"></Load>
+    v-show="isShowPopup"
+    @hidePopup="hidePopup"
+    :msg="msgDelete"
+    :name="btnName"
+    :close="closeStatus"
+    @isDelete="deleted"
+    :item="itemDelete"
+  ></Popup>
+  <!-- <div v-show="isShowLoad" class="loader"></div> -->
+  <div id="load"   v-show="isShowLoad" >
+     <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
+  </div>
+ 
+
 </template>
 <script>
 import { Table } from "../../js/common/table";
@@ -232,25 +286,42 @@ import Form from "../base/BaseForm.vue";
 import Popup from "../base/BasePopup.vue";
 import Paginate from "vuejs-paginate-next";
 import axios from "axios";
-import Load from "../base/BaseLoading.vue";
-import Combobox from "../base/BaseCombobox2.vue"
-import { ErrorMsg,btnPopup,TitlePopup } from "../../js/common/resource";
-import { FormDetailMode} from "../../js/common/enumeration";
-import { URL_FixedAssetPaging, URL_Category,URL_Department } from "@/js/common/urlAsset";
+import Combobox from "../base/BaseCombobox2.vue";
+import {
+  ErrorMsg,
+  btnPopup,
+  TitlePopup,
+  NoticeMsg,
+  Msg,
+} from "../../js/common/resource";
+import { useToast } from "vue-toastification";
+import { FormDetailMode } from "../../js/common/enumeration";
+import {
+  URL_FixedAssetPaging,
+  URL_Category,
+  URL_DELETE,
+  URL_FixedAssetsPut,
+  URL_Department,
+  URL_GetNewCode,
+} from "@/js/common/urlAsset";
 export default {
   data() {
     return {
-      numeric:0,
+      itemDelete: "",
+      isDeleted: 0,
+     
+      numeric: 0,
       employee: [],
-      msgError:"",
+      msgError: "",
+      msgDelete: "",
       isShow: false,
-      btnName:"",
-      isShowLoad:false,
-      closeStatus:0,
-      isShowPopup:false,
-      isShowPage:false,
+      btnName: "",
+      isShowLoad: false,
+      closeStatus: 0,
+      isShowPopup: false,
+      isShowPage: false,
       assetSelected: [],
-      fixedAssetId: "",
+      fixed_asset_id: "",
       tableInfo: Table,
       items: [], // các item hiển thị trên grid
       properties: [], // Danh sách tài sản được hiển thị
@@ -262,34 +333,48 @@ export default {
       totalPage: 0,
       totalRecord: 0,
       pageNumber: 1,
-      isActive: "10",
+      isActive: "20",
       pageDefault: 20,
-      fixedAssets:[],
+      fixedAssets: [],
       page: 1,
       newCode: "",
-      listFixedAsset:[],
-      fixedAsset:{},
+      listFixedAsset: [],
+      fixedAsset: {},
       fixedAssetCategory: [],
-      fixedAssetCategoryCode: "",
-      fixedAssetCategoryId: "",
-      fixedAssetCategoryName: "",
+      fixed_asset_category_code: "",
+      fixed_asset_category_id: "",
+      fixed_asset_category_name: "",
       departments: [],
-      departmentCode: "",
-      departmentId: "",
-      departmentName: "",
-      
+      department_code: "",
+      department_name: "",
+      department_id: "",
+      currentFixedAsset: {},
+      residualValue:0,
+      txtSearch:"",
+
+     
     };
   },
   components: {
     Form,
     Popup,
     Paginate,
-    Load,Combobox
+ 
+    Combobox,
+  },
+  watch: {
+    txtSearch: function () {
+      if (this.txtSearch == "") {
+        this.getPagingAsset();
+      }
+    }
   },
   created() {
-    this.filterEmployee();
+    this.getPagingAsset();
     this.getDepartments();
     this.getCategory();
+
+    // this.residualValue=parseInt(this.fixedAsset.cost) -this.fixedAsset.depreciation_value
   },
   methods: {
     /**
@@ -330,52 +415,34 @@ export default {
         console.log(error);
       }
     },
+  
     /**
-     * lấy thông tin phòng ban
-     * AUTHOR: HTTHOA(28/02/2023)
-     */
-    setDepartment(department) {
-      if (this.disabled) return;
-      for (const item of department) {
-        this.departmentName = item.DepartmentName;
-        this.departmentCode = item.DepartmentCode;
-        this.departmentID = item.DepartmentID;
-        console.log(this.departmentCode);
-      }
-    },
-    /**
-     * lấy thông tin bộ phận
-     * AUTHOR: HTTHOA(28/02/2023)
-     */
-    setCategory(fixedAssetCategory) {
-      if (this.disabled) return;
-      for (const item of fixedAssetCategory) {
-        this.fixedAssetCategoryCode = item.FixedAssetCategoryCode;
-        this.fixedAssetCategoryName = item.FixedAssetCategoryName;
-        this.fixedAssetCategoryId = item.FixedAssetCategoryId;
-      }
-    },
-     /**
      * lấy thông tin phòng ban từ combobox
      * AUTHOR: HTTHOA(28/02/2023)
      */
-     selectItemCbb(value) {
-      this.departmentName = value.DepartmentName;
-      this.fixedAsset.DepartmentCode = value.DepartmentCode;
-      this.fixedAsset.DepartmentName = value.DepartmentName;
-      this.fixedAsset.DepartmentId = value.DepartmentId;
-      console.log(this.fixedAsset.DepartmentCode);
+    selectItemCbb(value) {
+      if (value.department_id) {
+        this.department_id = value.department_id;
+      } else {
+        this.department_id = "";
+      }
+      this.getPagingAsset();
     },
     selectItemCategory(value) {
-      this.fixedAsset.FixedAssetCategoryName = value.FixedAssetCategoryName;
-      this.fixedAsset.FixedAssetCategoryCode = value.FixedAssetCategoryCode;
-      this.fixedAsset.FixedAssetCategoryId = value.FixedAssetCategoryId;
+      console.log(value.fixed_asset_category_id);
+      if (value.fixed_asset_category_id) {
+        this.fixed_asset_category_id = value.fixed_asset_category_id;
+      } else {
+        this.fixed_asset_category_id= "";
+      }
+      this.getPagingAsset();
+      
     },
-     /**
+    /**
      * hiển thị popup
      * AUTHOR: HTTHOA(28/02/2023)
      */
-     showPopup() {
+    showPopup() {
       this.isShowPopup = !this.isShowPopup;
     },
     /**
@@ -389,21 +456,20 @@ export default {
      * nhấn nút xóa
      * AUTHOR: HTTHOA(88/03/2023)
      */
-    onClickDelete(){
-      if(this.listFixedAsset.length <1){
-        this.showPopup(true)
-       this.msgError=ErrorMsg.NotChooseProperty
-       this.closeStatus=2
-       this.btnName=btnPopup.Agree
-      }else{
-        this.showPopup(false)
+    onClickDelete() {
+      if (this.listFixedAsset.length < 1) {
+        this.showPopup(true);
+        this.msgError = ErrorMsg.NotChooseProperty;
+        this.closeStatus = 2;
+        this.btnName = btnPopup.Agree;
+      } else {
+        this.showPopup(false);
       }
-      
     },
     /**
      * tính tổng cột tiền
      */
-     total(array, propName) {
+    total(array, propName) {
       let total = array.reduce((acc, cur) => {
         if (cur[propName]) {
           return acc + cur[propName];
@@ -413,68 +479,67 @@ export default {
       }, 0);
       return total;
     },
+    
     /**
      * hàm click vào số trang
      * AUTHOR: HTTHOA(15/08/2022)
      */
-     clickCallback(pageNum) {
+    clickCallback(pageNum) {
       this.pageNumber = pageNum;
-      this.filterEmployee();
+      this.getPagingAsset();
     },
     /**
      *
      * Hàm lấy ra số bản ghi trên 1 trang hiện lên input
      * AUTHOR: HTTHOA(05/08/2022)
      */
-     getPageDefault(e) {
+    getPageDefault(e) {
       this.isActive = e.target.getAttribute("pageSize");
       this.pageDefault = e.target.getAttribute("pageSize");
       this.showPage(false);
 
-      this.filterEmployee();
+      this.getPagingAsset();
       if (this.pageDefault > this.totalRecord) {
         this.pageDefault = this.totalRecord;
       }
     },
-     /**
+    /**
      * hàm hiện dropup
      * AUTHOR: HTTHOA(06/08/2022)
      */
-     btnDropUp() {
-     
+    btnDropUp() {
       if (!this.isShowPage) {
         this.showPage(true);
-      
       } else {
         this.showPage(false);
-    
       }
     },
     /**
      * lấy số bản ghi trên 1 trang số trang và tìm kiếm trên api
-     * AUTHOR: HTTHOA(11/08/2022)
+     * AUTHOR: HTTHOA(11/03/2023)
      */
-     filterEmployee() {
+    getPagingAsset() {
       try {
-        // const toast = useToast();
-         var me = this;
+        console.log(this.department_id);
+        var me = this;
         // this.showLoading(true);
-        me.isShowLoad=true;
+        me.isShowLoad = true;
         axios
-          .get(`${URL_FixedAssetPaging}?keyword= &pageSize=${this.pageDefault}&pageNumber=${this.pageNumber}`)
+          .get(
+            `${URL_FixedAssetPaging}?keyword=${this.txtSearch}&pageSize=${this.pageDefault}&pageNumber=${this.pageNumber}&departmentId=${this.department_id}&fixedAssetcategory=${this.fixed_asset_category_id}`
+          )
           .then(function (res) {
-            me.isShowLoad=false
+            me.isShowLoad = false;
             me.totalPage = res.data.TotalPages;
             me.totalRecord = res.data.TotalRecords;
             me.fixedAssets = res.data.Data;
             console.log(me.fixedAssets);
             for (const item of res.data.Data) {
-              console.log(item.Cost);
-              item.Cost = this.formatMoney(item.Cost);
+              me.residualValue= me.residualValue+(item.cost-item.depreciation_value)
+             
             }
-           
           })
-          
+         
           .catch(function () {
             console.log(1);
           });
@@ -485,49 +550,25 @@ export default {
     /*
     lấy mã mới 
     */
-    getMaxCode(){
+    getMaxCode() {
       try {
-        axios
-          .get("https://localhost:44371/api/FixedAsset/NewCode")
-          .then((res) => {
-            this.newCode=res.data
+        axios.get(`${URL_GetNewCode}`).then((res) => {
+          this.newCode = res.data;
           console.log(res.data);
-          });
+        });
       } catch (error) {
         console.log(error);
       }
     },
-     /**
+    /**
      *
      * hiển thị paging
      *  AUTHOR: HTTHOA(05/08/2022)
      */
-     showPage(is) {
+    showPage(is) {
       this.isShowPage = is;
     },
 
-    /**
-     * xử lý check box
-     * AUTHOR: HTTHOA(28/02/2023)
-     */
-    check(asset) {
-      this.listFixedAsset=[]
-      var listCheck = this.$refs.checkbox;
-      var rowCheck = this.$refs.rowCheck;
-
-      for (var i = 0; i < listCheck.length; i++) {
-        if (listCheck[i].checked == true) {
-          rowCheck[i].classList.add("rowActive");
-          this.listFixedAsset.push(asset.FixedAssetId)
-        } else {
-          rowCheck[i].classList.remove("rowActive");
-          this.$refs.checkall.checked = false;
-          
-        }
-      }
-      console.log(listCheck.length);
-      console.log(this.listFixedAsset.length);
-    },
     /**
      * xử lý checkall
      * AUTHOR: HTTHOA(28/02/2023)
@@ -548,7 +589,7 @@ export default {
         }
       }
     },
-   
+
     /**
      * hiển thị form
      * AUTHOR: HTTHOA(28/02/2023)
@@ -556,10 +597,10 @@ export default {
     btnAddOnclick() {
       this.formode = FormDetailMode.Add;
       this.name = TitlePopup.Add;
-      this.showForm()
+      this.showForm();
       this.getMaxCode();
     },
-    showForm(){
+    showForm() {
       this.isShow = true;
     },
     /**
@@ -568,6 +609,7 @@ export default {
      */
     closeForm() {
       this.isShow = false;
+      
     },
     hideForm(value) {
       this.isShow = value;
@@ -581,23 +623,26 @@ export default {
       this.name = TitlePopup.Edit;
       this.isShow = true;
       this.assetSelected = asset;
-      this.fixedAssetId = asset.FixedAssetId;
+      this.fixed_asset_id = asset.fixed_asset_id;
       console.log(asset);
     },
     /**
      * hiển thị form nhân bản
      * AUTHOR: HTTHOA(28/02/2023)
      */
-    showDuplicate() {
+    showDuplicate(asset) {
       this.formode = FormDetailMode.Replication;
       this.name = TitlePopup.Replication;
-      this.isShow = true;
+      this.isShow = true;  
+      this.assetSelected = asset;
+      this.fixed_asset_id = asset.fixed_asset_id;
+      this.getMaxCode();
     },
     /**
      * format tiền
      * AUTHOR: HTTHOA(28/02/2023)
      */
-     formatMoney(money) {
+    formatMoney(money) {
       if (!isNaN(money)) {
         var moneyInt = parseInt(money);
         return moneyInt
@@ -609,19 +654,19 @@ export default {
     },
     selectItemToList(asset) {
       try {
-        this.currentProperty = asset;
+        this.currentFixedAsset = asset;
 
-        if (!this.selectedProperties.includes(asset)) {
+        if (!this.listFixedAsset.includes(asset)) {
           //thực hiện chọn
-          this.selectedProperties.push(asset);
+          this.listFixedAsset.push(asset);
         } else {
           //thực hiện bỏ chọn
-          this.selectedProperties = this.selectedProperties.filter((a) => {
+          this.listFixedAsset = this.listFixedAsset.filter((a) => {
             return a !== asset;
           });
 
-          this.currentProperty =
-            this.selectedProperties[this.selectedProperties.length - 1];
+          this.currentFixedAsset =
+            this.listFixedAsset[this.listFixedAsset.length - 1];
         }
       } catch (err) {
         console.log(err);
@@ -631,10 +676,10 @@ export default {
      * hàm chọn 1 item
      * AUTHOR: HTTHOA(28/02/2023)
      */
-    selectItem(property) {
-      this.selectedProperties = [];
-      this.selectedProperties.push(property);
-      this.currentProperty = property;
+    selectItem(asset) {
+      this.listFixedAsset = [];
+      this.listFixedAsset.push(asset);
+      this.currentFixedAsset = asset;
     },
     /**
      * hàm chọn tất cả item
@@ -642,13 +687,110 @@ export default {
      */
     selectedAllItem() {
       try {
-        if (this.selectedProperties.length < this.properties.length) {
-          this.selectedProperties = this.properties;
+        if (this.listFixedAsset.length < this.fixedAssets.length) {
+          this.listFixedAsset = this.fixedAssets;
         } else {
-          this.selectedProperties = [];
+          this.listFixedAsset = [];
         }
       } catch (err) {
         console.log(err);
+      }
+    },
+    // onClickDelete1(asset) {
+    //   this.currentProperty = asset;
+    //   if (this.currentProperty.status === 1) {
+
+    //   } else {
+    //     this.isShowDelete1Item = true;
+
+    //   }
+    //   this.isShowFormConfirm = true;
+    // },
+    deleteOne(id) {
+      try {
+        const toast = useToast();
+        console.log(id);
+        axios
+          .delete(`${URL_FixedAssetsPut}${id}`)
+          .then(function () {
+            toast.warning(Msg.DeleteSucces, { timeout: 2000 });
+          })
+          .catch(function () {
+            toast.error(Msg.DeleteError, { timeout: 2000 });
+          });
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    deleteMultiple() {
+      try {
+        const toast = useToast();
+        let listFixedAssettyID = [];
+
+        this.listFixedAsset.filter((asset) => {
+          listFixedAssettyID.push(asset.fixed_asset_id);
+        });
+
+        axios({
+          url: `${URL_DELETE}`,
+          method: "delete",
+          data: listFixedAssettyID,
+        })
+          // axios
+          //   .delete(
+          //     `${URL_DELETE}`,listFixedAssettyID
+          //   )
+          .then(function () {
+            toast.warning(Msg.DeleteSucces, { timeout: 2000 });
+          })
+          .catch(function () {
+            toast.error(Msg.DeleteError, { timeout: 2000 });
+          });
+      } catch (error) {
+        console.log(error);
+      }
+    },
+
+    onClickDeleteMultiple() {
+      try {
+        // kiểm tra danh sách được chọn có bao nhiêu bản ghi và hiển thị thông báo
+
+        if (this.listFixedAsset.length == 0) {
+          this.showPopup(true);
+          this.msgDelete = ErrorMsg.NotChooseProperty;
+          this.closeStatus = 2;
+          this.btnName = btnPopup.Agree;
+        } else if (this.listFixedAsset.length == 1) {
+          console.log(this.listFixedAsset[0].fixed_asset_id);
+          //hiển thị confirm
+          //nút confirm
+          this.showPopup(true);
+          this.msgDelete = NoticeMsg.ConfirmDelet;
+          this.closeStatus = 4;
+          this.btnName = btnPopup.delete;
+          this.itemDelete = this.listFixedAsset[0].fixed_asset_code;
+        } else {
+          this.showPopup(true);
+          this.itemDelete = this.listFixedAsset.length + " tài sản";
+          this.msgDelete = NoticeMsg.ConfirmDelet;
+          this.closeStatus = 3;
+          this.btnName = btnPopup.delete;
+        }
+        console.log(this.listFixedAsset);
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    deleted(value) {
+      console.log(value);
+      console.log(this.listFixedAsset.length);
+
+      if (this.listFixedAsset.length == 1) {
+        var id = this.listFixedAsset[0].fixed_asset_id;
+        console.log(id);
+        this.deleteOne(id);
+      } else {
+        this.deleteMultiple();
       }
     },
   },
@@ -658,9 +800,9 @@ export default {
 .pagination {
   display: flex;
   color: #000;
-  margin-left: 100px;
+  margin-left: 0px;
+  padding: 0 !important;
 }
-
 
 .act {
   background-color: green;
@@ -674,11 +816,11 @@ export default {
 .page-item:first-child {
   margin-right: 15px;
   font-size: 20px;
-  color: #727272
+  color: #727272;
 }
-.page-item:last-child{
+.page-item:last-child {
   font-size: 20px;
-  color: #727272
+  color: #727272;
 }
 
 .page-item {
@@ -693,15 +835,13 @@ export default {
 }
 
 li.page-item.disabled {
-    color: #bbb;
+  color: #bbb;
 }
 .page-item.active {
-
   font-weight: 900;
   text-align: center;
   background-color: #eeeaea;
   color: #000;
-
 }
 
 .page-item.active a {
@@ -714,25 +854,25 @@ li.page-item.disabled {
 }
 
 .act {
-  background-color: rgba(26, 164, 200, 0.2) ;
+  background-color: rgba(26, 164, 200, 0.2);
   color: #111;
 }
-.rowActive {
+.active {
   background-color: rgba(4, 137, 170, 0.2);
 }
 .item-dropup {
   padding: 10px;
 }
 .item-up {
-    position: absolute;
-    background-color: #fff;
-    margin-left: -2px;
-    margin-top: -205px;
-    width: 60px;
-    border: 1px solid #bbb;
-    /* display: none; */
+  position: absolute;
+  background-color: #fff;
+  margin-left: -2px;
+  margin-top: -205px;
+  width: 60px;
+  border: 1px solid #bbb;
+  /* display: none; */
 }
-.item-dropup{
+.item-dropup {
   display: flex;
   justify-content: center;
 }
@@ -750,7 +890,6 @@ li.page-item.disabled {
 .paging-right {
   display: flex;
   margin-right: 24px;
-  
 }
 .paging-right select {
   min-width: 170px;
@@ -778,7 +917,7 @@ li.page-item.disabled {
   background-color: #fff;
   border: 1px solid #bbb;
 }
-.page{
+.page {
   position: relative;
   color: #111;
 }
@@ -793,19 +932,18 @@ li.page-item.disabled {
   margin-top: 10px;
 }
 .content-page {
-    width: 60px;
-    border: 1px solid;
-    height: 30px;
-    display: flex;
-    justify-content:flex-start;
-    align-items: center;
-    padding-left: 10px;
-    box-sizing: border-box;
-       
+  width: 60px;
+  border: 1px solid;
+  height: 30px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding-left: 10px;
+  box-sizing: border-box;
 }
 .page .icon.icon-down-bold {
-    position: absolute;
-    top: 14px;
-    right: 10px;
+  position: absolute;
+  top: 14px;
+  right: 0;
 }
 </style>

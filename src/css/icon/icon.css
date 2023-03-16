@@ -182,6 +182,7 @@
   background: url("../../assets/icon/qlts-icon.svg") no-repeat -72px -338px;
   width: 8px;
   height: 5px;
+  cursor: pointer;
 }
 
 .icon-notify {
@@ -280,7 +281,7 @@
   height: 18px;
 }
 
-.icon-duplicate {
+.icon-replicate {
   background: url("../../assets/icon/qlts-icon.svg") no-repeat -244px -112px;
   width: 16px;
   height: 16px;
@@ -311,4 +312,9 @@
   background: url('../../assets/icon/icons8-spinner1.gif');
   width: 40px;
   height: 40px;
+}
+.tick {
+	background: url("../../assets/icon/qlts-icon.svg") no-repeat -160px -424px;
+	width: 11px;
+	height: 8px;
 }

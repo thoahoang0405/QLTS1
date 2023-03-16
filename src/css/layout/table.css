@@ -100,6 +100,25 @@
   background-color: #f5f3f3;
   outline: none;
 }
+.icon-edit, .icon-replicate{
+  position: relative;
+}
+.icon-edit:hover .tooltip,
+.icon-replicate:hover .tooltip{
+  display:inline-block;
+}
+.icon-replicate .tooltip,
+.icon-edit .tooltip{
+ 
+  padding: 4px 12px;
+  background-color: #fff;
+  color: #000;
+  position: absolute;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+  opacity: 1;
+  top: 22px;
+ display:none;
+}
 .tooltip-excel,
 .tooltip-delete {
   padding: 4px 10px;
@@ -152,9 +171,14 @@
   border: 1px solid #afafaf;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.16);
   width: 100%;
-  height: calc(100% - 50px);
+ 
   overflow: hidden;
   margin-top: 16px;
+  overflow-x: none;
+}
+div#table\ {
+  /* height: 565px; */
+  height: calc(100% - 34px);
 }
 
 .table {
@@ -162,7 +186,7 @@
   height: 100%;
   overflow-y: scroll;
   width: 100%;
-
+  padding: 0;
   overflow-x: scroll;
 }
 .table::-webkit-scrollbar {
@@ -179,14 +203,16 @@
 table {
   border-collapse: collapse;
   width: 100%;
-  height: 100%;
+  /* height: 100%; */
 }
 
 table:focus {
   border: none;
   outline: none;
 }
-
+tbody{
+ height: calc(100% - 90px);
+}
 table tr {
   height: 40px;
   max-height: 40px;
@@ -213,10 +239,14 @@ tr .stt:hover .tooltip-stt {
 table thead tr {
   height: 38px;
 }
-
+td{
+  height: 40px;
+  box-sizing: border-box;
+}
 table td,
 table th {
   padding: 0 10px;
+
 }
 
 table td:first-child,
@@ -315,13 +345,13 @@ input[type="checkbox"] {
   border: none;
 }
 .tb-footer-left {
+
   display: flex;
   /* margin-bottom: 12px; */
   align-items: center;
+  padding-top: 3px;
 }
-.total-record {
-  width: 150px;
-}
+
 .paging-combobox {
   border-radius: 2.625px;
   padding: 10px 13px;
@@ -359,4 +389,88 @@ input.page {
  
   align-items: center;
   /* margin-right: 90px; */
+}
+#table-ft {
+  background-color: #ffffff;
+  border-radius: 3.5px;
+  
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.16);
+  width: 100%;
+  height: 45px;
+  overflow: hidden;
+  margin-top: 16px;
+  position: sticky;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  z-index: 10;
+  background-color: #edeaff;
+  box-sizing: border-box;
+  align-items: center;
+ 
+}
+
+.table-ft {
+  background-color: #fff;
+ 
+ padding: 0;
+ 
+  height: 45px;
+  width: 100%;
+
+ 
+}
+.table-ft::-webkit-scrollbar {
+  width: 2px;
+  height: 5px;
+  border-top: 1px solid #e2e2e2;
+}
+
+.table-ft::-webkit-scrollbar-thumb {
+  border-radius: 2px;
+  background-color: #ccc;
+}
+
+.table-ft table {
+  border-collapse: collapse;
+  width: 100%;
+  height: 100%;
+}
+
+.table-ft table:focus {
+  border: none;
+  outline: none;
+}
+.table-ft table td{
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+.table-footer {
+  padding: 0;
+}
+/* .table-footer  td, table th{
+  padding: 0;
+}
+.table-footer table td:first-child, table th:first-child{
+padding-left: 0 ;
+} */
+.tb-footer:hover{
+  background-color: #fff !important ;
+}
+.tb-footer{
+ position: sticky;
+  bottom: 0;
+  left:0;
+  right: 0; 
+   background-color: #fff;
+   z-index: 2;
+ 
+}
+.total-price , .total-count{
+  
+  box-sizing: border-box;
+  display: flex;
+  justify-content: flex-end;
+                
 }
