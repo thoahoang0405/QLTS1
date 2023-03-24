@@ -22,7 +22,7 @@ export const Msg={
 }
 export const NoticeMsg = {
   PropertyEdited:
-    "Thông tin tài sản đã được thay đổi. Bạn có muốn lưu thông tin thay đôi này?",
+    "Thông tin tài sản đã được thay đổi. Bạn có muốn lưu thông tin thay đổi này?",
     ConfirmDelet: " được chọn, bạn có chắc chắn muốn xóa không?",
   
 };
@@ -38,4 +38,8 @@ export const btnPopup= {
   cancel: "Hủy",
   delete:"Xóa",
   no:"Không"
+};
+export const PlaceHolder={
+  PlaceHolderDepartment:"Nhập tên phòng ban",
+  PlaceHolderCategory:"Nhập tên loại tài sản"
 }

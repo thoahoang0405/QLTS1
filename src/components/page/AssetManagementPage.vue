@@ -1,5 +1,5 @@
 <template>
-  <div class="body">
+  <div class="body" >
     <div class="body-header">
       <div class="row-input">
         <div class="input">
@@ -18,6 +18,8 @@
           :fieldName="'department_name'"
           :value="fixedAsset.department_name"
           @selectedItem="selectItemCbb"
+          @keyword="keywordDepartment"
+          :placeholder="place.PlaceHolderDepartment"
         ></Combobox>
       
         <Combobox
@@ -27,6 +29,8 @@
           @selectedItem="selectItemCategory"
           :value="fixedAsset.fixed_asset_category_name"
           refName="'fixed_asset_category_code'"
+          @keyword="keywordCateGo"
+          :placeholder="place.PlaceHolderCategory"
         ></Combobox>
       </div>
       <div class="button-function">
@@ -62,38 +66,38 @@
                 />
               </th>
 
-              <th class="stt">
+              <th  class="stt">
                 {{ tableInfo.numeric }}
                 <div class="tooltip-stt">{{ tableInfo.numericTooltip }}</div>
               </th>
 
-              <th>{{ tableInfo.fixed_asset_code }}</th>
-              <th>{{ tableInfo.fixed_asset_name }}</th>
-              <th>{{ tableInfo.fixed_asset_category_name }}</th>
-              <th>{{ tableInfo.department_name }}</th>
-              <th>{{ tableInfo.quantity }}</th>
-              <th class="text-right">{{ tableInfo.cost }}</th>
-              <th class="text-right kh">
+              <th >{{ tableInfo.fixed_asset_code }}</th>
+              <th >{{ tableInfo.fixed_asset_name }}</th>
+              <th >{{ tableInfo.fixed_asset_category_name }}</th>
+              <th >{{ tableInfo.department_name }}</th>
+              <th class="text-right">{{ tableInfo.quantity }}</th>
+              <th  class="text-right">{{ tableInfo.cost }}</th>
+              <th  class="text-right kh">
                 {{ tableInfo.depreciation }}
                 <div class="tooltip-kh">
                   {{ tableInfo.depreciationTooltip }}
                 </div>
               </th>
-              <th class="text-right">{{ tableInfo.residualValue }}</th>
+              <th  class="text-right">{{ tableInfo.residualValue }}</th>
               <th>{{ tableInfo.function }}</th>
             </tr>
           </thead>
           <tbody>
-            <tr
+            <tr 
               ref="rowCheck"
               :class="listFixedAsset.includes(asset) ? 'active' : ''"
               v-for="(asset, index) of fixedAssets"
               :key="asset.fixed_asset_id"
-              @click.prevent.exact="selectItemToList(asset)"
+           
               @dblclick="showFormEdit(asset)"
               style="max-height: 38px; box-sizing: border-box;"
             >
-              <td class="text-center">
+              <td style="min-Width: 47px; max-Width: 47px; box-sizing: border-box;"  class="text-center">
                 <input
                   type="checkbox"
                   ref="checkbox"
@@ -101,22 +105,22 @@
                   @click="selectItemToList(asset)"
                 />
               </td>
-              <td class="text-center">{{ index + 1 }}</td>
-              <td>{{ asset.fixed_asset_code }}</td>
-              <td>{{ asset.fixed_asset_name }}</td>
-              <td>{{ asset.fixed_asset_category_name }}</td>
-              <td>{{ asset.department_name }}</td>
-              <td class="text-right">{{ asset.quantity }}</td>
-              <td class="text-right">{{ formatMoney(asset.cost) }}</td>
-              <td class="text-right">{{ formatMoney(asset.depreciation_value) }}</td>
-              <td class="text-right">{{ formatMoney(asset.cost-asset.depreciation_value) }}</td>
-              <td>
+              <td style="min-Width: 45px; max-Width: 45px; box-sizing: border-box;" class="text-center">{{ index + 1 }}</td>
+              <td style="min-Width: 82px; max-Width: 82px;box-sizing: border-box;">{{ asset.fixed_asset_code }}</td>
+              <td style="min-Width: 130px; max-Width: 130px; box-sizing: border-box;">{{ asset.fixed_asset_name }}</td>
+              <td style="max-width: 148px !important; min-width: 148px !important; box-sizing: border-box;">{{ asset.fixed_asset_category_name }}</td>
+              <td style="max-width: 148px !important; min-width: 148px !important;  box-sizing: border-box;">{{ asset.department_name }}</td>
+              <td style="min-Width: 79px;  max-Width: 79px; box-sizing: border-box;" class="text-right">{{ asset.quantity }}</td>
+              <td  style="min-Width: 105px; max-Width: 105px; box-sizing: border-box;" class="text-right">{{ formatMoney(asset.cost) }}</td>
+              <td style="min-Width: 104px; max-Width: 104px;box-sizing: border-box;" class="text-right">{{ formatMoney(asset.depreciation_value) }}</td>
+              <td style="min-Width: 104px; max-Width: 104px; box-sizing: border-box;" class="text-right">{{ formatMoney(asset.cost-asset.depreciation_value) }}</td>
+              <td style="min-Width: 90px; max-Width: 90px; box-sizing: border-box;">
                 <div class="function-table">
                   <div class="icon icon-edit" @click="showFormEdit(asset)">
                     <div class="tooltip">Sửa</div>
                   </div>
-                  <div class="icon icon-replicate" @click="showDuplicate(asset)">
-                    <div class="tooltip">Xóa</div>
+                  <div class="icon icon-replicate" @click="showReplication(asset)">
+                    <div class="tooltip">Nhân bản</div>
                   </div>
                 </div>
               </td>
@@ -124,25 +128,27 @@
             
            
           </tbody>
-          <tfoot>
-             <tr class="tb-footer">
-              <td colspan="3">
+        <tfoot>
+           <tr class="tb-footer" style="background: #ffff;">
+              <td colspan="3" style="min-Width: 176px; max-Width: 176px; box-sizing: border-box;" >
                 <div>
                   <div class="total-record">
                     Tổng số: <strong>{{ totalRecord }}</strong> bản ghi
                   </div>
                 </div>
               </td>
-              <td colspan="1">
+              <td colspan="1" style="min-Width: 130px; max-Width: 130px; box-sizing: border-box;">
                 <div style="margin-right: 0px; box-sizing: border-box">
                   <div class="page">
-                    <div style="position: relative; width: 50px">
+                    <div style="position: relative; ">
                       <div class="content-page">
                         {{ pageDefault }}
                       </div>
-                      <div class="icon icon-down-bold" @click="btnDropUp"></div>
+                      <div class="icon icon-down-bold" @click="btnDropUp">
+                    
+                      </div>
+                    
                     </div>
-
                     <div class="dropup-page">
                       <div class="item-up" v-show="isShowPage">
                         <div
@@ -188,15 +194,16 @@
                         </div>
                       </div>
                     </div>
+                   
                   </div>
                 </div>
-              </td>
-              <td colspan="2">
-                <div>
+              </td >
+              <td  colspan="2" style="max-width: 280px !important; min-width: 280px !important; box-sizing: border-box;">
+                <div >
                   <Paginate
-                    v-model="page"
+                    v-model="pageNumber"
                     :page-count="totalPage"
-                    :page-range="2"
+                    :page-range="3"
                     :margin-pages="1"
                     :click-handler="clickCallback"
                     :prev-link-class="'page-link'"
@@ -211,7 +218,7 @@
                   </Paginate>
                 </div>
               </td>
-              <td colspan="1">
+              <td colspan="1" class="text-right" style="min-Width: 79px;  max-Width: 79px;  box-sizing: border-box;">
                 <div
                   class="total-count"
                   
@@ -221,7 +228,7 @@
                   }}</strong>
                 </div>
               </td>
-              <td colspan="1">
+              <td colspan="1" class="text-right" style="min-Width: 105px; max-Width: 105px; box-sizing: border-box;">
                 <div
                   class="total-price"
                 
@@ -229,15 +236,15 @@
                   <strong>{{ formatMoney(total(fixedAssets, "cost")) }}</strong>
                 </div>
               </td>
-              <td colspan="1">
+              <td colspan="1" class="text-right" style="min-Width: 104px; max-Width: 104px;box-sizing: border-box;" >
                 <div
                   class="total-price"
                   
                 >
-                  <strong>{{ formatMoney(total(fixedAssets, "depreciation_value")) }}</strong>
+                  <strong>{{ formatMoney(depre) }}</strong>
                 </div>
               </td>
-              <td colspan="1">
+              <td colspan="1" class="text-right" style="min-Width: 104px; max-Width: 104px;box-sizing: border-box;">
                 <div
                   class="total-price"
                   
@@ -245,29 +252,36 @@
                   <strong>{{ formatMoney(residualValue) }}</strong>
                 </div>
               </td>
-              <td colspan="1"></td>
+              <td colspan="1" style="min-Width: 90px; max-Width: 90px;box-sizing: border-box;">
+                
+              </td>
             </tr>
-          </tfoot>
+        </tfoot>
         </table>
       </div>
      
         
     </div>
+  
+        
+ 
   </div>
 
   <Form
     :formName="name"
-    v-show="isShow"
+    v-if="isShow"
     @close="hideForm"
     :fixedAssetDetail="assetSelected"
     :fixedAssetIdSelected="fixed_asset_id"
     :newCodeForm="newCode"
     :FormMode="formode"
+    @loadData="loadData"
   ></Form>
   <Popup
     v-show="isShowPopup"
     @hidePopup="hidePopup"
     :msg="msgDelete"
+    @loadData="loadData"
     :name="btnName"
     :close="closeStatus"
     @isDelete="deleted"
@@ -292,7 +306,7 @@ import {
   btnPopup,
   TitlePopup,
   NoticeMsg,
-  Msg,
+  Msg,PlaceHolder
 } from "../../js/common/resource";
 import { useToast } from "vue-toastification";
 import { FormDetailMode } from "../../js/common/enumeration";
@@ -309,7 +323,8 @@ export default {
     return {
       itemDelete: "",
       isDeleted: 0,
-     
+     keywordDep:"",
+     keywordCate:"",
       numeric: 0,
       employee: [],
       msgError: "",
@@ -336,7 +351,7 @@ export default {
       isActive: "20",
       pageDefault: 20,
       fixedAssets: [],
-      page: 1,
+      place: PlaceHolder,
       newCode: "",
       listFixedAsset: [],
       fixedAsset: {},
@@ -351,7 +366,9 @@ export default {
       currentFixedAsset: {},
       residualValue:0,
       txtSearch:"",
-
+      depre:0,
+      placeholderName:""
+      
      
     };
   },
@@ -367,7 +384,27 @@ export default {
       if (this.txtSearch == "") {
         this.getPagingAsset();
       }
-    }
+    },
+    department_id: function(){
+      if (this.department_id == "") {
+        this.getPagingAsset();
+      }
+
+    },
+    fixed_asset_category_id: function(){
+      if (this.fixed_asset_category_id == "") {
+        this.getPagingAsset();
+      }
+    },
+    fixedAsset: function(){
+      if (this.fixedAsset.department_id == "") {
+        this.getPagingAsset();
+      }
+      if (this.fixedAsset.fixed_asset_category_id == "") {
+        this.getPagingAsset();
+      }
+    },
+   
   },
   created() {
     this.getPagingAsset();
@@ -377,6 +414,24 @@ export default {
     // this.residualValue=parseInt(this.fixedAsset.cost) -this.fixedAsset.depreciation_value
   },
   methods: {
+    keywordDepartment(value){
+    this.keywordDep=value
+     
+    if(this.keywordDep== ""){
+     
+       this.department_id = " ";
+        this.getPagingAsset();
+      }
+    },
+    keywordCateGo(value){
+    this.keywordCate=value
+     
+    if(this.keywordCate== ""){
+    
+       this.fixed_asset_category_id = " ";
+        this.getPagingAsset();
+      }
+    },
     /**
      * lấy thông tin phòng ban
      * AUTHOR: HTTHOA(28/02/2023)
@@ -421,21 +476,28 @@ export default {
      * AUTHOR: HTTHOA(28/02/2023)
      */
     selectItemCbb(value) {
+      console.log(value.department_name);
       if (value.department_id) {
         this.department_id = value.department_id;
       } else {
         this.department_id = "";
+        this.getPagingAsset();
       }
       this.getPagingAsset();
+     
     },
     selectItemCategory(value) {
       console.log(value.fixed_asset_category_id);
       if (value.fixed_asset_category_id) {
         this.fixed_asset_category_id = value.fixed_asset_category_id;
+        
       } else {
         this.fixed_asset_category_id= "";
+        this.getPagingAsset();
       }
       this.getPagingAsset();
+     
+      
       
     },
     /**
@@ -451,6 +513,9 @@ export default {
      */
     hidePopup(value) {
       this.isShowPopup = value;
+      this.assetSelected={}
+      this.listFixedAsset=[]
+    
     },
     /**
      * nhấn nút xóa
@@ -520,23 +585,28 @@ export default {
      */
     getPagingAsset() {
       try {
-        console.log(this.department_id);
+      
         var me = this;
+        me.depre=0;
+        me.residualValue=0;
         // this.showLoading(true);
         me.isShowLoad = true;
         axios
           .get(
-            `${URL_FixedAssetPaging}?keyword=${this.txtSearch}&pageSize=${this.pageDefault}&pageNumber=${this.pageNumber}&departmentId=${this.department_id}&fixedAssetcategory=${this.fixed_asset_category_id}`
+            `${URL_FixedAssetPaging}?keyword=${this.txtSearch}&pageSize=${this.pageDefault}&departmentID=${this.department_id}&fixedAssetCategoryID=${this.fixed_asset_category_id}&pageNumber=${this.pageNumber}`
           )
           .then(function (res) {
+           
             me.isShowLoad = false;
             me.totalPage = res.data.TotalPages;
             me.totalRecord = res.data.TotalRecords;
             me.fixedAssets = res.data.Data;
+            me.listFixedAsset=[];
             console.log(me.fixedAssets);
             for (const item of res.data.Data) {
-              me.residualValue= me.residualValue+(item.cost-item.depreciation_value)
-             
+              me.depre=me.depre+(item.depreciation_value*item.life_time)
+              me.residualValue= me.residualValue+(item.cost - me.depre)
+            
             }
           })
          
@@ -546,6 +616,9 @@ export default {
       } catch (error) {
         console.log(error);
       }
+    },
+    loadData(){
+      this.getPagingAsset()
     },
     /*
     lấy mã mới 
@@ -597,8 +670,10 @@ export default {
     btnAddOnclick() {
       this.formode = FormDetailMode.Add;
       this.name = TitlePopup.Add;
+      // this.getMaxCode();
       this.showForm();
-      this.getMaxCode();
+      // this.assetSelected={}
+     
     },
     showForm() {
       this.isShow = true;
@@ -609,10 +684,14 @@ export default {
      */
     closeForm() {
       this.isShow = false;
+        // this.assetSelected={}
+      this.loadData();
       
     },
     hideForm(value) {
       this.isShow = value;
+      // this.assetSelected={}
+      this.loadData();
     },
     /**
      * hiển thị form chỉnh sửa
@@ -624,19 +703,20 @@ export default {
       this.isShow = true;
       this.assetSelected = asset;
       this.fixed_asset_id = asset.fixed_asset_id;
-      console.log(asset);
+     
     },
     /**
      * hiển thị form nhân bản
      * AUTHOR: HTTHOA(28/02/2023)
      */
-    showDuplicate(asset) {
+    showReplication(asset) {
       this.formode = FormDetailMode.Replication;
-      this.name = TitlePopup.Replication;
+      this.name = TitlePopup.Replication;   
+      // this.getMaxCode();
       this.isShow = true;  
       this.assetSelected = asset;
       this.fixed_asset_id = asset.fixed_asset_id;
-      this.getMaxCode();
+      
     },
     /**
      * format tiền
@@ -696,24 +776,18 @@ export default {
         console.log(err);
       }
     },
-    // onClickDelete1(asset) {
-    //   this.currentProperty = asset;
-    //   if (this.currentProperty.status === 1) {
-
-    //   } else {
-    //     this.isShowDelete1Item = true;
-
-    //   }
-    //   this.isShowFormConfirm = true;
-    // },
+    
+   
     deleteOne(id) {
       try {
         const toast = useToast();
         console.log(id);
+        var me=this
         axios
           .delete(`${URL_FixedAssetsPut}${id}`)
           .then(function () {
-            toast.warning(Msg.DeleteSucces, { timeout: 2000 });
+            toast.success(Msg.DeleteSucces, { timeout: 2000 });          
+            me.getPagingAsset()
           })
           .catch(function () {
             toast.error(Msg.DeleteError, { timeout: 2000 });
@@ -726,8 +800,8 @@ export default {
       try {
         const toast = useToast();
         let listFixedAssettyID = [];
-
-        this.listFixedAsset.filter((asset) => {
+        var me=this
+        me.listFixedAsset.filter((asset) => {
           listFixedAssettyID.push(asset.fixed_asset_id);
         });
 
@@ -736,12 +810,11 @@ export default {
           method: "delete",
           data: listFixedAssettyID,
         })
-          // axios
-          //   .delete(
-          //     `${URL_DELETE}`,listFixedAssettyID
-          //   )
-          .then(function () {
-            toast.warning(Msg.DeleteSucces, { timeout: 2000 });
+          
+          .then(function(res) {
+            console.log(res.data);
+            toast.success(Msg.DeleteSucces, { timeout: 2000 });
+            me.getPagingAsset()
           })
           .catch(function () {
             toast.error(Msg.DeleteError, { timeout: 2000 });
@@ -783,6 +856,7 @@ export default {
     },
     deleted(value) {
       console.log(value);
+      this.isShowPopup = value;
       console.log(this.listFixedAsset.length);
 
       if (this.listFixedAsset.length == 1) {
@@ -802,8 +876,12 @@ export default {
   color: #000;
   margin-left: 0px;
   padding: 0 !important;
+  box-sizing: border-box;
+  width: 200px;
 }
-
+.page-link{
+  margin: 5px;
+}
 .act {
   background-color: green;
   color: #fff;
@@ -814,7 +892,7 @@ export default {
 }
 
 .page-item:first-child {
-  margin-right: 15px;
+ 
   font-size: 20px;
   color: #727272;
 }
@@ -824,28 +902,29 @@ export default {
 }
 
 .page-item {
-  margin-left: 10px;
-  width: 24px;
-  height: 24px;
+  margin: 5px;
+  width: 20px;
+  height: 20px;
   display: flex;
   align-items: center;
   text-align: center;
   cursor: pointer;
   padding: 0;
+  justify-content: center;
 }
 
 li.page-item.disabled {
   color: #bbb;
 }
 .page-item.active {
-  font-weight: 900;
+  font-weight: 700;
   text-align: center;
   background-color: #eeeaea;
   color: #000;
 }
 
 .page-item.active a {
-  width: 24px;
+  width: 20px;
   text-align: center;
 }
 
@@ -863,15 +942,24 @@ li.page-item.disabled {
 .item-dropup {
   padding: 10px;
 }
-.item-up {
+.item-up{
   position: absolute;
   background-color: #fff;
   margin-left: -2px;
   margin-top: -205px;
   width: 60px;
+  z-index: 10;
   border: 1px solid #bbb;
-  /* display: none; */
 }
+/* .item-up {
+  position: absolute;
+  background-color: #fff;
+  margin-left: -2px;
+  margin-top: -205px;
+  width: 60px;
+  z-index: 10;
+  border: 1px solid #bbb;
+} */
 .item-dropup {
   display: flex;
   justify-content: center;
@@ -942,8 +1030,8 @@ li.page-item.disabled {
   box-sizing: border-box;
 }
 .page .icon.icon-down-bold {
-  position: absolute;
-  top: 14px;
-  right: 0;
+    position: absolute;
+    top: 14px;
+    right: 81px;
 }
 </style>

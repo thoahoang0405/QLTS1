@@ -190,6 +190,7 @@ export default {
   },
   created() {
     // this.placeholder = this.label;
+    this.keyword = this.value;
   },
   watch: {
     Filter: function(value){
@@ -205,8 +206,9 @@ export default {
     },
     
     keyword() {
-      if (this.keyword != this.currentItem[this.fieldCode]) {
-        // this.isShowCbb = true;
+      console.log(this.keyword);
+      if (this.keyword == "" ){
+        this.$emit("key", this.keyword)
       } else if (this.keyword) {
         // this.isShowCbb=!this.isShowCbb
         this.dataItems.forEach((item) => {

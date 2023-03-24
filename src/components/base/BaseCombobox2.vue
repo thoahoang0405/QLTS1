@@ -77,16 +77,17 @@
       value: {
         type: String,
       },
-      Filter: {
-        type: Int16Array,
-      },
+      
+      placeholder:{
+type:String,
+      }
   
     },
     data() {
       return {
         currentItem: {}, // item hiện tại
         isShowCbb: false, // show drop-down
-        placeholder: "Nhập giá trị ", // playholder
+        // placeholder: "Nhập giá trị ", // playholder
         dataItems: [],
         keyword: "",
         i: -1,

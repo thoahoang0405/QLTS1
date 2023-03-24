@@ -117,6 +117,7 @@
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
   opacity: 1;
   top: 22px;
+  right: 0px;
  display:none;
 }
 .tooltip-excel,
@@ -170,15 +171,27 @@
   border-radius: 3.5px;
   border: 1px solid #afafaf;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.16);
-  width: 100%;
- 
-  overflow: hidden;
+  max-width: 1100px;
+  overflow-x: hidden;
+  overflow-y: auto;
   margin-top: 16px;
-  overflow-x: none;
+
 }
 div#table\ {
   /* height: 565px; */
-  height: calc(100% - 34px);
+  height: calc(100% - 35px);
+
+}
+.table2 table tr{
+  z-index: 1;
+}
+.table2{
+  background-color: #fff;
+
+  overflow-y: none;
+  width: 100%;
+  padding: 0;
+  overflow-x: hidden;
 }
 
 .table {
@@ -187,7 +200,7 @@ div#table\ {
   overflow-y: scroll;
   width: 100%;
   padding: 0;
-  overflow-x: scroll;
+  overflow-x: hidden;
 }
 .table::-webkit-scrollbar {
   width: 2px;
@@ -200,7 +213,7 @@ div#table\ {
   background-color: #ccc;
 }
 
-table {
+ table {
   border-collapse: collapse;
   width: 100%;
   /* height: 100%; */
@@ -275,11 +288,12 @@ table tbody tr {
   box-sizing: border-box;
 }
 
-table tbody tr:hover {
+.table table tbody tr:hover {
   background-color: rgba(26, 164, 200, 0.2);
 }
+.table
 table tbody tr:active {
-  background-color: rgba(26, 164, 200, 0.2) !important;
+  background-color: rgba(26, 164, 200, 0.2) ;
 }
 .text-center {
   text-align: center;
@@ -287,10 +301,10 @@ table tbody tr:active {
 .text-right {
   text-align: end;
 }
-table tbody tr:hover .function-table {
+.table table tbody tr:hover .function-table {
   display: flex;
 }
-table thead {
+.table table thead {
   position: sticky;
   top: 0;
   left: 0;
@@ -330,7 +344,6 @@ input[type="checkbox"] {
 .table-footer {
   width: 100%;
   display: flex;
-  
   padding: 0px 16px ;
   justify-content: space-between;
   position: sticky;
@@ -371,6 +384,9 @@ input.page {
   padding: 4px 10px;
   border: 1px solid #000;
 }
+.page{
+  position: relative;
+}
 .paging {
   display: flex;
   align-items: center;
@@ -382,7 +398,9 @@ input.page {
 .paging p {
   margin: 0px 30px;
 }
-
+.dropup-page{
+  position: absolute;
+}
 
 .tb-footer-right {
   display: flex;
@@ -455,17 +473,26 @@ input.page {
 .table-footer table td:first-child, table th:first-child{
 padding-left: 0 ;
 } */
-.tb-footer:hover{
+.table table tbody tr .tb-footer:active{
+  background: #fff;
+}
+table tr .tb-footer:focus{
+  background-color: #fff !important ;
+}
+table tr .tb-footer:active{
+  background-color: #fff !important ;
+}
+table tr .tb-footer :hover{
   background-color: #fff !important ;
 }
 .tb-footer{
  position: sticky;
   bottom: 0;
   left:0;
+  width: 100%;
   right: 0; 
-   background-color: #fff;
-   z-index: 2;
- 
+  box-sizing: border-box;
+  background-color: #fff;
 }
 .total-price , .total-count{
   

@@ -7,7 +7,8 @@
         </div>
        
         <div class="content-popup">
-       <strong v-if="closeStatus==3 ||closeStatus==4">{{ item }}</strong>  {{ msg }}
+          <span>   <strong v-if="closeStatus==3 ||closeStatus==4">{{ item }}</strong> </span>
+          {{ msg }}
         </div>
       </div>
       <div class="popup-footer">
@@ -45,19 +46,19 @@ export default {
     onClickCancel() {
       console.log(this.closeStatus);
     
-      if(this.closeStatus != 1){
-        this.$emit("hidePopup",false)
-        if(this.closeStatus == 3){
+      if(this.closeStatus == 2){
        
-       this.$emit("isDelete")
+        this.$emit("hidePopup",false)
      }
-     if(this.closeStatus == 4){
+     else if(this.closeStatus == 3){
+       
+       this.$emit("isDelete",false)}
+    else if(this.closeStatus == 4){
       
-       this.$emit("isDelete")
+       this.$emit("isDelete",false)
      
        
       } 
-      }
       else{
         this.$emit("hidePopupAndForm", false);
        
@@ -95,7 +96,7 @@ export default {
 }
 .popup-body {
   display: flex;
-  text-align: center;
+ 
   margin-top: 24px;
 }
 #content {
@@ -106,8 +107,9 @@ export default {
 }
 .content-popup {
   margin-top: 10px;
-  display: flex;
+ 
   justify-content: flex-start;
+  margin-left: 10px;
 }
 
 .popup-footer {
