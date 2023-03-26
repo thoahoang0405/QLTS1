@@ -1,5 +1,5 @@
 <template>
-  <div class="body" >
+  <div class="body">
     <div class="body-header">
       <div class="row-input">
         <div class="input">
@@ -7,11 +7,12 @@
             type="text"
             class="search"
             :placeholder="tableInfo.searchFixedAsset"
-            v-model="txtSearch"   @keypress.enter="getPagingAsset"
+            v-model="txtSearch"
+            @keypress.enter="getPagingAsset"
           />
           <div class="icon-search icon"></div>
         </div>
-       
+
         <Combobox
           :items="departments"
           :code="'department_code'"
@@ -21,7 +22,7 @@
           @keyword="keywordDepartment"
           :placeholder="place.PlaceHolderDepartment"
         ></Combobox>
-      
+
         <Combobox
           :items="fixedAssetCategory"
           :fieldCode="'fixed_asset_category_code'"
@@ -66,38 +67,40 @@
                 />
               </th>
 
-              <th  class="stt">
+              <th class="stt">
                 {{ tableInfo.numeric }}
                 <div class="tooltip-stt">{{ tableInfo.numericTooltip }}</div>
               </th>
 
-              <th >{{ tableInfo.fixed_asset_code }}</th>
-              <th >{{ tableInfo.fixed_asset_name }}</th>
-              <th >{{ tableInfo.fixed_asset_category_name }}</th>
-              <th >{{ tableInfo.department_name }}</th>
+              <th>{{ tableInfo.fixed_asset_code }}</th>
+              <th>{{ tableInfo.fixed_asset_name }}</th>
+              <th>{{ tableInfo.fixed_asset_category_name }}</th>
+              <th>{{ tableInfo.department_name }}</th>
               <th class="text-right">{{ tableInfo.quantity }}</th>
-              <th  class="text-right">{{ tableInfo.cost }}</th>
-              <th  class="text-right kh">
+              <th class="text-right">{{ tableInfo.cost }}</th>
+              <th class="text-right kh">
                 {{ tableInfo.depreciation }}
                 <div class="tooltip-kh">
                   {{ tableInfo.depreciationTooltip }}
                 </div>
               </th>
-              <th  class="text-right">{{ tableInfo.residualValue }}</th>
+              <th class="text-right">{{ tableInfo.residualValue }}</th>
               <th>{{ tableInfo.function }}</th>
             </tr>
           </thead>
           <tbody>
-            <tr 
+            <tr
               ref="rowCheck"
               :class="listFixedAsset.includes(asset) ? 'active' : ''"
               v-for="(asset, index) of fixedAssets"
               :key="asset.fixed_asset_id"
-           
               @dblclick="showFormEdit(asset)"
-              style="max-height: 38px; box-sizing: border-box;"
+              style="max-height: 38px; box-sizing: border-box"
             >
-              <td style="min-Width: 47px; max-Width: 47px; box-sizing: border-box;"  class="text-center">
+              <td
+                style="min-width: 47px; max-width: 47px; box-sizing: border-box"
+                class="text-center"
+              >
                 <input
                   type="checkbox"
                   ref="checkbox"
@@ -105,49 +108,128 @@
                   @click="selectItemToList(asset)"
                 />
               </td>
-              <td style="min-Width: 45px; max-Width: 45px; box-sizing: border-box;" class="text-center">{{ index + 1 }}</td>
-              <td style="min-Width: 82px; max-Width: 82px;box-sizing: border-box;">{{ asset.fixed_asset_code }}</td>
-              <td style="min-Width: 130px; max-Width: 130px; box-sizing: border-box;">{{ asset.fixed_asset_name }}</td>
-              <td style="max-width: 148px !important; min-width: 148px !important; box-sizing: border-box;">{{ asset.fixed_asset_category_name }}</td>
-              <td style="max-width: 148px !important; min-width: 148px !important;  box-sizing: border-box;">{{ asset.department_name }}</td>
-              <td style="min-Width: 79px;  max-Width: 79px; box-sizing: border-box;" class="text-right">{{ asset.quantity }}</td>
-              <td  style="min-Width: 105px; max-Width: 105px; box-sizing: border-box;" class="text-right">{{ formatMoney(asset.cost) }}</td>
-              <td style="min-Width: 104px; max-Width: 104px;box-sizing: border-box;" class="text-right">{{ formatMoney(asset.depreciation_value) }}</td>
-              <td style="min-Width: 104px; max-Width: 104px; box-sizing: border-box;" class="text-right">{{ formatMoney(asset.cost-asset.depreciation_value) }}</td>
-              <td style="min-Width: 90px; max-Width: 90px; box-sizing: border-box;">
+              <td
+                style="min-width: 45px; max-width: 45px; box-sizing: border-box"
+                class="text-center"
+              >
+                {{ index + 1 }}
+              </td>
+              <td
+                style="min-width: 82px; max-width: 82px; box-sizing: border-box"
+              >
+                {{ asset.fixed_asset_code }}
+              </td>
+              <td
+                style="
+                  min-width: 130px;
+                  max-width: 130px;
+                  box-sizing: border-box;
+                "
+              >
+                {{ asset.fixed_asset_name }}
+              </td>
+              <td
+                style="
+                  max-width: 148px !important;
+                  min-width: 148px !important;
+                  box-sizing: border-box;
+                "
+              >
+                {{ asset.fixed_asset_category_name }}
+              </td>
+              <td
+                style="
+                  max-width: 148px !important;
+                  min-width: 148px !important;
+                  box-sizing: border-box;
+                "
+              >
+                {{ asset.department_name }}
+              </td>
+              <td
+                style="min-width: 79px; max-width: 79px; box-sizing: border-box"
+                class="text-right"
+              >
+                {{ asset.quantity }}
+              </td>
+              <td
+                style="
+                  min-width: 105px;
+                  max-width: 105px;
+                  box-sizing: border-box;
+                "
+                class="text-right"
+              >
+                {{ formatMoney(asset.cost) }}
+              </td>
+              <td
+                style="
+                  min-width: 104px;
+                  max-width: 104px;
+                  box-sizing: border-box;
+                "
+                class="text-right"
+              >
+                {{ formatMoney(asset.impoverishment) }}
+              </td>
+              <td
+                style="
+                  min-width: 104px;
+                  max-width: 104px;
+                  box-sizing: border-box;
+                "
+                class="text-right"
+              >
+                {{ formatMoney(asset.cost - asset.impoverishment) }}
+              </td>
+              <td
+                style="min-width: 90px; max-width: 90px; box-sizing: border-box"
+              >
                 <div class="function-table">
                   <div class="icon icon-edit" @click="showFormEdit(asset)">
                     <div class="tooltip">Sửa</div>
                   </div>
-                  <div class="icon icon-replicate" @click="showReplication(asset)">
+                  <div
+                    class="icon icon-replicate"
+                    @click="showReplication(asset)"
+                  >
                     <div class="tooltip">Nhân bản</div>
                   </div>
                 </div>
               </td>
             </tr>
-            
-           
           </tbody>
-        <tfoot>
-           <tr class="tb-footer" style="background: #ffff;">
-              <td colspan="3" style="min-Width: 176px; max-Width: 176px; box-sizing: border-box;" >
+          <tfoot>
+            <tr class="tb-footer" style="background: #ffff">
+              <td
+                colspan="3"
+                style="
+                  min-width: 176px;
+                  max-width: 176px;
+                  box-sizing: border-box;
+                "
+              >
                 <div>
                   <div class="total-record">
                     Tổng số: <strong>{{ totalRecord }}</strong> bản ghi
                   </div>
                 </div>
               </td>
-              <td colspan="1" style="min-Width: 130px; max-Width: 130px; box-sizing: border-box;">
+              <td
+                colspan="1"
+                style="
+                  min-width: 130px;
+                  max-width: 130px;
+                  box-sizing: border-box;
+                "
+              >
                 <div style="margin-right: 0px; box-sizing: border-box">
                   <div class="page">
-                    <div style="position: relative; ">
+                    <div style="position: relative">
                       <div class="content-page">
                         {{ pageDefault }}
                       </div>
-                      <div class="icon icon-down-bold" @click="btnDropUp">
-                    
-                      </div>
-                    
+                      <div class="icon icon-down-bold" @click="btnDropUp"></div>
                     </div>
                     <div class="dropup-page">
                       <div class="item-up" v-show="isShowPage">
@@ -194,12 +276,18 @@
                         </div>
                       </div>
                     </div>
-                   
                   </div>
                 </div>
-              </td >
-              <td  colspan="2" style="max-width: 280px !important; min-width: 280px !important; box-sizing: border-box;">
-                <div >
+              </td>
+              <td
+                colspan="2"
+                style="
+                  max-width: 280px !important;
+                  min-width: 280px !important;
+                  box-sizing: border-box;
+                "
+              >
+                <div>
                   <Paginate
                     v-model="pageNumber"
                     :page-count="totalPage"
@@ -218,53 +306,63 @@
                   </Paginate>
                 </div>
               </td>
-              <td colspan="1" class="text-right" style="min-Width: 79px;  max-Width: 79px;  box-sizing: border-box;">
-                <div
-                  class="total-count"
-                  
-                >
-                  <strong>{{
-                    formatMoney(total(fixedAssets, "quantity"))
-                  }}</strong>
+              <td
+                colspan="1"
+                class="text-right"
+                style="min-width: 79px; max-width: 79px; box-sizing: border-box"
+              >
+                <div class="total-count">
+                  <strong>{{ formatMoney(totalQuantity) }}</strong>
                 </div>
               </td>
-              <td colspan="1" class="text-right" style="min-Width: 105px; max-Width: 105px; box-sizing: border-box;">
-                <div
-                  class="total-price"
-                
-                >
-                  <strong>{{ formatMoney(total(fixedAssets, "cost")) }}</strong>
+              <td
+                colspan="1"
+                class="text-right"
+                style="
+                  min-width: 105px;
+                  max-width: 105px;
+                  box-sizing: border-box;
+                "
+              >
+                <div class="total-price">
+                  <strong>{{ formatMoney(totalCost) }}</strong>
                 </div>
               </td>
-              <td colspan="1" class="text-right" style="min-Width: 104px; max-Width: 104px;box-sizing: border-box;" >
-                <div
-                  class="total-price"
-                  
-                >
-                  <strong>{{ formatMoney(depre) }}</strong>
+              <td
+                colspan="1"
+                class="text-right"
+                style="
+                  min-width: 104px;
+                  max-width: 104px;
+                  box-sizing: border-box;
+                "
+              >
+                <div class="total-price">
+                  <strong>{{ formatMoney(totalImprover) }}</strong>
                 </div>
               </td>
-              <td colspan="1" class="text-right" style="min-Width: 104px; max-Width: 104px;box-sizing: border-box;">
-                <div
-                  class="total-price"
-                  
-                >
-                  <strong>{{ formatMoney(residualValue) }}</strong>
+              <td
+                colspan="1"
+                class="text-right"
+                style="
+                  min-width: 104px;
+                  max-width: 104px;
+                  box-sizing: border-box;
+                "
+              >
+                <div class="total-price">
+                  <strong>{{ formatMoney(totalCost - totalImprover) }}</strong>
                 </div>
               </td>
-              <td colspan="1" style="min-Width: 90px; max-Width: 90px;box-sizing: border-box;">
-                
-              </td>
+              <td
+                colspan="1"
+                style="min-width: 90px; max-width: 90px; box-sizing: border-box"
+              ></td>
             </tr>
-        </tfoot>
+          </tfoot>
         </table>
       </div>
-     
-        
     </div>
-  
-        
- 
   </div>
 
   <Form
@@ -288,11 +386,14 @@
     :item="itemDelete"
   ></Popup>
   <!-- <div v-show="isShowLoad" class="loader"></div> -->
-  <div id="load"   v-show="isShowLoad" >
-     <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
+  <div id="load" v-show="isShowLoad">
+    <div class="lds-ring">
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
   </div>
- 
-
 </template>
 <script>
 import { Table } from "../../js/common/table";
@@ -306,7 +407,8 @@ import {
   btnPopup,
   TitlePopup,
   NoticeMsg,
-  Msg,PlaceHolder
+  Msg,
+  PlaceHolder,
 } from "../../js/common/resource";
 import { useToast } from "vue-toastification";
 import { FormDetailMode } from "../../js/common/enumeration";
@@ -323,8 +425,8 @@ export default {
     return {
       itemDelete: "",
       isDeleted: 0,
-     keywordDep:"",
-     keywordCate:"",
+      keywordDep: "",
+      keywordCate: "",
       numeric: 0,
       employee: [],
       msgError: "",
@@ -364,19 +466,20 @@ export default {
       department_name: "",
       department_id: "",
       currentFixedAsset: {},
-      residualValue:0,
-      txtSearch:"",
-      depre:0,
-      placeholderName:""
-      
-     
+      residualValue: 0,
+      txtSearch: "",
+      depre: 0,
+      placeholderName: "",
+      totalQuantity: 0,
+      totalCost: 0,
+      totalImprover: 0,
     };
   },
   components: {
     Form,
     Popup,
     Paginate,
- 
+
     Combobox,
   },
   watch: {
@@ -385,18 +488,17 @@ export default {
         this.getPagingAsset();
       }
     },
-    department_id: function(){
+    department_id: function () {
       if (this.department_id == "") {
         this.getPagingAsset();
       }
-
     },
-    fixed_asset_category_id: function(){
+    fixed_asset_category_id: function () {
       if (this.fixed_asset_category_id == "") {
         this.getPagingAsset();
       }
     },
-    fixedAsset: function(){
+    fixedAsset: function () {
       if (this.fixedAsset.department_id == "") {
         this.getPagingAsset();
       }
@@ -404,31 +506,26 @@ export default {
         this.getPagingAsset();
       }
     },
-   
   },
   created() {
     this.getPagingAsset();
     this.getDepartments();
     this.getCategory();
-
-    // this.residualValue=parseInt(this.fixedAsset.cost) -this.fixedAsset.depreciation_value
   },
   methods: {
-    keywordDepartment(value){
-    this.keywordDep=value
-     
-    if(this.keywordDep== ""){
-     
-       this.department_id = " ";
+    keywordDepartment(value) {
+      this.keywordDep = value;
+
+      if (this.keywordDep == "") {
+        this.department_id = " ";
         this.getPagingAsset();
       }
     },
-    keywordCateGo(value){
-    this.keywordCate=value
-     
-    if(this.keywordCate== ""){
-    
-       this.fixed_asset_category_id = " ";
+    keywordCateGo(value) {
+      this.keywordCate = value;
+
+      if (this.keywordCate == "") {
+        this.fixed_asset_category_id = " ";
         this.getPagingAsset();
       }
     },
@@ -470,7 +567,7 @@ export default {
         console.log(error);
       }
     },
-  
+
     /**
      * lấy thông tin phòng ban từ combobox
      * AUTHOR: HTTHOA(28/02/2023)
@@ -484,21 +581,16 @@ export default {
         this.getPagingAsset();
       }
       this.getPagingAsset();
-     
     },
     selectItemCategory(value) {
       console.log(value.fixed_asset_category_id);
       if (value.fixed_asset_category_id) {
         this.fixed_asset_category_id = value.fixed_asset_category_id;
-        
       } else {
-        this.fixed_asset_category_id= "";
+        this.fixed_asset_category_id = "";
         this.getPagingAsset();
       }
       this.getPagingAsset();
-     
-      
-      
     },
     /**
      * hiển thị popup
@@ -513,9 +605,8 @@ export default {
      */
     hidePopup(value) {
       this.isShowPopup = value;
-      this.assetSelected={}
-      this.listFixedAsset=[]
-    
+      this.assetSelected = {};
+      this.listFixedAsset = [];
     },
     /**
      * nhấn nút xóa
@@ -544,7 +635,7 @@ export default {
       }, 0);
       return total;
     },
-    
+
     /**
      * hàm click vào số trang
      * AUTHOR: HTTHOA(15/08/2022)
@@ -585,10 +676,9 @@ export default {
      */
     getPagingAsset() {
       try {
-      
         var me = this;
-        me.depre=0;
-        me.residualValue=0;
+        me.depre = 0;
+        me.residualValue = 0;
         // this.showLoading(true);
         me.isShowLoad = true;
         axios
@@ -596,20 +686,21 @@ export default {
             `${URL_FixedAssetPaging}?keyword=${this.txtSearch}&pageSize=${this.pageDefault}&departmentID=${this.department_id}&fixedAssetCategoryID=${this.fixed_asset_category_id}&pageNumber=${this.pageNumber}`
           )
           .then(function (res) {
-           
             me.isShowLoad = false;
             me.totalPage = res.data.TotalPages;
             me.totalRecord = res.data.TotalRecords;
+            me.totalImprover = res.data.TotalImprover;
+            me.totalCost = res.data.TotalCost;
+            me.totalQuantity = res.data.TotalQuantity;
             me.fixedAssets = res.data.Data;
-            me.listFixedAsset=[];
+            me.listFixedAsset = [];
             console.log(me.fixedAssets);
-            for (const item of res.data.Data) {
-              me.depre=me.depre+(item.depreciation_value*item.life_time)
-              me.residualValue= me.residualValue+(item.cost - me.depre)
-            
+            for (const item of me.fixedAssets) {
+              this.residualValue =
+                parseInt(item.cost) - parseInt(item.impoverishment);
             }
           })
-         
+
           .catch(function () {
             console.log(1);
           });
@@ -617,8 +708,8 @@ export default {
         console.log(error);
       }
     },
-    loadData(){
-      this.getPagingAsset()
+    loadData() {
+      this.getPagingAsset();
     },
     /*
     lấy mã mới 
@@ -664,16 +755,14 @@ export default {
     },
 
     /**
-     * hiển thị form
+     * hiển thị form thêm
      * AUTHOR: HTTHOA(28/02/2023)
      */
     btnAddOnclick() {
       this.formode = FormDetailMode.Add;
       this.name = TitlePopup.Add;
-      // this.getMaxCode();
       this.showForm();
-      // this.assetSelected={}
-     
+
     },
     showForm() {
       this.isShow = true;
@@ -684,13 +773,10 @@ export default {
      */
     closeForm() {
       this.isShow = false;
-        // this.assetSelected={}
       this.loadData();
-      
     },
     hideForm(value) {
       this.isShow = value;
-      // this.assetSelected={}
       this.loadData();
     },
     /**
@@ -703,7 +789,6 @@ export default {
       this.isShow = true;
       this.assetSelected = asset;
       this.fixed_asset_id = asset.fixed_asset_id;
-     
     },
     /**
      * hiển thị form nhân bản
@@ -711,12 +796,10 @@ export default {
      */
     showReplication(asset) {
       this.formode = FormDetailMode.Replication;
-      this.name = TitlePopup.Replication;   
-      // this.getMaxCode();
-      this.isShow = true;  
+      this.name = TitlePopup.Replication;
+      this.isShow = true;
       this.assetSelected = asset;
       this.fixed_asset_id = asset.fixed_asset_id;
-      
     },
     /**
      * format tiền
@@ -732,6 +815,10 @@ export default {
         return parseInt(money);
       }
     },
+    /**
+     * thêm phần tử xóa vào mảng xóa
+     * AUTHOR: HTTHOA (20/03/2023)
+     */
     selectItemToList(asset) {
       try {
         this.currentFixedAsset = asset;
@@ -776,18 +863,20 @@ export default {
         console.log(err);
       }
     },
-    
-   
+    /**
+     * xóa 1 bản ghi
+     * AUTHOR: HTTHOA(20/03/2023)
+     */
     deleteOne(id) {
       try {
         const toast = useToast();
         console.log(id);
-        var me=this
+        var me = this;
         axios
           .delete(`${URL_FixedAssetsPut}${id}`)
           .then(function () {
-            toast.success(Msg.DeleteSucces, { timeout: 2000 });          
-            me.getPagingAsset()
+            toast.success(Msg.DeleteSucces, { timeout: 2000 });
+            me.getPagingAsset();
           })
           .catch(function () {
             toast.error(Msg.DeleteError, { timeout: 2000 });
@@ -796,11 +885,15 @@ export default {
         console.log(error);
       }
     },
+    /**
+     * xóa nhiều bản ghi
+     * AUTHOR: HTTHOA(20/03/2023)
+     */
     deleteMultiple() {
       try {
         const toast = useToast();
         let listFixedAssettyID = [];
-        var me=this
+        var me = this;
         me.listFixedAsset.filter((asset) => {
           listFixedAssettyID.push(asset.fixed_asset_id);
         });
@@ -810,11 +903,10 @@ export default {
           method: "delete",
           data: listFixedAssettyID,
         })
-          
-          .then(function(res) {
+          .then(function (res) {
             console.log(res.data);
             toast.success(Msg.DeleteSucces, { timeout: 2000 });
-            me.getPagingAsset()
+            me.getPagingAsset();
           })
           .catch(function () {
             toast.error(Msg.DeleteError, { timeout: 2000 });
@@ -823,7 +915,10 @@ export default {
         console.log(error);
       }
     },
-
+    /**
+     * kiểm tra xóa 1 hay xóa nhiều khi ấn xóa
+     * AUTHOR: HTTHOA(20/03/2023)
+     */
     onClickDeleteMultiple() {
       try {
         // kiểm tra danh sách được chọn có bao nhiêu bản ghi và hiển thị thông báo
@@ -834,7 +929,6 @@ export default {
           this.closeStatus = 2;
           this.btnName = btnPopup.Agree;
         } else if (this.listFixedAsset.length == 1) {
-          console.log(this.listFixedAsset[0].fixed_asset_id);
           //hiển thị confirm
           //nút confirm
           this.showPopup(true);
@@ -854,6 +948,10 @@ export default {
         console.log(err);
       }
     },
+    /**
+     * hàm thực hiện xóa
+     * AUTHOR: HTTHOA(20/03/2023)
+     */
     deleted(value) {
       console.log(value);
       this.isShowPopup = value;
@@ -879,7 +977,7 @@ export default {
   box-sizing: border-box;
   width: 200px;
 }
-.page-link{
+.page-link {
   margin: 5px;
 }
 .act {
@@ -892,7 +990,6 @@ export default {
 }
 
 .page-item:first-child {
- 
   font-size: 20px;
   color: #727272;
 }
@@ -942,11 +1039,11 @@ li.page-item.disabled {
 .item-dropup {
   padding: 10px;
 }
-.item-up{
+.item-up {
   position: absolute;
   background-color: #fff;
-  margin-left: -2px;
-  margin-top: -205px;
+  margin-left: -1px;
+  margin-top: -208px;
   width: 60px;
   z-index: 10;
   border: 1px solid #bbb;
@@ -1030,8 +1127,8 @@ li.page-item.disabled {
   box-sizing: border-box;
 }
 .page .icon.icon-down-bold {
-    position: absolute;
-    top: 14px;
-    right: 81px;
+  position: absolute;
+  top: 13px;
+  right: 60px;
 }
 </style>

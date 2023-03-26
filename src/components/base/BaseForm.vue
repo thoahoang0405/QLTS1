@@ -83,7 +83,7 @@
             <label for="item-input">{{ formInfo.department_name }}</label>
             <br />
             <input
-              readonly
+              disabled
               type="text"
               class="item-input"
               v-model="fixedAsset.department_name"
@@ -128,7 +128,7 @@
             <br />
             <input
               v-model="fixedAsset.fixed_asset_category_name"
-              readonly
+              disabled
               type="text"
               class="item-input"
             />
@@ -228,6 +228,7 @@
             </div>
             <br />
             <input
+              disabled
               v-model="fixedAsset.depreciation_value"
               id="amorYear"
               type="text"
@@ -259,7 +260,7 @@
               formInfo.purchase_date
             }}</label>
             <br />
-            <!-- <input type="date" class="item-input" /> -->
+
             <div class="form-input">
               <el-date-picker
                 v-model="fixedAsset.purchase_date"
@@ -308,11 +309,6 @@
   </div>
 </template>
 <script>
-// import {
-//  URL_Department
-
-// } from "../../js/common/urlAsset";
-
 import Combobox from "./BaseCombobox.vue";
 import axios from "axios";
 import { ElDatePicker } from "element-plus";
@@ -322,6 +318,7 @@ import { DateConfig } from "../../js/common/config";
 import { Form } from "../../js/common/form";
 import Popup from "../base/BasePopup.vue";
 import { ErrorMsg, btnPopup, Msg, NoticeMsg } from "../../js/common/resource";
+import { FormDetailMode } from "../../js/common/enumeration";
 import Notice from "./BasePopupNotice.vue";
 import { useToast } from "vue-toastification";
 import {
@@ -378,20 +375,16 @@ export default {
         life_time: "",
         depreciation_rate: "",
         depreciation_value: "",
-        // purchase_date: "",
       }, //  các thông báo lỗi
       rules: {
         fixed_asset_code: { Required: true },
         fixed_asset_name: { Required: true },
         fixed_asset_category_code: { Required: true },
-        depreciation_rate: { Required: true, Major: 100 },
-        depreciation_value: { Required: true, Price: true },
-
+        depreciation_rate: { Required: true },
+        depreciation_value: { Required: true },
         department_code: { Required: true },
-
         cost: { Required: true, Price: true },
         life_time: { Required: true, Major: 100 },
-        // purchase_date: {Required: true},
         quantity: { Required: true },
       },
     };
@@ -407,51 +400,15 @@ export default {
 
   watch: {
     /**
-     * lấy thông tin nhân viên từ component cha
-     * AUTHOR: HTTHOA(28/02/2023)
+     * chuyển tiền về số
+     * AUTHOR: HTTHOA(24/03/2023)
      */
-    // fixedAsset: function (value) {
-    //   if (this.fixedAsset[value]) {
-    //     this.error[value] = "";
-    //   }
-    //   console.log(value);
-    //   if (this.fixedAsset.production_year == "") {
-    //     this.fixedAsset.production_year = 2023;
-    //   }
-    // },
-    // "fixedAsset.cost": function (nval) {
-    //   console.log(nval);
-
-    //   this.fixedAsset.cost = this.formatMoney(nval);
-
-    //   console.log(this.fixedAsset.cost);
-    // },
-
     depreciation_value: function () {
       this.depreciation_value =
-        parseInt(this.convertMoneyToNum(this.fixedAsset.cost) * this.fixedAsset.depreciation_rate) /
-        100;
-     
-    },
-    fixedAssetDetail: function (value) {
-      this.fixedAsset = value;
-      this.department_code = value.department_code;
-      this.department_name = value.department_name;
-      this.fixedAsset.purchase_date = value.purchase_date;
-      this.fixedAsset.tracked_year = value.tracked_year;
-      this.fixedAsset.fixed_asset_id = value.fixed_asset_id;
-      this.fixedAsset.quantity = value.quantity;
-      this.fixedAsset.depreciation_rate = value.depreciation_rate;
-      this.depreciation_value =
-        parseInt(this.fixedAsset.cost * this.fixedAsset.depreciation_rate) /
-        100;
-      this.oldData = { ...value };
-    },
-    newCodeForm: function (value) {
-      this.fixedAsset.fixed_asset_code = value;
-    },
-    FormMode: function (value) {
-      this.formMode = value;
+        parseInt(
+          this.convertMoneyToNum(this.fixedAsset.cost) *
+            this.fixedAsset.depreciation_rate
+        ) / 100;
     },
   },
   props: [
@@ -466,14 +423,19 @@ export default {
     this.setFocus();
   },
   methods: {
+    /**
+     * theo dõi sự thay đổi tiền trên form để format
+     * AUTHOR: HTTHOA(24/03/2023)
+     */
     formatCost() {
       console.log(this.formatMoney(this.fixedAsset.cost));
-      this.fixedAsset.cost=
-      this.formatMoney(this.fixedAsset.cost)
+      this.fixedAsset.cost = this.formatMoney(this.fixedAsset.cost);
 
       this.depreciation_value =
-        parseInt(this.convertMoneyToNum(this.fixedAsset.cost) * this.fixedAsset.depreciation_rate) /
-        100;
+        parseInt(
+          this.convertMoneyToNum(this.fixedAsset.cost) *
+            this.fixedAsset.depreciation_rate
+        ) / 100;
     },
     /**
      * click nút save
@@ -485,8 +447,10 @@ export default {
         console.log("validate lỗi");
       } else {
         console.log("validate ok");
-        this.fixedAsset.cost= this.convertMoneyToNum(this.fixedAsset.cost) 
-        this.fixedAsset.depreciation_value= this.convertMoneyToNum(this.fixedAsset.depreciation_value) 
+        this.fixedAsset.cost = this.convertMoneyToNum(this.fixedAsset.cost);
+        this.fixedAsset.depreciation_value = this.convertMoneyToNum(
+          this.fixedAsset.depreciation_value
+        );
         if (this.formMode == 1) {
           this.editData();
         } else {
@@ -577,14 +541,25 @@ export default {
           })
 
           .catch(function () {
-            toast.error(Msg.EditError, { timeout: 2000 });
+            if (res.response.data.ErrorCode == 5) {
+              me.isShowPopup = true;
+              me.closeStatus = 5;
+              me.msgError =
+                "Mã tài sản " +
+                me.fixedAsset.fixed_asset_code +
+                " đã tồn tại trong hệ thống. Vui lòng kiểm tra lại";
+              me.btnName = "Đồng ý";
+            } else {
+              toast.error(Msg.AddError, { timeout: 2000 });
+            }
           });
       } catch (error) {
         console.log(error);
       }
     },
     /*
-    lấy mã code  mới 
+    lấy mã code mới 
+    AUTHOR: HTTHOA(24/03/2023)
     */
     getMaxCode() {
       try {
@@ -597,30 +572,22 @@ export default {
     },
 
     /**
-     * format tiền
+     * chuyển format tiền về số
      * AUTHOR: HTTHOA(28/02/2023)
      */
-    // formatMoney(money) {
-    //   if (!isNaN(money)) {
-    //     var moneyInt = parseInt(money);
-    //     return moneyInt
-    //       .toString()
-    //       .replace(/(\d)(?=(\d{3})+(?:\.\d+)?$)/g, "$1.");
-    //   } else {
-    //     return parseInt(money);
-    //   }
-    // },
-    convertMoneyToNum: function (s) {
-        try {
-            if(s!='') return parseInt(s.replaceAll('.', ''));
-            return 0;
-        }
-        catch (Ex) {
-            return 0;
-        }
-        
-    },
 
+    convertMoneyToNum: function (s) {
+      try {
+        if (s != "") return parseInt(s.replaceAll(".", ""));
+        return 0;
+      } catch (Ex) {
+        return 0;
+      }
+    },
+    /**
+     * Hàm format tiền
+     * AUTHOR: HTTHOA(20/03/2023)
+     */
     formatMoney: function (s) {
       s = parseInt(s);
       try {
@@ -705,25 +672,25 @@ export default {
       }
 
       // tỷ lệ hao mòn thay đổi thì kiểm tra lại số năm sử dụng
-      if (propName == "depreciation_rate") {
-        if (
-          this.fixedAsset.depreciation_rate !=
-          (value / this.fixedAsset.life_time).toFixed(2)
-        ) {
-          this.msgError = ErrorMsg.UsedYear;
-          this.btnName = btnPopup.Agree;
-          this.closeStatus = 0;
-          this.showPopup();
-          this.fixedAsset.depreciation_rate = parseFloat(
-            (value / this.fixedAsset.life_time).toFixed(2)
-          );
+      // if (propName == "depreciation_rate") {
+      //   if (
+      //     this.fixedAsset.depreciation_rate !=
+      //     (value / this.fixedAsset.life_time).toFixed(2)
+      //   ) {
+      //     this.msgError = ErrorMsg.UsedYear;
+      //     this.btnName = btnPopup.Agree;
+      //     this.closeStatus = 0;
+      //     this.showPopup();
+      //     this.fixedAsset.depreciation_rate = parseFloat(
+      //       (value / this.fixedAsset.life_time).toFixed(2)
+      //     );
 
-          return false;
-        } else {
-          this.msgError = "";
-          return true;
-        }
-      }
+      //     return false;
+      //   } else {
+      //     this.msgError = "";
+      //     return true;
+      //   }
+      // }
     },
     /**
      *
@@ -731,30 +698,32 @@ export default {
      * AUTHOR: HTTHOA(9/03/2023)
      */
     validatePrice(value, propName) {
-      var cost = this.convertMoneyToNum(this.fixedAsset.cost) 
+      var cost = this.convertMoneyToNum(this.fixedAsset.cost);
       var rate = parseInt(this.fixedAsset.depreciation_rate);
       if (propName == "cost") {
         this.fixedAsset.depreciation_value = parseInt((cost * rate) / 100);
-        this.fixedAsset.depreciation_value=this.formatMoney(this.fixedAsset.depreciation_value)
+        this.fixedAsset.depreciation_value = this.formatMoney(
+          this.fixedAsset.depreciation_value
+        );
         return true;
       }
-      if (propName == "depreciation_value") {
-        if (this.fixedAsset.depreciation_value > cost) {
-          this.msgError = ErrorMsg.AttritionValueLessThanMarkedPrice;
-          this.btnName = btnPopup.Agree;
-          this.showPopup();
-          this.closeStatus = 0;
-          this.fixedAsset.depreciation_value = parseInt((cost * rate) / 100);
-          this.fixedAsset.depreciation_rate =
-            this.fixedAsset.depreciation_value / cost;
+      // if (propName == "depreciation_value") {
+      //   if (this.fixedAsset.depreciation_value > cost) {
+      //     this.msgError = ErrorMsg.AttritionValueLessThanMarkedPrice;
+      //     this.btnName = btnPopup.Agree;
+      //     this.showPopup();
+      //     this.closeStatus = 0;
+      //     this.fixedAsset.depreciation_value = parseInt((cost * rate) / 100);
+      //     this.fixedAsset.depreciation_rate =
+      //       this.fixedAsset.depreciation_value / cost;
 
-          this.fixedAsset.life_time = 1 / this.fixedAsset.depreciation_rate;
-          return false;
-        } else {
-          this.msgError = " ";
-          return true;
-        }
-      }
+      //     this.fixedAsset.life_time = 1 / this.fixedAsset.depreciation_rate;
+      //     return false;
+      //   } else {
+      //     this.msgError = " ";
+      //     return true;
+      //   }
+      // }
     },
     /**
      * NHẤN nút hủy ở form
@@ -916,40 +885,32 @@ export default {
 
   created() {
     this.formMode = this.FormMode;
-    console.log(this.formMode);
-    if (this.formMode == 0) {
+    if (this.formMode == FormDetailMode.Add) {
       this.fixedAsset = {};
       this.fixedAsset.purchase_date = new Date().toISOString().slice(0, 10);
       this.fixedAsset.tracked_year = new Date().toISOString().slice(0, 10);
 
       this.getMaxCode();
     }
-    if (this.formMode == 1) {
+    if (this.formMode == FormDetailMode.Edit) {
       this.fixedAsset = this.fixedAssetDetail;
-      this.department_code = this.fixedAssetDetail.department_code;
-      this.department_name = this.fixedAssetDetail.department_name;
-      this.fixedAsset.fixed_asset_category_code =
-        this.fixedAssetDetail.fixed_asset_category_code;
       this.fixedAsset.cost = this.formatMoney(this.fixedAssetDetail.cost);
       this.fixedAsset.depreciation_value = this.formatMoney(
-        this.fixedAssetDetail.depreciation_value
+      this.fixedAssetDetail.depreciation_value
       );
-      console.log(this.fixedAssetDetail.fixed_asset_category_code);
+      this.oldData = { ...this.fixedAssetDetail };
     }
-    if (this.formMode == 2) {
+    if (this.formMode == FormDetailMode.Replication) {
       this.getMaxCode();
-      this.department_code = this.fixedAssetDetail.department_code;
       this.fixedAsset = this.fixedAssetDetail;
-      this.department_name = this.fixedAssetDetail.department_name;
+      this.fixedAsset.purchase_date = new Date().toISOString().slice(0, 10);
+      this.fixedAsset.tracked_year = new Date().toISOString().slice(0, 10);
       this.fixedAsset.cost = this.formatMoney(this.fixedAssetDetail.cost);
       this.fixedAsset.depreciation_value = this.formatMoney(
-        this.fixedAssetDetail.depreciation_value
+      this.fixedAssetDetail.depreciation_value
       );
-      this.fixedAsset.fixed_asset_category_code =
-        this.fixedAssetDetail.fixed_asset_category_code;
     }
-    this.fixedAsset.purchase_date = new Date().toISOString().slice(0, 10);
-    this.fixedAsset.tracked_year = new Date().toISOString().slice(0, 10);
+
     this.getDepartments();
     this.getCategory();
   },
