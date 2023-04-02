@@ -25,10 +25,10 @@
         </div>
       </div>
   
-      <div class="drop-down" v-show="isShowCbb">
+      <div class="drop-down"  @mouseleave="isShowCbb=false" v-show="isShowCbb">
         
   
-        <div class="drop-down-body">
+        <div class="drop-down-body" >
           <div
             v-for="(item,index) of dataItems"
             class="drop-down-item"
@@ -238,6 +238,25 @@ type:String,
   .border-red{
     border-color: #e03232 !important;
   }
+  .drop-down {
+    width: fit-content;
+    min-width:96%;
+    position: absolute;
+    top: calc(100% - 7px);
+    left: 0;
+    z-index: 10;
+    padding: 4px;
+    border-radius: 2.5px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, .16);
+    background-color: #f9fafc;
+    border: 1px solid #e0e0e0;
+    height: fit-content;
+    max-height: 150px;
+    overflow: auto;
+    margin-top: 8px;
+    box-sizing: border-box;
+}
+
   .m-combobox-2 .drop-down .drop-down-body {
     max-height: 110px;
     height: -moz-fit-content;

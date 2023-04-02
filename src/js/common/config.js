@@ -1,3 +1,3 @@
 export const DateConfig = {
-    Format: " DD/MM/YYYY",
+    Format: "DD/MM/YYYY",
   };

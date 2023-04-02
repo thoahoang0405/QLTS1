@@ -222,7 +222,7 @@
 }
 
 .icon-add {
-  background: url("../../assets/icon/qlts-icon.svg") no-repeat -204px -424px;
+  background: url("../../assets/icon/qlts-icon.svg") no-repeat  -467px -423px;
   width: 18px;
   height: 18px;
 }
@@ -317,4 +317,10 @@
 	background: url("../../assets/icon/qlts-icon.svg") no-repeat -160px -424px;
 	width: 11px;
 	height: 8px;
+}
+.show .icon-down-bold{
+  background: url("../../assets/icon/All-icon.svg") no-repeat -820px -74px;
+	width: 8px;
+	height: 5px;
+  cursor: pointer;
 }

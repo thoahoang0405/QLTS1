@@ -1,5 +1,5 @@
 <template>
-  <div class="body">
+  <div class="body" @click.exact.shift="onClickDeleteMultiple">
     <div class="body-header">
       <div class="row-input">
         <div class="input">
@@ -9,6 +9,7 @@
             :placeholder="tableInfo.searchFixedAsset"
             v-model="txtSearch"
             @keypress.enter="getPagingAsset"
+            ref="search"
           />
           <div class="icon-search icon"></div>
         </div>
@@ -41,10 +42,15 @@
           </button>
         </div>
 
-        <button class="btn-excel">
-          <div class="icon icon-excel">
-            <div class="tooltip-excel">{{ tableInfo.btnExcelTooltip }}</div>
-          </div>
+        <button class="btn-excel" download>
+          <a
+            :href="`https://localhost:44371/api/FixedAssets/ExportExcel?keyword=${this.txtSearch}&departmentID=${this.department_id}&fixedAssetCategoryID=${this.fixed_asset_category_id}`"
+            download
+          >
+            <div class="icon icon-excel">
+              <div class="tooltip-excel">{{ tableInfo.btnExcelTooltip }}</div>
+            </div>
+          </a>
         </button>
         <button class="btn-excel">
           <div class="icon icon-delete" @click="onClickDeleteMultiple">
@@ -55,7 +61,7 @@
     </div>
     <div id="table ">
       <div class="table">
-        <table>
+        <table keyup.up="onKeyUpTable">
           <thead>
             <tr>
               <th class="text-center width-fit">
@@ -95,6 +101,9 @@
               v-for="(asset, index) of fixedAssets"
               :key="asset.fixed_asset_id"
               @dblclick="showFormEdit(asset)"
+              @contextmenu="onClickContextMenu(asset, $event)"
+              @mousedown.prevent.ctrl="mousedown(asset)"
+              @mouseup.prevent.ctrl="mouseup(asset)"
               style="max-height: 38px; box-sizing: border-box"
             >
               <td
@@ -223,57 +232,63 @@
                   box-sizing: border-box;
                 "
               >
-                <div style="margin-right: 0px; box-sizing: border-box">
-                  <div class="page">
-                    <div style="position: relative">
-                      <div class="content-page">
-                        {{ pageDefault }}
+                <div class="page">
+                  <div style="position: relative">
+                    <div class="content-page">
+                      {{ pageDefault }}
+                      <!-- <div class="up-down" @click="btnDropUp"> -->
+                      <div
+                        class="down"
+                        :class="isShowPage == true ? 'show' : ''"
+                        @click="btnDropUp"
+                      >
+                        <div class="icon-down-bold"></div>
                       </div>
-                      <div class="icon icon-down-bold" @click="btnDropUp"></div>
+                      <!-- </div> -->
                     </div>
-                    <div class="dropup-page">
-                      <div class="item-up" v-show="isShowPage">
-                        <div
-                          class="item-dropup"
-                          :class="{ act: isActive == '10' }"
-                          pageSize="10"
-                          @click="getPageDefault"
-                        >
-                          10
-                        </div>
-                        <div
-                          class="item-dropup"
-                          :class="{ act: isActive == '20' }"
-                          :value="pageDefault"
-                          pageSize="20"
-                          @click="getPageDefault"
-                        >
-                          20
-                        </div>
-                        <div
-                          class="item-dropup"
-                          :class="{ act: isActive == '30' }"
-                          pageSize="30"
-                          @click="getPageDefault"
-                        >
-                          30
-                        </div>
-                        <div
-                          class="item-dropup"
-                          :class="{ act: isActive == '50' }"
-                          pageSize="50"
-                          @click="getPageDefault"
-                        >
-                          50
-                        </div>
-                        <div
-                          class="item-dropup"
-                          :class="{ act: isActive == '100' }"
-                          pageSize="100"
-                          @click="getPageDefault"
-                        >
-                          100
-                        </div>
+                  </div>
+                  <div class="dropup-page">
+                    <div class="item-up" v-show="isShowPage">
+                      <div
+                        class="item-dropup"
+                        :class="{ act: isActive == '10' }"
+                        pageSize="10"
+                        @click="getPageDefault"
+                      >
+                        10
+                      </div>
+                      <div
+                        class="item-dropup"
+                        :class="{ act: isActive == '20' }"
+                        :value="pageDefault"
+                        pageSize="20"
+                        @click="getPageDefault"
+                      >
+                        20
+                      </div>
+                      <div
+                        class="item-dropup"
+                        :class="{ act: isActive == '30' }"
+                        pageSize="30"
+                        @click="getPageDefault"
+                      >
+                        30
+                      </div>
+                      <div
+                        class="item-dropup"
+                        :class="{ act: isActive == '50' }"
+                        pageSize="50"
+                        @click="getPageDefault"
+                      >
+                        50
+                      </div>
+                      <div
+                        class="item-dropup"
+                        :class="{ act: isActive == '100' }"
+                        pageSize="100"
+                        @click="getPageDefault"
+                      >
+                        100
                       </div>
                     </div>
                   </div>
@@ -375,12 +390,23 @@
     :FormMode="formode"
     @loadData="loadData"
   ></Form>
+  <ContextMenu
+    :posTop="posTop"
+    :posLeft="posLeft"
+    v-show="isShowContextMenu"
+    @mouseleave="closeContextMenu"
+    @clickAdd="onClickAddContextMenu"
+    @clickEdit="onClickEditContextMenu"
+    @clickDelete="onClickDeleteContextMenu"
+    @clickReplication="onClickReplicationContextMenu"
+  />
   <Popup
     v-show="isShowPopup"
     @hidePopup="hidePopup"
     :msg="msgDelete"
     @loadData="loadData"
     :name="btnName"
+    :btnLeft="btnNameLeft"
     :close="closeStatus"
     @isDelete="deleted"
     :item="itemDelete"
@@ -402,6 +428,7 @@ import Popup from "../base/BasePopup.vue";
 import Paginate from "vuejs-paginate-next";
 import axios from "axios";
 import Combobox from "../base/BaseCombobox2.vue";
+import ContextMenu from "../base/BaseContextMenu.vue";
 import {
   ErrorMsg,
   btnPopup,
@@ -423,6 +450,9 @@ import {
 export default {
   data() {
     return {
+      isShowContextMenu: false,
+      posTop: 10,
+      posLeft: 10,
       itemDelete: "",
       isDeleted: 0,
       keywordDep: "",
@@ -433,6 +463,7 @@ export default {
       msgDelete: "",
       isShow: false,
       btnName: "",
+      btnNameLeft: "",
       isShowLoad: false,
       closeStatus: 0,
       isShowPopup: false,
@@ -441,9 +472,6 @@ export default {
       fixed_asset_id: "",
       tableInfo: Table,
       items: [], // các item hiển thị trên grid
-      properties: [], // Danh sách tài sản được hiển thị
-      selectedProperties: [], // các Tài sản đã chọn được chọn
-      currentProperty: {}, // tài sản vừa được chọn
       name: "",
       selectedItems: [], // các item được chọn
       formode: 0,
@@ -473,14 +501,16 @@ export default {
       totalQuantity: 0,
       totalCost: 0,
       totalImprover: 0,
+      listOnMouseDown: {},
+      listOnMouseUp: {},
     };
   },
   components: {
     Form,
     Popup,
     Paginate,
-
     Combobox,
+    ContextMenu,
   },
   watch: {
     txtSearch: function () {
@@ -508,24 +538,161 @@ export default {
     },
   },
   created() {
+    this.setFocus();
     this.getPagingAsset();
     this.getDepartments();
     this.getCategory();
   },
   methods: {
+   /**
+     * 
+     * click ctrl 
+     * AUTHOR: HTTHOA(2/4/2023)
+     */
+    mousedown(asset) {
+      try {
+        // lưu tài sản khi mousedown
+        this.listOnMouseDown = asset;
+      } catch (err) {
+        console.log(err);
+      }
+      console.log(this.listOnMouseDown);
+    },
+    /**
+     * 
+     * chọn trong khoảng đã kéo 
+     * AUTHOR: HTTHOA(2/4/2023)
+     */
+    selectMultipleItem(item1, item2) {
+      //đoạn này là lấy những tài sản khi kéo giữ chuột
+      if (
+        this.fixedAssets.includes(item1) &&
+        this.fixedAssets.includes(item2)
+      ) {
+        // lấy vị trí của 2 item trong mảng fixedAsset
+        //start là vị trí đầu khi down ctrl
+        let startIndex = this.fixedAssets.indexOf(item2);
+        //end là vị trí khi up ctrl
+        let endIndex = this.fixedAssets.indexOf(item1);
+        console.log(startIndex);
+        console.log(endIndex);
+        // kiểm tra vị trí bắt đầu và kết thúc nếu bắt đầu lớn hơn kết thúc thì đổi lại
+        if (startIndex > endIndex) {
+          let tmp = startIndex;
+          startIndex = endIndex;
+          endIndex = tmp;
+        }
+
+        // thêm các item chưa có trong mảng xóa từ vị trí bắt đầu đến kết thúc
+        for (let i = startIndex; i <= endIndex; i++) {
+          //nếu trong danh sách chưa gồm tài sản đó thì push vào danh sách
+          if (!this.listFixedAsset.includes(this.fixedAssets[i])) {
+            this.listFixedAsset.push(this.fixedAssets[i]);
+          }
+        }
+      }
+    },
+    /**
+     * up ctrl thả chuột để lấy vị trí cuối cùng chọn
+     * AUTHOR: HTTHOA(2/4/2023)
+     */
+    mouseup(asset) {
+      try {
+        // lưu tài sản khi mouseup
+        this.listOnMouseUp = asset;
+        this.selectMultipleItem(this.listOnMouseDown, this.listOnMouseUp);
+        this.listOnMouseDown = {};
+        this.listOnMouseUp = {};
+      } catch (err) {
+        console.log(err);
+      }
+    },
+
+    /**
+     * click lấy vị trí context menu
+     * AUTHOR: HTTHOA(2/04/2023)
+     */
+
+    onClickContextMenu(asset, e) {
+      e.preventDefault();
+      // alert(asset)
+      console.log(asset);
+      this.selectItem(asset);
+      this.posTop = e.clientY;
+      this.posLeft = e.clientX;
+      this.isShowContextMenu = true;
+    },
+    /**
+     * đóng context menu
+     * AUTHOR: HTTHOA(2/4/2023)
+     */
+    closeContextMenu() {
+      setTimeout(() => {
+        this.isShowContextMenu = false;
+        this.listFixedAsset = [];
+      }, 1000);
+    },
+    /**
+     * click vào nhân bản trong  chức năng context menu
+     * AUTHOR: HTTHOA(2/4/2023)
+     */
+    onClickReplicationContextMenu() {
+      this.isShowContextMenu = false;
+      this.showReplication(this.currentFixedAsset);
+    },
+    /**
+     * click vào xóa trong  chức năng context menu
+     * AUTHOR: HTTHOA(2/4/2023)
+     */
+    onClickDeleteContextMenu() {
+      this.isShowContextMenu = false;
+      this.onClickDeleteMultiple();
+    },
+    /**
+     * click vào sửa trong  chức năng context menu
+     * AUTHOR: HTTHOA(2/4/2023)
+     */
+    onClickEditContextMenu() {
+      this.isShowContextMenu = false;
+      this.showFormEdit(this.currentFixedAsset);
+    },
+    /**
+     * click vào thêm trong  chức năng context menu
+     * AUTHOR: HTTHOA(2/4/2023)
+     */
+    onClickAddContextMenu() {
+      this.isShowContextMenu = false;
+      this.btnAddOnclick();
+    },
+    /**focus vào ô search đầu tiên
+     * AUTHOR: HTTHOA(27/03/2023)
+     */
+    setFocus() {
+      this.$nextTick(function () {
+        this.$refs["search"].focus();
+      });
+    },
+    /**check dữ liệu bên combobox truyền sang nếu trống thì gọi lại api
+     * AUTHOR: HTTHOA(27/03/2023)
+     */
     keywordDepartment(value) {
       this.keywordDep = value;
 
       if (this.keywordDep == "") {
         this.department_id = " ";
+        this.pageNumber = 1;
         this.getPagingAsset();
       }
     },
+    /**check dữ liệu bên combobox truyền sang nếu trống thì gọi lại api
+     * AUTHOR: HTTHOA(27/03/2023)
+     */
     keywordCateGo(value) {
       this.keywordCate = value;
 
       if (this.keywordCate == "") {
         this.fixed_asset_category_id = " ";
+        this.pageNumber = 1;
         this.getPagingAsset();
       }
     },
@@ -580,8 +747,13 @@ export default {
         this.department_id = "";
         this.getPagingAsset();
       }
+      this.pageNumber = 1;
       this.getPagingAsset();
     },
+    /**
+     * lấy thông tin phòng ban từ combobox
+     * AUTHOR: HTTHOA(28/02/2023)
+     */
     selectItemCategory(value) {
       console.log(value.fixed_asset_category_id);
       if (value.fixed_asset_category_id) {
@@ -590,6 +762,7 @@ export default {
         this.fixed_asset_category_id = "";
         this.getPagingAsset();
       }
+      this.pageNumber = 1;
       this.getPagingAsset();
     },
     /**
@@ -622,19 +795,6 @@ export default {
         this.showPopup(false);
       }
     },
-    /**
-     * tính tổng cột tiền
-     */
-    total(array, propName) {
-      let total = array.reduce((acc, cur) => {
-        if (cur[propName]) {
-          return acc + cur[propName];
-        } else {
-          return acc;
-        }
-      }, 0);
-      return total;
-    },
 
     /**
      * hàm click vào số trang
@@ -653,12 +813,13 @@ export default {
       this.isActive = e.target.getAttribute("pageSize");
       this.pageDefault = e.target.getAttribute("pageSize");
       this.showPage(false);
-
+      this.pageNumber = 1;
       this.getPagingAsset();
       if (this.pageDefault > this.totalRecord) {
         this.pageDefault = this.totalRecord;
       }
     },
+
     /**
      * hàm hiện dropup
      * AUTHOR: HTTHOA(06/08/2022)
@@ -681,6 +842,7 @@ export default {
         me.residualValue = 0;
         // this.showLoading(true);
         me.isShowLoad = true;
+
         axios
           .get(
             `${URL_FixedAssetPaging}?keyword=${this.txtSearch}&pageSize=${this.pageDefault}&departmentID=${this.department_id}&fixedAssetCategoryID=${this.fixed_asset_category_id}&pageNumber=${this.pageNumber}`
@@ -709,6 +871,7 @@ export default {
       }
     },
     loadData() {
+      this.pageNumber = 1;
       this.getPagingAsset();
     },
     /*
@@ -762,7 +925,6 @@ export default {
       this.formode = FormDetailMode.Add;
       this.name = TitlePopup.Add;
       this.showForm();
-
     },
     showForm() {
       this.isShow = true;
@@ -823,6 +985,7 @@ export default {
       try {
         this.currentFixedAsset = asset;
 
+        // this.indexFocus = this.fixedAssets.indexOf(asset);
         if (!this.listFixedAsset.includes(asset)) {
           //thực hiện chọn
           this.listFixedAsset.push(asset);
@@ -847,6 +1010,7 @@ export default {
       this.listFixedAsset = [];
       this.listFixedAsset.push(asset);
       this.currentFixedAsset = asset;
+    
     },
     /**
      * hàm chọn tất cả item
@@ -892,20 +1056,20 @@ export default {
     deleteMultiple() {
       try {
         const toast = useToast();
-        let listFixedAssettyID = [];
+        let listFixedAssetID = [];
         var me = this;
         me.listFixedAsset.filter((asset) => {
-          listFixedAssettyID.push(asset.fixed_asset_id);
+          listFixedAssetID.push(asset.fixed_asset_id);
         });
 
         axios({
           url: `${URL_DELETE}`,
           method: "delete",
-          data: listFixedAssettyID,
+          data: listFixedAssetID,
         })
           .then(function (res) {
             console.log(res.data);
-            toast.success(Msg.DeleteSucces, { timeout: 2000 });
+            toast.success(res.data + Msg.DeleteSucces, { timeout: 2000 });
             me.getPagingAsset();
           })
           .catch(function () {
@@ -927,7 +1091,7 @@ export default {
           this.showPopup(true);
           this.msgDelete = ErrorMsg.NotChooseProperty;
           this.closeStatus = 2;
-          this.btnName = btnPopup.Agree;
+          this.btnName = btnPopup.closePop;
         } else if (this.listFixedAsset.length == 1) {
           //hiển thị confirm
           //nút confirm
@@ -935,12 +1099,14 @@ export default {
           this.msgDelete = NoticeMsg.ConfirmDelet;
           this.closeStatus = 4;
           this.btnName = btnPopup.delete;
+          this.btnNameLeft = btnPopup.no;
           this.itemDelete = this.listFixedAsset[0].fixed_asset_code;
         } else {
           this.showPopup(true);
           this.itemDelete = this.listFixedAsset.length + " tài sản";
           this.msgDelete = NoticeMsg.ConfirmDelet;
           this.closeStatus = 3;
+          this.btnNameLeft = btnPopup.no;
           this.btnName = btnPopup.delete;
         }
         console.log(this.listFixedAsset);
@@ -977,9 +1143,11 @@ export default {
   box-sizing: border-box;
   width: 200px;
 }
+
 .page-link {
   margin: 5px;
 }
+
 .act {
   background-color: green;
   color: #fff;
@@ -993,6 +1161,7 @@ export default {
   font-size: 20px;
   color: #727272;
 }
+
 .page-item:last-child {
   font-size: 20px;
   color: #727272;
@@ -1013,6 +1182,7 @@ export default {
 li.page-item.disabled {
   color: #bbb;
 }
+
 .page-item.active {
   font-weight: 700;
   text-align: center;
@@ -1033,12 +1203,15 @@ li.page-item.disabled {
   background-color: rgba(26, 164, 200, 0.2);
   color: #111;
 }
+
 .active {
   background-color: rgba(4, 137, 170, 0.2);
 }
+
 .item-dropup {
   padding: 10px;
 }
+
 .item-up {
   position: absolute;
   background-color: #fff;
@@ -1048,6 +1221,7 @@ li.page-item.disabled {
   z-index: 10;
   border: 1px solid #bbb;
 }
+
 /* .item-up {
   position: absolute;
   background-color: #fff;
@@ -1061,10 +1235,12 @@ li.page-item.disabled {
   display: flex;
   justify-content: center;
 }
+
 .item-dropup:hover {
   background-color: rgba(26, 164, 200, 0.2);
   color: #111;
 }
+
 /* .paging-left strong {
   color: #000;
 } */
@@ -1076,15 +1252,18 @@ li.page-item.disabled {
   display: flex;
   margin-right: 24px;
 }
+
 .paging-right select {
   min-width: 170px;
   height: 35px;
 }
+
 .before-text {
   color: rgb(104, 102, 102);
   margin: 8px;
   margin-top: 10px;
 }
+
 .more-icon {
   /* background: url("../../icon/icons8-more-24.png"); */
   width: 24px;
@@ -1093,19 +1272,26 @@ li.page-item.disabled {
   margin-top: 6px;
   margin-right: 4px;
 }
+
 .button-unclick {
   border: none;
   background-color: #fff;
 }
+
 .button-clicked {
   padding: 2px;
   background-color: #fff;
   border: 1px solid #bbb;
 }
+
 .page {
   position: relative;
   color: #111;
+  align-items: center;
+  text-align: center;
+  margin-top: 5px;
 }
+
 /* .paging button {
   margin: 8px 4px 2px 0px;
   width: 20px;
@@ -1116,19 +1302,37 @@ li.page-item.disabled {
   margin: 8px;
   margin-top: 10px;
 }
+
 .content-page {
   width: 60px;
   border: 1px solid;
   height: 30px;
   display: flex;
-  justify-content: flex-start;
+  justify-content: space-between;
   align-items: center;
-  padding-left: 10px;
+  padding: 0 10px;
   box-sizing: border-box;
 }
-.page .icon.icon-down-bold {
+
+/* .page .icon.icon-down-bold {
   position: absolute;
   top: 13px;
-  right: 60px;
+  /* right: 60px; */
+/* }  */
+/* .down{
+ 
+    position: absolute;
+    right: 55%;
+    top: 50%;
+    transform: translateY(-50%);
+    justify-content: center;
+} */
+.page .up-down {
+  position: absolute;
+  right: 56%;
+  top: 32%;
+  transform: translateY(-50%);
+  transform: translateX(-50%);
+  justify-content: center;
 }
 </style>

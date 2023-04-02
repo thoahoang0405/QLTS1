@@ -1,5 +1,5 @@
 <template>
-  <div id="form">
+  <div id="form" @keypress.exact.enter="onClickSave">
     <div class="form">
       <div class="form-header">
         <h2 id="hd-form">{{ formName }}</h2>
@@ -16,19 +16,11 @@
             </div>
 
             <br />
-            <input
-              v-model="fixedAsset.fixed_asset_code"
-              type="text"
-              id="txtAssetCode"
-              placeholder="Nhập mã tài sản"
-              class="item-input check-input"
-              ref="fixed_asset_code"
-              :class="error.fixed_asset_code != '' ? 'border-red' : ''"
-              @blur="validate('fixed_asset_code')"
-            />
+            <input v-model="fixedAsset.fixed_asset_code" type="text" id="txtAssetCode" placeholder="Nhập mã tài sản"
+              class="item-input check-input" ref="fixed_asset_code"
+              :class="error.fixed_asset_code != '' ? 'border-red' : ''" @blur="validate('fixed_asset_code')" />
             <p class="error" v-if="error.fixed_asset_code != ''">
-              <span>{{ formInfo.fixed_asset_code }} </span
-              >{{ error.fixed_asset_code }}
+              <span>{{ formInfo.fixed_asset_code }} </span>{{ error.fixed_asset_code }}
             </p>
           </div>
           <div class="row-input-right">
@@ -37,57 +29,33 @@
               <span>*</span>
             </div>
             <br />
-            <input
-              v-model="fixedAsset.fixed_asset_name"
-              id="assetName"
-              placeholder="Nhập tên tài sản"
-              type="text"
-              class="item-input check-input"
-              ref="fixed_asset_name"
-              :class="error.fixed_asset_name != '' ? 'border-red' : ''"
-              @blur="validate('fixed_asset_name')"
-            />
+            <input v-model="fixedAsset.fixed_asset_name" id="assetName" placeholder="Nhập tên tài sản" type="text"
+              class="item-input check-input" ref="fixed_asset_name"
+              :class="error.fixed_asset_name != '' ? 'border-red' : ''" @blur="validate('fixed_asset_name')" />
             <p class="error" v-if="error.fixed_asset_name != ''">
-              <span>{{ formInfo.fixed_asset_name }} </span
-              >{{ error.fixed_asset_name }}
+              <span>{{ formInfo.fixed_asset_name }} </span>{{ error.fixed_asset_name }}
             </p>
           </div>
         </div>
         <div class="row-input">
           <div class="row-input-left">
             <div class="lb">
-              <label for="item-input">{{ formInfo.department_code }}</label
-              ><span>*</span>
+              <label for="item-input">{{ formInfo.department_code }}</label><span>*</span>
             </div>
 
-            <Combobox
-              class="item-input check-input"
-              style="margin-top: 14px"
-              :items="departments"
-              :code="'department_code'"
-              :fieldCode="'department_code'"
-              :fieldName="'department_name'"
-              :value="fixedAsset.department_code"
-              @selectedItem="selectItemCbb"
-              refName="'department_code'"
-              :border="error.department_code != '' ? 'border-red' : ''"
-              @onBlur="validate('department_code')"
-            />
+            <Combobox class="item-input check-input" style="margin-top: 14px" :items="departments"
+              :code="'department_code'" :fieldCode="'department_code'" :fieldName="'department_name'"
+              :value="fixedAsset.department_code" @selectedItem="selectItemCbb" refName="'department_code'"
+              :border="error.department_code != '' ? 'border-red' : ''" @onBlur="validate('department_code')" />
 
             <p class="error" v-if="error.department_code != ''">
-              <span>{{ formInfo.department_code }} </span
-              >{{ error.department_code }}
+              <span>{{ formInfo.department_code }} </span>{{ error.department_code }}
             </p>
           </div>
           <div style="margin-left: 9px" class="row-input-right">
             <label for="item-input">{{ formInfo.department_name }}</label>
             <br />
-            <input
-              disabled
-              type="text"
-              class="item-input"
-              v-model="fixedAsset.department_name"
-            />
+            <input disabled type="text" class="item-input" v-model="fixedAsset.department_name" />
           </div>
         </div>
         <div class="row-input">
@@ -100,23 +68,14 @@
             </div>
 
             <br />
-            <Combobox
-              class="combobox item-input check-input"
-              :items="fixedAssetCategory"
-              :code="'fixed_asset_category_code'"
-              :fieldCode="'fixed_asset_category_code'"
-              :fieldName="'fixed_asset_category_name'"
-              @selectedItem="selectItemCategory"
-              :value="fixedAsset.fixed_asset_category_code"
-              refName="'fixed_asset_category_code'"
-              :border="
+            <Combobox class="combobox item-input check-input" :items="fixedAssetCategory"
+              :code="'fixed_asset_category_code'" :fieldCode="'fixed_asset_category_code'"
+              :fieldName="'fixed_asset_category_name'" @selectedItem="selectItemCategory"
+              :value="fixedAsset.fixed_asset_category_code" refName="'fixed_asset_category_code'" :border="
                 error.fixed_asset_category_code != '' ? 'border-red' : ''
-              "
-              @onBlur="validate('fixed_asset_category_code')"
-            />
+              " @onBlur="validate('fixed_asset_category_code')" />
             <p class="error" v-if="error.fixed_asset_category_code != ''">
-              <span>{{ formInfo.fixed_asset_category_code }} </span
-              >{{ error.fixed_asset_category_code }}
+              <span>{{ formInfo.fixed_asset_category_code }} </span>{{ error.fixed_asset_category_code }}
             </p>
 
             <!-- <div class="icon icon-down-bold"></div> -->
@@ -126,31 +85,17 @@
               formInfo.fixed_asset_category_name
             }}</label>
             <br />
-            <input
-              v-model="fixedAsset.fixed_asset_category_name"
-              disabled
-              type="text"
-              class="item-input"
-            />
+            <input v-model="fixedAsset.fixed_asset_category_name" disabled type="text" class="item-input" />
           </div>
         </div>
         <div class="row-input-cl3 input-number">
           <div class="item-input-cl3">
             <div class="lb">
-              <label for="item-input">{{ formInfo.quantity }} </label
-              ><span>*</span>
+              <label for="item-input">{{ formInfo.quantity }} </label><span>*</span>
             </div>
             <br />
-            <el-input-number
-              v-model="fixedAsset.quantity"
-              :min="1"
-              :max="100000"
-              controls-position="right"
-              size="large"
-              @change="handleChange"
-              :class="error.quantity != '' ? 'border-red' : ''"
-              @blur="validate('quantity')"
-            />
+            <el-input-number v-model="fixedAsset.quantity" :min="1" :max="100000" controls-position="right" size="large"
+              @change="handleChange" :class="error.quantity != '' ? 'border-red' : ''" @blur="validate('quantity')" />
 
             <p class="error" v-if="error.quantity != ''">
               <span>{{ formInfo.quantity }} </span>{{ error.quantity }}
@@ -161,16 +106,9 @@
               <label for="item-input">{{ formInfo.cost }}</label> <span>*</span>
             </div>
             <br />
-            <input
-              v-model="fixedAsset.cost"
-              type="text"
-              @change="formatCost"
-              id="price"
-              class="check-input item-input text-right"
-              ref="cost"
-              :class="error.cost != '' ? 'border-red' : ''"
-              @blur="validate('cost')"
-            />
+            <input v-model="fixedAsset.cost" type="text" @change="formatCost" id="price"
+              class="check-input item-input text-right" ref="cost" :class="error.cost != '' ? 'border-red' : ''"
+              @blur="validate('cost')" />
             <p class="error" v-if="error.cost != ''">
               <span>{{ formInfo.cost }} </span>{{ error.cost }}
             </p>
@@ -178,19 +116,11 @@
 
           <div class="item-input-cl3">
             <div class="lb">
-              <label for="item-input">{{ formInfo.life_time }}</label
-              ><span>*</span>
+              <label for="item-input">{{ formInfo.life_time }}</label><span>*</span>
             </div>
             <br />
-            <input
-              v-model="fixedAsset.life_time"
-              id="yearNumber"
-              type="text"
-              class="check-input item-input text-right"
-              ref="life_time"
-              :class="error.life_time != '' ? 'border-red' : ''"
-              @blur="validate('life_time')"
-            />
+            <input v-model="fixedAsset.life_time" id="yearNumber" type="text" class="check-input item-input text-right"
+              ref="life_time" :class="error.life_time != '' ? 'border-red' : ''" @blur="validate('life_time')" />
             <p class="error" v-if="error.life_time != ''">
               <span>{{ formInfo.life_time }} </span>{{ error.life_time }}
             </p>
@@ -204,8 +134,8 @@
               <span>*</span>
             </div>
             <br />
-
-            <el-input-number
+            <input type="text" class="text-right" v-model="fixedAsset.depreciation_rate" disabled>
+            <!-- <el-input-number
               v-model="fixedAsset.depreciation_rate"
               :min="0"
               :step="0.1"
@@ -214,11 +144,10 @@
               @change="handleChange"
               :class="error.depreciation_rate != '' ? 'border-red' : ''"
               @blur="validate('depreciation_rate')"
-            />
+            /> -->
 
             <p class="error" v-if="error.depreciation_rate != ''">
-              <span>{{ formInfo.depreciation_rate }} </span
-              >{{ error.depreciation_rate }}
+              <span>{{ formInfo.depreciation_rate }} </span>{{ error.depreciation_rate }}
             </p>
           </div>
           <div class="item-input-cl3">
@@ -227,31 +156,18 @@
               <span>*</span>
             </div>
             <br />
-            <input
-              disabled
-              v-model="fixedAsset.depreciation_value"
-              id="amorYear"
-              type="text"
-              class="check-input item-input text-right"
-              ref="depreciation_value"
-              :class="error.depreciation_value != '' ? 'border-red' : ''"
-              @blur="validate('depreciation_value')"
-            />
+            <input disabled v-model="fixedAsset.depreciation_value" id="amorYear" type="text"
+              class="check-input item-input text-right" ref="depreciation_value"
+              :class="error.depreciation_value != '' ? 'border-red' : ''" @blur="validate('depreciation_value')" />
             <p class="error" v-if="error.depreciation_value != ''">
-              <span>{{ formInfo.depreciation_value }} </span
-              >{{ error.depreciation_value }}
+              <span>{{ formInfo.depreciation_value }} </span>{{ error.depreciation_value }}
             </p>
           </div>
 
           <div class="item-input-cl3">
             <label for="item-input">{{ formInfo.production_year }}</label>
             <br />
-            <input
-              v-model="fixedAsset.production_year"
-              readonly
-              type="text"
-              class="item-input text-right"
-            />
+            <input v-model="fixedAsset.production_year" readonly type="text" class="item-input text-right" />
           </div>
         </div>
         <div class="row-input-end">
@@ -262,13 +178,8 @@
             <br />
 
             <div class="form-input">
-              <el-date-picker
-                v-model="fixedAsset.purchase_date"
-                type="date"
-                :placeholder="dateConfig.Format"
-                :format="dateConfig.Format"
-                value-format="YYYY-MM-DD"
-              />
+              <el-date-picker v-model="fixedAsset.purchase_date" type="date" :placeholder="dateConfig.Format"
+                :format="dateConfig.Format" value-format="YYYY-MM-DD" />
             </div>
           </div>
           <div class="item-input-cl3">
@@ -277,13 +188,11 @@
             }}</label>
             <br />
             <div class="form-input">
-              <el-date-picker
-                v-model="fixedAsset.tracked_year"
-                type="date"
-                :placeholder="dateConfig.Format"
-                :format="dateConfig.Format"
-                value-format="YYYY-MM-DD"
-              />
+              <el-date-picker v-model="fixedAsset.tracked_year" type="date" :placeholder="dateConfig.Format"
+                :format="dateConfig.Format" value-format="YYYY-MM-DD" :class="error.tracked_year != '' ? 'border-red' : ''"/>
+                <p class="error" v-if="error.tracked_year != ''">
+           {{ error.tracked_year }}
+            </p>
             </div>
           </div>
         </div>
@@ -297,14 +206,8 @@
         </button>
       </div>
     </div>
-    <Popup
-      v-show="isShowPopup"
-      @hidePopup="hidePopupm"
-      @hidePopupAndForm="hidePopupForm"
-      :msg="msgError"
-      :name="btnName"
-      :close="closeStatus"
-    ></Popup>
+    <Popup v-show="isShowPopup" @hidePopup="hidePopupm" @saveAndHideForm="saveAndHide" :btnLeft="btnLeftName" @hidePopupAndForm="hidePopupForm" :msg="msgError" :name="btnName"
+      :close="closeStatus"></Popup>
     <Notice v-show="isShowNotice"></Notice>
   </div>
 </template>
@@ -353,6 +256,7 @@ export default {
       keyWord: "",
       cost: 0,
       btnName: "",
+      btnLeftName:"",
       formMode: 0,
       isShowNotice: false,
       msgError: "",
@@ -375,13 +279,13 @@ export default {
         life_time: "",
         depreciation_rate: "",
         depreciation_value: "",
+        tracked_year:"",
       }, //  các thông báo lỗi
       rules: {
         fixed_asset_code: { Required: true },
         fixed_asset_name: { Required: true },
         fixed_asset_category_code: { Required: true },
-        depreciation_rate: { Required: true },
-        depreciation_value: { Required: true },
+        tracked_year:{UseDay: true},
         department_code: { Required: true },
         cost: { Required: true, Price: true },
         life_time: { Required: true, Major: 100 },
@@ -404,10 +308,10 @@ export default {
      * AUTHOR: HTTHOA(24/03/2023)
      */
     depreciation_value: function () {
-      this.depreciation_value =
+      this.fixedAsset.depreciation_value =
         parseInt(
           this.convertMoneyToNum(this.fixedAsset.cost) *
-            this.fixedAsset.depreciation_rate
+          this.fixedAsset.depreciation_rate
         ) / 100;
     },
   },
@@ -434,26 +338,35 @@ export default {
       this.depreciation_value =
         parseInt(
           this.convertMoneyToNum(this.fixedAsset.cost) *
-            this.fixedAsset.depreciation_rate
+          this.fixedAsset.depreciation_rate
         ) / 100;
     },
     /**
      * click nút save
      * AUTHOR: HTTHOA(10/03/2023)
      */
+     saveAndHide(value){
+      this.showPopup(value);
+      this.closeForm();
+      this.onClickSave()
+     },
+     
     onClickSave() {
       console.log(this.formMode);
       if (!this.validateAll()) {
-        console.log("validate lỗi");
+        this.isShowPopup=true
+        this.btnName=btnPopup.Agree
+        this.msgError=NoticeMsg.ValidateError
+        this.closeStatus=7
       } else {
-        console.log("validate ok");
         this.fixedAsset.cost = this.convertMoneyToNum(this.fixedAsset.cost);
-        this.fixedAsset.depreciation_value = this.convertMoneyToNum(
-          this.fixedAsset.depreciation_value
-        );
-        if (this.formMode == 1) {
+        this.fixedAsset.depreciation_value = this.convertMoneyToNum(this.fixedAsset.depreciation_value);
+
+        if (this.formMode == FormDetailMode.Edit) {
+
           this.editData();
         } else {
+
           this.saveData();
         }
       }
@@ -541,17 +454,9 @@ export default {
           })
 
           .catch(function () {
-            if (res.response.data.ErrorCode == 5) {
-              me.isShowPopup = true;
-              me.closeStatus = 5;
-              me.msgError =
-                "Mã tài sản " +
-                me.fixedAsset.fixed_asset_code +
-                " đã tồn tại trong hệ thống. Vui lòng kiểm tra lại";
-              me.btnName = "Đồng ý";
-            } else {
-              toast.error(Msg.AddError, { timeout: 2000 });
-            }
+
+            toast.error(Msg.EditError, { timeout: 2000 });
+
           });
       } catch (error) {
         console.log(error);
@@ -671,26 +576,48 @@ export default {
         return true;
       }
 
-      // tỷ lệ hao mòn thay đổi thì kiểm tra lại số năm sử dụng
-      // if (propName == "depreciation_rate") {
-      //   if (
-      //     this.fixedAsset.depreciation_rate !=
-      //     (value / this.fixedAsset.life_time).toFixed(2)
-      //   ) {
-      //     this.msgError = ErrorMsg.UsedYear;
-      //     this.btnName = btnPopup.Agree;
-      //     this.closeStatus = 0;
-      //     this.showPopup();
-      //     this.fixedAsset.depreciation_rate = parseFloat(
-      //       (value / this.fixedAsset.life_time).toFixed(2)
-      //     );
+     
+    },
+    validateUseDay(value, propName) {
+      var  tracked= new Date(this.fixedAsset.tracked_year)
+      var  purchase= new Date(this.fixedAsset.purchase_date)
 
-      //     return false;
-      //   } else {
-      //     this.msgError = "";
-      //     return true;
-      //   }
-      // }
+      if (propName == "tracked_year") {
+        if( tracked.getFullYear() < purchase.getFullYear()){
+          this.error[propName] = ErrorMsg.UsedYear;
+         
+          return false
+        }
+        else  if(tracked.getFullYear() == purchase.getFullYear()){
+          if(tracked.getMonth()+1 < purchase.getMonth()+1){
+            this.error[propName] =  ErrorMsg.UsedYear;
+           
+            return false
+          }
+          else if(tracked.getMonth()+1 == purchase.getMonth()+1){
+            if(tracked.getDate() < purchase.getDate()){
+              this.error[propName] = ErrorMsg.UsedYear;
+             
+              return false
+            }
+            else{
+              this.error[propName] = "";
+              return true
+            }
+
+          }else{
+            this.error[propName] = "";
+            return true
+          }
+        }
+       else{
+        this.error[propName] = "";
+        return true
+       }
+        
+      }
+        
+      
     },
     /**
      *
@@ -707,23 +634,7 @@ export default {
         );
         return true;
       }
-      // if (propName == "depreciation_value") {
-      //   if (this.fixedAsset.depreciation_value > cost) {
-      //     this.msgError = ErrorMsg.AttritionValueLessThanMarkedPrice;
-      //     this.btnName = btnPopup.Agree;
-      //     this.showPopup();
-      //     this.closeStatus = 0;
-      //     this.fixedAsset.depreciation_value = parseInt((cost * rate) / 100);
-      //     this.fixedAsset.depreciation_rate =
-      //       this.fixedAsset.depreciation_value / cost;
-
-      //     this.fixedAsset.life_time = 1 / this.fixedAsset.depreciation_rate;
-      //     return false;
-      //   } else {
-      //     this.msgError = " ";
-      //     return true;
-      //   }
-      // }
+   
     },
     /**
      * NHẤN nút hủy ở form
@@ -736,9 +647,19 @@ export default {
         this.$emit("close", false);
       } else {
         this.showPopup();
-        this.closeStatus = 1;
+        if(this.formMode==1){
+        
+        this.closeStatus = 6;
         this.msgError = NoticeMsg.PropertyEdited;
-        this.btnName = btnPopup.cancel;
+         this.btnLeftName=btnPopup.close
+        this.btnName = btnPopup.save;
+        }else{
+          this.closeStatus = 1;
+          this.btnLeftName=btnPopup.no
+          this.msgError = NoticeMsg.ProopertyAdd;
+          this.btnName = btnPopup.cancel;
+        }
+        
       }
     },
     /**
@@ -884,19 +805,24 @@ export default {
   },
 
   created() {
+  
+    
     this.formMode = this.FormMode;
     if (this.formMode == FormDetailMode.Add) {
       this.fixedAsset = {};
       this.fixedAsset.purchase_date = new Date().toISOString().slice(0, 10);
       this.fixedAsset.tracked_year = new Date().toISOString().slice(0, 10);
-
+      this.fixedAsset.production_year=new Date().getFullYear()
+      this.fixedAsset.depreciation_value=0
+      this.fixedAsset.depreciation_rate=0
       this.getMaxCode();
     }
     if (this.formMode == FormDetailMode.Edit) {
       this.fixedAsset = this.fixedAssetDetail;
+     
       this.fixedAsset.cost = this.formatMoney(this.fixedAssetDetail.cost);
       this.fixedAsset.depreciation_value = this.formatMoney(
-      this.fixedAssetDetail.depreciation_value
+        this.fixedAssetDetail.depreciation_value
       );
       this.oldData = { ...this.fixedAssetDetail };
     }
@@ -907,7 +833,7 @@ export default {
       this.fixedAsset.tracked_year = new Date().toISOString().slice(0, 10);
       this.fixedAsset.cost = this.formatMoney(this.fixedAssetDetail.cost);
       this.fixedAsset.depreciation_value = this.formatMoney(
-      this.fixedAssetDetail.depreciation_value
+        this.fixedAssetDetail.depreciation_value
       );
     }
 
@@ -918,69 +844,82 @@ export default {
 </script>
 <style>
 .border-red {
-  border: 1px solid red;
+  border-color:  red;
 }
+.el-input .el-input--prefix .el-input--suffix .el-date-editor .el-date-editor--date  .el-tooltip__trigger .el-tooltip__trigger{
+  border: 0px solid transparent !important;
+}
+
 .el-input-number .el-input-number__decrease .el-icon svg {
   background: url("../../assets/icon/qlts-icon.svg") no-repeat -72px -338px !important;
   width: 10px !important;
   height: 8px !important;
 }
+
 .el-input-number .el-input-number__increase .el-icon svg {
   background: url("../../assets/icon/qlts-icon.svg") no-repeat -28px -338px !important;
   width: 10px !important;
   height: 8px !important;
 }
+
 .el-input-number .el-icon {
   font-size: 18px !important;
   width: 10px !important;
   height: 8px !important;
 }
-.el-input-number.is-controls-right
-  .el-input-number__decrease
-  [class*="el-icon"],
-.el-input-number.is-controls-right
-  .el-input-number__increase
-  [class*="el-icon"] {
+
+.el-input-number.is-controls-right .el-input-number__decrease [class*="el-icon"],
+.el-input-number.is-controls-right .el-input-number__increase [class*="el-icon"] {
   transform: none !important;
 }
+
 .el-input-number--large {
   width: 260px !important;
   line-height: 38px;
   box-sizing: border-box;
 }
+
 .el-input-number path {
   display: none;
 }
+
 .el-input-number__decrease,
 .el-input-number__increase {
   background: #ffff !important;
   border: none !important;
 }
+
 .el-input-number--large .el-input-number__decrease,
 .el-input-number--large .el-input-number__increase {
   width: 35px !important;
 }
+
 .el-input-number.is-controls-right[class*="large"] [class*="decrease"] {
   --el-input-number-controls-height: 10px !important;
   height: 8px !important;
   margin-bottom: 8px;
 }
+
 .el-input-number.is-controls-right[class*="large"] [class*="increase"] {
   --el-input-number-controls-height: 10px !important;
   margin-top: 18px;
   height: 8px !important;
 }
+
 .el-input-number .el-input__inner {
   margin-right: -155px;
   padding: 0px 0px 0px 0px;
 }
+
 .input-number .el-input__wrapper {
   margin-top: 8px;
   padding: 1px 20px 0 14px !important;
 }
+
 .el-input-number.el-input-number--large.is-controls-right {
   border: none !important;
 }
+
 #form {
   width: 100%;
 }

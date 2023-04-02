@@ -39,7 +39,7 @@
 
 .drop-down {
     width: fit-content;
-    min-width: 100%;
+    min-width: 96%;
     position: absolute;
     top: calc(100% + 1px);
     left: 0;
