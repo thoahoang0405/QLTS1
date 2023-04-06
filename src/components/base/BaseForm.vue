@@ -1,5 +1,5 @@
 <template>
-  <div id="form" @keypress.exact.enter="onClickSave">
+  <div id="form" @keypress.exact.enter="onClickSave" @keyup.esc="onClickBtnCancel">
     <div class="form">
       <div class="form-header">
         <h2 id="hd-form">{{ formName }}</h2>
@@ -106,7 +106,7 @@
               <label for="item-input">{{ formInfo.cost }}</label> <span>*</span>
             </div>
             <br />
-            <input v-model="fixedAsset.cost" type="text" @change="formatCost" id="price"
+            <input v-model="fixedAsset.cost" type="text" @change="formatCost" id="price" @keypress="inputEnterNumber($event)"
               class="check-input item-input text-right" ref="cost" :class="error.cost != '' ? 'border-red' : ''"
               @blur="validate('cost')" />
             <p class="error" v-if="error.cost != ''">
@@ -119,7 +119,7 @@
               <label for="item-input">{{ formInfo.life_time }}</label><span>*</span>
             </div>
             <br />
-            <input v-model="fixedAsset.life_time" id="yearNumber" type="text" class="check-input item-input text-right"
+            <input v-model="fixedAsset.life_time" id="yearNumber" @keypress="inputEnterNumber($event)" type="text" class="check-input item-input text-right"
               ref="life_time" :class="error.life_time != '' ? 'border-red' : ''" @blur="validate('life_time')" />
             <p class="error" v-if="error.life_time != ''">
               <span>{{ formInfo.life_time }} </span>{{ error.life_time }}
@@ -188,7 +188,7 @@
             }}</label>
             <br />
             <div class="form-input">
-              <el-date-picker v-model="fixedAsset.tracked_year" type="date" :placeholder="dateConfig.Format"
+              <el-date-picker @blur="validate('tracked_year')" v-model="fixedAsset.tracked_year" type="date" :placeholder="dateConfig.Format"
                 :format="dateConfig.Format" value-format="YYYY-MM-DD" :class="error.tracked_year != '' ? 'border-red' : ''"/>
                 <p class="error" v-if="error.tracked_year != ''">
            {{ error.tracked_year }}
@@ -221,7 +221,7 @@ import { DateConfig } from "../../js/common/config";
 import { Form } from "../../js/common/form";
 import Popup from "../base/BasePopup.vue";
 import { ErrorMsg, btnPopup, Msg, NoticeMsg } from "../../js/common/resource";
-import { FormDetailMode } from "../../js/common/enumeration";
+import { FormDetailMode , CloseST} from "../../js/common/enumeration";
 import Notice from "./BasePopupNotice.vue";
 import { useToast } from "vue-toastification";
 import {
@@ -262,7 +262,7 @@ export default {
       msgError: "",
       oldDatta: {},
       date: "",
-
+      currentTabindex:1,
       fixedAsset: {
         production_year: 2023,
       },
@@ -282,7 +282,7 @@ export default {
         tracked_year:"",
       }, //  các thông báo lỗi
       rules: {
-        fixed_asset_code: { Required: true },
+        fixed_asset_code: { Required: true, Length:7 },
         fixed_asset_name: { Required: true },
         fixed_asset_category_code: { Required: true },
         tracked_year:{UseDay: true},
@@ -352,12 +352,13 @@ export default {
      },
      
     onClickSave() {
-      console.log(this.formMode);
+      
+  
       if (!this.validateAll()) {
         this.isShowPopup=true
         this.btnName=btnPopup.Agree
         this.msgError=NoticeMsg.ValidateError
-        this.closeStatus=7
+        this.closeStatus=CloseST.ValiDate
       } else {
         this.fixedAsset.cost = this.convertMoneyToNum(this.fixedAsset.cost);
         this.fixedAsset.depreciation_value = this.convertMoneyToNum(this.fixedAsset.depreciation_value);
@@ -370,6 +371,8 @@ export default {
           this.saveData();
         }
       }
+      
+      
     },
     /**
      * focus vào mã tài sản
@@ -416,14 +419,15 @@ export default {
 
           .catch(function (res) {
             console.log(res.response.data.ErrorCode);
-            if (res.response.data.ErrorCode == 5) {
+            if (res.response.data.ErrorCode == CloseST.DuplicateCode) {
               me.isShowPopup = true;
-              me.closeStatus = 5;
+              me.closeStatus = CloseST.DuplicateCode;
               me.msgError =
-                "Mã tài sản " +
-                me.fixedAsset.fixed_asset_code +
-                " đã tồn tại trong hệ thống. Vui lòng kiểm tra lại";
-              me.btnName = "Đồng ý";
+              ErrorMsg.MsgDuplicateLeft +
+               me.fixedAsset.fixed_asset_code + ErrorMsg.MsgDuplicateRight;
+              me.btnName = btnPopup.Agree;
+              me.focusToInputError();
+             
             } else {
               toast.error(Msg.AddError, { timeout: 2000 });
             }
@@ -451,11 +455,24 @@ export default {
             me.fixedAsset = {};
             toast.success(Msg.EditSucces, { timeout: 2000 });
             me.$emit("loadData");
+           
           })
 
-          .catch(function () {
-
-            toast.error(Msg.EditError, { timeout: 2000 });
+          .catch(function (res) {
+            if (res.response.data.ErrorCode == CloseST.DuplicateCode) {
+              me.isShowPopup = true;
+              me.closeStatus = CloseST.DuplicateCode;
+              me.msgError =
+              ErrorMsg.MsgDuplicateLeft +
+               me.fixedAsset.fixed_asset_code + ErrorMsg.MsgDuplicateRight;
+              me.btnName = btnPopup.Agree;
+              me.focusToInputError();
+              
+            } 
+            else {
+              toast.error(Msg.EditError, { timeout: 2000 });
+            }
+          
 
           });
       } catch (error) {
@@ -528,6 +545,10 @@ export default {
           isValidAll = isValid;
         }
       }
+      if (!isValidAll) {
+        this.focusToInputError();
+      }
+
       return isValidAll;
     },
     /**
@@ -558,9 +579,12 @@ export default {
         this.error[propName] = ErrorMsg.Required;
 
         return false;
-      }
-      this.error[propName] = "";
+      }else{
+        this.error[propName] = "";
       return true;
+      }
+
+      
     },
     /**
      *
@@ -578,6 +602,24 @@ export default {
 
      
     },
+    validateLength(value, propName) {
+      // số năm sử dụng thay đổi thì kiểm tra lại tỷ lệ hao mòn
+      if (propName == "fixed_asset_code") {
+       if(this.fixedAsset.fixed_asset_code.length > value){
+        this.error[propName] = ErrorMsg.LengthError;
+        return false
+       }else{
+        return true;
+       }
+      }
+
+     
+    },
+    /**
+     * validate ngày sử dụng k nhỏ hơn ngày mua
+     * AUTHOR: HTTHOA(2/4/2023)
+     
+     */
     validateUseDay(value, propName) {
       var  tracked= new Date(this.fixedAsset.tracked_year)
       var  purchase= new Date(this.fixedAsset.purchase_date)
@@ -641,23 +683,22 @@ export default {
      * AUTHOR: HTTHOA(9/03/2023)
      */
     onClickBtnCancel() {
-      let checkDataChange =
+      let checkDataNoChange =
         JSON.stringify(this.oldData) === JSON.stringify(this.fixedAsset);
-      if (checkDataChange) {
+      if (checkDataNoChange) {
         this.$emit("close", false);
       } else {
         this.showPopup();
-        if(this.formMode==1){
-        
-        this.closeStatus = 6;
+        if(this.formMode==FormDetailMode.Edit){       
+        this.closeStatus = CloseST.EditClose;
         this.msgError = NoticeMsg.PropertyEdited;
-         this.btnLeftName=btnPopup.close
-        this.btnName = btnPopup.save;
+         this.btnLeftName=btnPopup.Close
+        this.btnName = btnPopup.Save;
         }else{
-          this.closeStatus = 1;
-          this.btnLeftName=btnPopup.no
+          this.closeStatus = CloseST.AddClose;
+          this.btnLeftName=btnPopup.No
           this.msgError = NoticeMsg.ProopertyAdd;
-          this.btnName = btnPopup.cancel;
+          this.btnName = btnPopup.Cancel;
         }
         
       }
@@ -802,6 +843,38 @@ export default {
       this.showPopup(value);
       this.closeForm();
     },
+    /**
+     * những ô input number k được nhập chữ vào
+     */
+    inputEnterNumber(evt) {
+      var charCode =  evt.keyCode;
+      if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+        evt.preventDefault();
+      } else {
+        return true;
+      }
+    },
+    focusToInputError() {
+      try {
+        let i = 1;
+        for (const key in this.error) {
+          // kiểm tra xem trường nào có lỗi thì focus vào trường đó và break ngay
+          if (this.error[key] !== "") {
+            this.currentTabindex = i;
+            this.setFocusError(this.currentTabindex);
+            break;
+          }
+          i++;
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    setFocusError(tabindex) {
+      if (this.$el.querySelector(`input[tabindex='${tabindex}']`)) {
+        this.$el.querySelector(`input[tabindex='${tabindex}']`).focus();
+      }
+    },
   },
 
   created() {
@@ -829,8 +902,6 @@ export default {
     if (this.formMode == FormDetailMode.Replication) {
       this.getMaxCode();
       this.fixedAsset = this.fixedAssetDetail;
-      this.fixedAsset.purchase_date = new Date().toISOString().slice(0, 10);
-      this.fixedAsset.tracked_year = new Date().toISOString().slice(0, 10);
       this.fixedAsset.cost = this.formatMoney(this.fixedAssetDetail.cost);
       this.fixedAsset.depreciation_value = this.formatMoney(
         this.fixedAssetDetail.depreciation_value

@@ -1,31 +1,55 @@
 <template>
-  <div id="popup">
+  <div id="popup" @keyup.enter="keypressEnter">
     <div class="popup">
       <div class="popup-body">
         <div class="icon-popup">
-           <div class="icon icon-warning"></div>
+          <div class="icon icon-warning"></div>
         </div>
-       
+
         <div class="content-popup">
-          <span>   <strong v-if="closeStatus==3 ||closeStatus==4">{{ item }}</strong> </span>
-          {{ msg }}
+          <span>
+            <strong v-if="closeStatus == 3 || closeStatus == 4">{{
+              item
+            }}</strong>
+          </span>
+          <span v-html="msg"></span>
         </div>
       </div>
       <div class="popup-footer">
-        <button v-if="closeStatus==1||closeStatus==3||closeStatus==4||closeStatus==6 " class="no btn-hover-outline" @click="onClickBtnNo">
-      {{ btnLeft }}
+        <button
+          ref="nobutton"
+          v-show="
+            closeStatus == 1 ||
+            closeStatus == 3 ||
+            closeStatus == 4 ||
+            closeStatus == 6
+          "
+          class="no btn-hover-outline"
+          @click="onClickBtnNo"
+        >
+          {{ btnLeft }}
         </button>
-        <button v-if="closeStatus==6 " class="no-save" @click="onclickNoSave">
-        Không Lưu
+        <button
+          ref="noSave"
+          v-if="closeStatus == 6"
+          class="no-save"
+          @click="onclickNoSave"
+        >
+          Không Lưu
         </button>
-        <button  class="cancel btn-hover-blue" @click="onClickCancel">
-         {{ name }}
+        <button
+          class="cancel btn-hover-blue"
+          @click="onClickCancel"
+      
+        >
+          {{ name }}
         </button>
       </div>
     </div>
   </div>
 </template>
 <script>
+import { CloseST } from "../../js/common/enumeration";
 export default {
   data() {
     return {
@@ -33,55 +57,51 @@ export default {
     };
   },
   watch: {
-    close:function(value){
-      this.closeStatus=value
-  
-    }
+    close: function (value) {
+      this.closeStatus = value;
+    },
   },
-  props:["msg","name","close","item","btnLeft"],
+  props: ["msg", "name", "close", "item", "btnLeft"],
   methods: {
+   
+    keypressEnter() {
+    
+      if (this.closeStatus == CloseST.EditClose) {
+        this.onclickNoSave();
+      }
+    },
     // tắt popup
     onClickBtnNo() {
-     
       this.$emit("hidePopup", false);
     },
-    onclickNoSave(){
-      this.$emit("hidePopupAndForm",false)
+    onclickNoSave() {
+      this.$emit("hidePopupAndForm", false);
     },
     //tắt popup, form
     onClickCancel() {
       console.log(this.closeStatus);
-     
-      if(this.closeStatus == 2 || this.closeStatus==7){
-       
-        this.$emit("hidePopup",false)
-     }
-     else if(this.closeStatus == 3||this.closeStatus == 4){
-       
-       this.$emit("isDelete",false)}
-       else if(this.closeStatus==6){
-        this.$emit("saveAndHideForm",false)
-       }
-    // else if(this.closeStatus == 4){
-      
-    //    this.$emit("isDelete",false)
-    //   } 
-     
-      else{
-        this.$emit("hidePopupAndForm", false);
-       
+
+      if (this.closeStatus == CloseST.DeleteCloseNotChoose || this.closeStatus == CloseST.ValiDate||this.closeStatus==CloseST.DuplicateCode) {
+        this.$emit("hidePopup", false);
+      } else if (this.closeStatus == CloseST.DeleteMulti || this.closeStatus == CloseST.DeleteOne) {
+        this.$emit("isDelete", false);
+      } else if (this.closeStatus == CloseST.EditClose) {
+        this.$emit("saveAndHideForm", false);
       }
-    
-      
+      // else if(this.closeStatus == 4){
+
+      //    this.$emit("isDelete",false)
+      //   }
+      else {
+        this.$emit("hidePopupAndForm", false);
+      }
     },
-  },
-  created() {
-  },
+  }
 };
 </script>
 <style>
-.no-save{
-  color:#1aa4c8;
+.no-save {
+  color: #1aa4c8;
   background-color: #fff;
   border: 1px solid #1aa4c8;
   margin-left: 12px;
@@ -112,9 +132,8 @@ export default {
 }
 .popup-body {
   display: flex;
- 
-  margin-top: 24px;
- 
+
+  margin-top: 30px;
 }
 #content {
   margin-left: 20px;
@@ -123,12 +142,14 @@ export default {
   width: calc(100% - 80px);
 }
 .content-popup {
-  margin-top: 10px;
- 
+ margin-bottom: 20px;
+
   justify-content: flex-start;
   margin-left: 10px;
 }
-
+.icon-popup {
+    margin-top: -8px;
+}
 .popup-footer {
   display: flex;
   justify-content: flex-end;

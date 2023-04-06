@@ -2,9 +2,9 @@
   <div
     class="m-combobox m-combobox-2"
     @click="toggleCombobox"
-    @keyup.enter="selectItem"
-    @keyup.down.stop="keyDown"
-    @keyup.up.stop="keyUp"
+    @keydown.enter.stop="selectItem"
+    @keyup.down="keyDown"
+    @keyup.up="keyUp"
   >
     <input
       class="input"

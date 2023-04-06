@@ -95,6 +95,20 @@
             </tr>
           </thead>
           <tbody>
+           <tr style="border: none" class="data" v-if="totalRecord==0">
+            <td colspan="1" class="noData"></td>
+            <td colspan="1" class="noData"></td>
+            <td colspan="1" class="noData"></td>
+            <td colspan="1" class="noData"></td>
+            <td colspan="1" class="noData"></td>
+            <td colspan="2" class="noData text-center"  >Không có dữ liệu </td>
+            <td colspan="1" class="noData"></td>
+            <td colspan="1" class="noData"></td>
+            <td colspan="1" class="noData"></td>
+            <td colspan="1" class="noData"></td>
+
+           </tr>
+           
             <tr
               ref="rowCheck"
               :class="listFixedAsset.includes(asset) ? 'active' : ''"
@@ -208,7 +222,7 @@
               </td>
             </tr>
           </tbody>
-          <tfoot>
+          <tfoot v-if="totalRecord!=0">
             <tr class="tb-footer" style="background: #ffff">
               <td
                 colspan="3"
@@ -438,7 +452,7 @@ import {
   PlaceHolder,
 } from "../../js/common/resource";
 import { useToast } from "vue-toastification";
-import { FormDetailMode } from "../../js/common/enumeration";
+import { FormDetailMode,CloseST } from "../../js/common/enumeration";
 import {
   URL_FixedAssetPaging,
   URL_Category,
@@ -503,6 +517,7 @@ export default {
       totalImprover: 0,
       listOnMouseDown: {},
       listOnMouseUp: {},
+      oldKeyDepartment:"",
     };
   },
   components: {
@@ -518,16 +533,7 @@ export default {
         this.getPagingAsset();
       }
     },
-    department_id: function () {
-      if (this.department_id == "") {
-        this.getPagingAsset();
-      }
-    },
-    fixed_asset_category_id: function () {
-      if (this.fixed_asset_category_id == "") {
-        this.getPagingAsset();
-      }
-    },
+   
     fixedAsset: function () {
       if (this.fixedAsset.department_id == "") {
         this.getPagingAsset();
@@ -678,7 +684,7 @@ export default {
     keywordDepartment(value) {
       this.keywordDep = value;
 
-      if (this.keywordDep == "") {
+      if (this.keywordDep == "" ) {
         this.department_id = " ";
         this.pageNumber = 1;
         this.getPagingAsset();
@@ -690,7 +696,7 @@ export default {
     keywordCateGo(value) {
       this.keywordCate = value;
 
-      if (this.keywordCate == "") {
+      if (this.keywordCate == "" ) {
         this.fixed_asset_category_id = " ";
         this.pageNumber = 1;
         this.getPagingAsset();
@@ -743,12 +749,13 @@ export default {
       console.log(value.department_name);
       if (value.department_id) {
         this.department_id = value.department_id;
+        this.pageNumber = 1;
+      this.getPagingAsset();
       } else {
         this.department_id = "";
-        this.getPagingAsset();
+       
       }
-      this.pageNumber = 1;
-      this.getPagingAsset();
+      
     },
     /**
      * lấy thông tin phòng ban từ combobox
@@ -758,12 +765,15 @@ export default {
       console.log(value.fixed_asset_category_id);
       if (value.fixed_asset_category_id) {
         this.fixed_asset_category_id = value.fixed_asset_category_id;
+        this.oldKeyDepartment=value.fixed_asset_category_id
+        this.pageNumber = 1;
+      this.getPagingAsset();
       } else {
         this.fixed_asset_category_id = "";
-        this.getPagingAsset();
+        this.oldKeyDepartment=""
+       
       }
-      this.pageNumber = 1;
-      this.getPagingAsset();
+    
     },
     /**
      * hiển thị popup
@@ -789,7 +799,7 @@ export default {
       if (this.listFixedAsset.length < 1) {
         this.showPopup(true);
         this.msgError = ErrorMsg.NotChooseProperty;
-        this.closeStatus = 2;
+        this.closeStatus = CloseST.DeleteCloseNotChoose;
         this.btnName = btnPopup.Agree;
       } else {
         this.showPopup(false);
@@ -1090,24 +1100,24 @@ export default {
         if (this.listFixedAsset.length == 0) {
           this.showPopup(true);
           this.msgDelete = ErrorMsg.NotChooseProperty;
-          this.closeStatus = 2;
-          this.btnName = btnPopup.closePop;
+          this.closeStatus = CloseST.DeleteCloseNotChoose;
+          this.btnName = btnPopup.ClosePop;
         } else if (this.listFixedAsset.length == 1) {
           //hiển thị confirm
           //nút confirm
           this.showPopup(true);
           this.msgDelete = NoticeMsg.ConfirmDelet;
-          this.closeStatus = 4;
-          this.btnName = btnPopup.delete;
-          this.btnNameLeft = btnPopup.no;
+          this.closeStatus = CloseST.DeleteOne;
+          this.btnName = btnPopup.Delete;
+          this.btnNameLeft = btnPopup.No;
           this.itemDelete = this.listFixedAsset[0].fixed_asset_code;
         } else {
           this.showPopup(true);
           this.itemDelete = this.listFixedAsset.length + " tài sản";
           this.msgDelete = NoticeMsg.ConfirmDelet;
-          this.closeStatus = 3;
-          this.btnNameLeft = btnPopup.no;
-          this.btnName = btnPopup.delete;
+          this.closeStatus = CloseST.DeleteMulti;
+          this.btnNameLeft = btnPopup.No;
+          this.btnName = btnPopup.Delete;
         }
         console.log(this.listFixedAsset);
       } catch (err) {
@@ -1135,6 +1145,18 @@ export default {
 };
 </script>
 <style>
+.data{
+ 
+ 
+  width: 100%;
+}
+.noData{
+ 
+  
+  height: auto;
+  margin: auto auto;
+  align-items: center;
+}
 .pagination {
   display: flex;
   color: #000;

@@ -25,7 +25,7 @@
         </div>
       </div>
   
-      <div class="drop-down"  @mouseleave="isShowCbb=false" v-show="isShowCbb">
+      <div class="drop-down"   v-show="isShowCbb">
         
   
         <div class="drop-down-body" >
