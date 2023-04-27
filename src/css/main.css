@@ -3,6 +3,7 @@
 @import url("./icon/icon.css");
 @import url("./layout/table.css");
 @import url("./layout/form.css" );
+
 * {
     font-family: "Roboto", sans-serif;
   }
@@ -23,7 +24,34 @@
   h2 {
     font-size: 20px;
   }
-  
+  .Vue-Toastification__toast--success {
+    background-color: #ffffff !important;
+    color: #111 !important;
+}
+.Vue-Toastification__toast--success .Vue-Toastification__icon {
+
+  color: #1ebb0bed !important;
+  border: 4px solid  #13c5284f  !important;
+  border-radius: 50% !important;
+}
+.Vue-Toastification__toast--success  .Vue-Toastification__progress-bar {
+  background-color: #1ebb0bed !important;
+
+}
+.Vue-Toastification__toast{
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3) !important;
+  font-family: "Roboto", sans-serif !important;
+}
+.Vue-Toastification__toast--error {
+  background-color: #fff !important;
+  color: #111 !important;
+}
+.Vue-Toastification__toast--error .Vue-Toastification__icon{
+  color: red !important;
+}
+.Vue-Toastification__toast--error  .Vue-Toastification__progress-bar {
+  background-color:red !important;
+}
   .bold {
     font-weight: bold;
   }
@@ -189,6 +217,9 @@
     position: relative;
     margin-right: 8px;
   }
+  input[type="checkbox"]{
+    cursor: pointer;
+  }
   .search {
     background-color: #ffffff;
     border-radius: 2.5px;
@@ -198,6 +229,9 @@
     overflow: hidden;
     padding-left: 38px;
     box-sizing: border-box;
+  }
+  .item-header .input{
+    margin-left: 9px;
   }
   .icon-filter,
   .icon-search {

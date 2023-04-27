@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import HomePage from "../src/components/page/HomePage.vue"
- import PropertyManagementPage from "./components/page/AssetManagementPage.vue";
-
+ import AssetManagementPage from "./components/page/AssetManagementPage.vue";
+import IncreaseAsset from "./components/page/IncreaseFixedAssetPage.vue"
 const routes =  [
     {
         
@@ -11,35 +11,37 @@ const routes =  [
         children: [
             {
               path: "/tongquan",
-              component: PropertyManagementPage,
+              component: AssetManagementPage,
             },
             {
               path: "/taisan",
-              component: PropertyManagementPage,
+              component: AssetManagementPage,
+             
             },
             {
               path: "/timkiem",
-              component: PropertyManagementPage,
+              component: AssetManagementPage,
+
             },
             {
               path: "/congcu",
-              component: PropertyManagementPage,
+              component: AssetManagementPage,
             },
             {
               path: "/danhmuc",
-              component: PropertyManagementPage,
+              component: AssetManagementPage,
             },
             {
               path: "/baocao",
-              component: PropertyManagementPage,
+              component: AssetManagementPage,
             },
             {
               path: "/taisanhbdt",
-              component: PropertyManagementPage,
+              component: AssetManagementPage,
             },
             {
               path: "/ghitang",
-              component: PropertyManagementPage,
+              component: IncreaseAsset,
             },
           ],
 

@@ -100,13 +100,16 @@
   background-color: #f5f3f3;
   outline: none;
 }
+.icon-delete,
 .icon-edit, .icon-replicate{
   position: relative;
 }
+.icon-delete:hover .tooltip,
 .icon-edit:hover .tooltip,
 .icon-replicate:hover .tooltip{
   display:inline-block;
 }
+.icon-delete .tooltip,
 .icon-replicate .tooltip,
 .icon-edit .tooltip{
  
@@ -170,16 +173,19 @@
   background-color: #ffffff;
   border-radius: 3.5px;
   border: 1px solid #afafaf;
-  box-shadow: 3px 3px 3px 10px rgba(0, 0, 0, 0.16);
   width:calc(100% - 244px);
-  overflow-x: auto;
-  overflow-y: auto;
+  overflow-x: hidden;
+  overflow-y: hidden;
   margin-top: 16px;
 
 }
+tfoot tr{
+border-top: 1px solid #afafaf !important;
+  border-collapse:separate;
+}
 div#table\ {
   /* height: 565px; */
-  height: calc(100% - 35px);
+  height: calc(100% - 45px);
   box-shadow: 3px 5px 8px 0 rgba(0, 0, 0, 0.2);
 
 }
@@ -189,19 +195,20 @@ div#table\ {
 .table2{
   background-color: #fff;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
-  overflow-y: none;
+  overflow-y: auto;
   width: 100%;
   padding: 0;
-  overflow-x: hidden;
+  overflow-x: auto;
 }
 
 .table {
   background-color: #fff;
   height: 100%;
-  overflow-y: scroll;
+  overflow-y: auto;
   width: 100%;
   padding: 0;
-  overflow-x: scroll;
+  overflow-x: auto;
+  border: 1px solid #ccc;
 }
 .table::-webkit-scrollbar {
   width: 2px;
@@ -226,7 +233,9 @@ table:focus {
 }
 tbody{
  height: calc(100% - 90px);
-}
+ width: 100%;
+ overflow-x: auto;
+  }
 table tr {
   height: 40px;
   max-height: 40px;
@@ -261,6 +270,10 @@ table td,
 table th {
   padding: 0 10px;
 
+}
+table th:hover{
+  /* resize: horizontal; */
+  overflow: auto;
 }
 
 table td:first-child,
@@ -325,14 +338,14 @@ input[type="checkbox"] {
 .table input[type="checkbox"]:after {
   background: url("../../assets/icon/All-icon.svg") no-repeat -69px -201px;
   width: 14px;
-  height: 15px;
+  height: 18px;
   content: "";
   display: inline-block;
 }
 .table input[type="checkbox"]:checked::after {
   background: url("../../assets/icon/All-icon.svg") no-repeat -25px -201px;
   width: 14px;
-  height: 15px;
+  height: 18px;
   content: "";
   display: inline-block;
 }
@@ -355,6 +368,7 @@ input[type="checkbox"] {
   background-color: #ffff;
   box-sizing: border-box;
   align-items: center;
+  border: 1px solid #afafaf;
  
   border: none;
 }
@@ -405,7 +419,6 @@ input.page {
 
 .tb-footer-right {
   display: flex;
- 
   align-items: center;
   /* margin-right: 90px; */
 }
@@ -431,9 +444,7 @@ input.page {
 
 .table-ft {
   background-color: #fff;
- 
  padding: 0;
- 
   height: 45px;
   width: 100%;
 
@@ -494,6 +505,7 @@ table tr .tb-footer :hover{
   right: 0; 
   box-sizing: border-box;
   background-color: #fff;
+
 }
 .total-price , .total-count{
   

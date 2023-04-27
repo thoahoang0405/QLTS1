@@ -115,6 +115,23 @@
     background-color: #fff;
     margin-right: 10px;
   }
+  .btn-hover-blue{
+  position: relative;
+  }
+   .btn-hover-blue:hover .tooltipSave{
+    display: block;
+  }
+   .tooltipSave{
+    position: absolute;
+    bottom: -28px;
+    padding: 4px 10px;
+    background-color: #fff;
+    color: #000;
+    right: 10px;
+    opacity: 1 !important;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    display: none;
+  }
   .form .toolipClose {
     position: absolute;
     top: 20px;
@@ -144,7 +161,7 @@
   }
   .row-input-left .icon-down-bold {
     position: absolute;
-    bottom: -5px;
+    bottom: -11px;
     right: 16px;
   }
   input:read-only {
@@ -185,14 +202,28 @@
     margin-bottom: 8px;
   }
   input:hover,.item-input:hover,
-  input:focus,.item-input:focus,
-  .el-input__wrapper.is-focus,
-  .el-date-editor.el-input .el-input__wrapper:hover {
+ .el-input__wrapper:hover
+ 
+   {
     border-color: #1aa4c8;
     outline-color: #1aa4c8;
-    outline-width: 1px;
+    /* outline-width: 1px; */
   }
-  
+
+  .el-input__inner:focus{
+    outline: 1px !important;
+  }
+  .el-input__wrapper.is-focus,
+  .el-input__wrapper:focus{
+    outline: 1px solid #1aa4c8 !important;
+    border-color: #1aa4c8;
+  }
+  input:focus,.item-input:focus{
+    outline-color: #1aa4c8;
+    outline-style: hidden
+    /* outline: none;
+    border-color: #1aa4c8; */
+  }
   .border-red .el-input__wrapper {
     border-color: #e03232 !important;
   }
@@ -263,3 +294,89 @@
   .border-red {
     border-color: #e03232 !important;
   }
+
+
+  
+.el-input
+.el-input--prefix
+.el-input--suffix
+.el-date-editor
+.el-date-editor--date
+.el-tooltip__trigger
+.el-tooltip__trigger {
+border: 0px solid transparent !important;
+}
+
+.el-input-number .el-input-number__decrease .el-icon svg {
+background: url("../../assets/icon/qlts-icon.svg") no-repeat -72px -338px !important;
+width: 10px !important;
+height: 8px !important;
+}
+
+.el-input-number .el-input-number__increase .el-icon svg {
+background: url("../../assets/icon/qlts-icon.svg") no-repeat -28px -338px !important;
+width: 10px !important;
+height: 8px !important;
+}
+
+.el-input-number .el-icon {
+font-size: 18px !important;
+width: 10px !important;
+height: 8px !important;
+}
+
+.el-input-number.is-controls-right
+.el-input-number__decrease
+[class*="el-icon"],
+.el-input-number.is-controls-right
+.el-input-number__increase
+[class*="el-icon"] {
+transform: none !important;
+}
+
+.el-input-number--large {
+width: 260px !important;
+line-height: 38px;
+box-sizing: border-box;
+}
+
+.el-input-number path {
+display: none;
+}
+
+.el-input-number__decrease,
+.el-input-number__increase {
+background: #ffff !important;
+border: none !important;
+}
+
+.el-input-number--large .el-input-number__decrease,
+.el-input-number--large .el-input-number__increase {
+width: 24px !important;
+}
+
+.el-input-number.is-controls-right[class*="large"] [class*="decrease"] {
+--el-input-number-controls-height: 10px !important;
+height: 8px !important;
+margin-bottom: 8px;
+}
+
+.el-input-number.is-controls-right[class*="large"] [class*="increase"] {
+--el-input-number-controls-height: 10px !important;
+margin-top: 18px;
+height: 8px !important;
+}
+
+.el-input-number .el-input__inner {
+margin-right: -190px;
+padding: 0px 0px 0px 0px;
+}
+
+.input-number .el-input__wrapper {
+margin-top: 8px;
+padding: 1px 20px 0 14px !important;
+}
+
+.el-input-number.el-input-number--large.is-controls-right {
+border: none !important;
+}

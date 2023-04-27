@@ -24,9 +24,19 @@
             
             <!-- <div class="toolTip" v-if="!isZoomOut"> {{ item.name }}</div> -->
             <div class="nav-item-text" v-if="isZoomOut">{{ item.name }}</div>
-            <div class="icon-down" v-if="item.dropdown==true && isZoomOut"></div>
+            <div class="icon-down" v-if="item.menuItem && isZoomOut"></div>
           </router-link>
-          
+          <div class="nav-item-childs" >
+             <router-link
+              class="nav-item-child"
+              v-for="(child, index) in item.menuItem"
+              :key="index"
+              v-show="item.openChild && isZoomOut"
+              :to="child.toItem"
+              >
+              <div class="text">{{ child.nameItem }}</div>
+            </router-link>
+          </div>
         </div>
       </ul>
     </div>
@@ -49,8 +59,7 @@ export default {
       items: [
         {
           icon: "icon-tivi",
-          name: "Tổng quan",
-    
+          name: "Tổng quan",    
           dropdown: false,
           to: "/tongquan",
         },
@@ -60,6 +69,45 @@ export default {
           openChild: false,
           dropdown: true,
           to: "/taisan",
+            menuItem:[
+              {               
+                nameItem: "Ghi tăng",
+                toItem: "/ghitang",
+              },
+              {               
+                nameItem: "Thay đổi thông tin",
+                toItem:"/congcu",
+              },
+              {              
+                nameItem: "Đánh giá lại",
+                toItem: "/congcu",
+              },
+              {
+                
+                nameItem: "Tính hao mòn",
+                toItem: "/congcu",
+              },
+              {
+                
+                nameItem: "Điều chuyển tài sản",
+                toItem: "/congcu",
+              },
+              {
+                
+                nameItem: "Ghi giảm",
+                toItem: "/congcu",
+              },
+              {
+                
+                nameItem: "Kiểm kê",
+                toItem: "/congcu",
+              },
+              {
+                
+                nameItem: "Khác",
+                toItem: "/congcu",
+              },
+            ]
         
         },
         {

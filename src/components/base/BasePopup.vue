@@ -1,12 +1,12 @@
 <template>
   <div id="popup" @keyup.enter="keypressEnter">
-    <div class="popup">
+    <div class="popup" :style="closeStatus == 9? {width: 390 + 'px',minHeight: 170 + 'px' }: {}">
       <div class="popup-body">
         <div class="icon-popup">
           <div class="icon icon-warning"></div>
         </div>
 
-        <div class="content-popup">
+        <div  class="content-popup">
           <span>
             <strong v-if="closeStatus == 3 || closeStatus == 4">{{
               item
@@ -14,6 +14,7 @@
           </span>
           <span v-html="msg"></span>
         </div>
+      
       </div>
       <div class="popup-footer">
         <button
@@ -81,7 +82,7 @@ export default {
     onClickCancel() {
       console.log(this.closeStatus);
 
-      if (this.closeStatus == CloseST.DeleteCloseNotChoose || this.closeStatus == CloseST.ValiDate||this.closeStatus==CloseST.DuplicateCode) {
+      if (this.closeStatus == CloseST.DeleteCloseNotChoose || this.closeStatus == CloseST.ValiDate||this.closeStatus==CloseST.DuplicateCode|| this.closeStatus==9) {
         this.$emit("hidePopup", false);
       } else if (this.closeStatus == CloseST.DeleteMulti || this.closeStatus == CloseST.DeleteOne) {
         this.$emit("isDelete", false);
@@ -120,20 +121,22 @@ export default {
 .popup {
   font-size: 13px;
   width: 450px;
-  min-height: 200px;
+  min-height: 180px;
   height: fit-content;
   background-color: #fff;
   margin: auto;
-  padding: 24px;
+  /* padding: 24px; */
   box-sizing: border-box;
   border-radius: 5px;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
   /* display: none; */
 }
 .popup-body {
+  align-items: center;
   display: flex;
-
-  margin-top: 30px;
+  margin: 24px;
+  height: calc(100% - 101px);
+  /* margin-top: 30px; */
 }
 #content {
   margin-left: 20px;
@@ -153,7 +156,9 @@ export default {
 .popup-footer {
   display: flex;
   justify-content: flex-end;
-  margin-top: 30px;
+  margin-top: 0px;
+  background-color: #dddddd5e;
+  padding: 8px 10px;
 }
 .popup-footer button {
   min-width: 110px;
@@ -179,12 +184,15 @@ export default {
 .btn-hover-blue:hover {
   background-color: #0062cc;
 }
-.no-save:focus,
-.no-save:hover,
+
 .btn-hover-outline:focus,
 .btn-hover-outline:hover {
   background-color: #1aa4c8;
   color: #fff;
   border: none;
+}
+.no-save:focus,
+.no-save:hover{
+  background-color: #abe9f8;
 }
 </style>

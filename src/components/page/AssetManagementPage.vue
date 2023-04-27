@@ -8,10 +8,10 @@
             class="search"
             :placeholder="tableInfo.searchFixedAsset"
             v-model="txtSearch"
-            @keypress.enter="getPagingAsset"
+            @keypress.enter="onClickSearch"
             ref="search"
           />
-          <div class="icon-search icon"></div>
+          <div class="icon-search icon" @click="onClickSearch"></div>
         </div>
 
         <Combobox
@@ -20,7 +20,7 @@
           :fieldName="'department_name'"
           :value="fixedAsset.department_name"
           @selectedItem="selectItemCbb"
-          @keyword="keywordDepartment"
+          @keyword="selectItemCbb"
           :placeholder="place.PlaceHolderDepartment"
         ></Combobox>
 
@@ -31,7 +31,7 @@
           @selectedItem="selectItemCategory"
           :value="fixedAsset.fixed_asset_category_name"
           refName="'fixed_asset_category_code'"
-          @keyword="keywordCateGo"
+          @keyword="selectItemCategory"
           :placeholder="place.PlaceHolderCategory"
         ></Combobox>
       </div>
@@ -95,47 +95,48 @@
             </tr>
           </thead>
           <tbody>
-           <tr style="border: none" class="data" v-if="totalRecord==0">
-            <td colspan="1" class="noData"></td>
-            <td colspan="1" class="noData"></td>
-            <td colspan="1" class="noData"></td>
-            <td colspan="1" class="noData"></td>
-            <td colspan="1" class="noData"></td>
-            <td colspan="2" class="noData text-center"  >Không có dữ liệu </td>
-            <td colspan="1" class="noData"></td>
-            <td colspan="1" class="noData"></td>
-            <td colspan="1" class="noData"></td>
-            <td colspan="1" class="noData"></td>
+            <tr style="border: none" class="data" v-if="totalRecord == 0">
+              <td colspan="1" class="noData"></td>
+              <td colspan="1" class="noData"></td>
+              <td colspan="1" class="noData"></td>
+              <td colspan="1" class="noData"></td>
+              <td colspan="1" class="noData"></td>
+              <td colspan="2" class="noData text-center">Không có dữ liệu</td>
+              <td colspan="1" class="noData"></td>
+              <td colspan="1" class="noData"></td>
+              <td colspan="1" class="noData"></td>
+              <td colspan="1" class="noData"></td>
+            </tr>
 
-           </tr>
-           
             <tr
               ref="rowCheck"
-              :class="listFixedAsset.includes(asset) ? 'active' : ''"
-              v-for="(asset, index) of fixedAssets"
+              v-for="(asset, index) of fixedAssets"             
               :key="asset.fixed_asset_id"
-              @dblclick="showFormEdit(asset)"
+              :class="listFixedAsset.includes(asset) ? 'active' : ''"
+              @dblclick="showFormEdit(asset)"          
               @contextmenu="onClickContextMenu(asset, $event)"
-              @mousedown.prevent.ctrl="mousedown(asset)"
-              @mouseup.prevent.ctrl="mouseup(asset)"
+              @mousedown.prevent.ctrl="mouseDown(asset)"
+              @mouseup.prevent.ctrl="mouseUp(asset)"
               style="max-height: 38px; box-sizing: border-box"
             >
+
               <td
                 style="min-width: 47px; max-width: 47px; box-sizing: border-box"
                 class="text-center"
               >
                 <input
                   type="checkbox"
-                  ref="checkbox"
-                  :checked="listFixedAsset.includes(asset) ? true : false"
+                  ref="checkbox" 
+                  :checked="listFixedAsset.includes(asset)"
                   @click="selectItemToList(asset)"
                 />
+          
               </td>
               <td
                 style="min-width: 45px; max-width: 45px; box-sizing: border-box"
                 class="text-center"
               >
-                {{ index + 1 }}
+              {{ index + 1 }}
               </td>
               <td
                 style="min-width: 82px; max-width: 82px; box-sizing: border-box"
@@ -143,6 +144,7 @@
                 {{ asset.fixed_asset_code }}
               </td>
               <td
+            
                 style="
                   min-width: 130px;
                   max-width: 130px;
@@ -158,6 +160,7 @@
                   box-sizing: border-box;
                 "
               >
+            
                 {{ asset.fixed_asset_category_name }}
               </td>
               <td
@@ -222,7 +225,7 @@
               </td>
             </tr>
           </tbody>
-          <tfoot v-if="totalRecord!=0">
+          <tfoot v-if="totalRecord != 0">
             <tr class="tb-footer" style="background: #ffff">
               <td
                 colspan="3"
@@ -234,7 +237,7 @@
               >
                 <div>
                   <div class="total-record">
-                    Tổng số: <strong>{{ totalRecord }}</strong> bản ghi
+                    Tổng số: <strong>{{ formatMoney(totalRecord) }}</strong> bản ghi
                   </div>
                 </div>
               </td>
@@ -243,11 +246,15 @@
                 style="
                   min-width: 130px;
                   max-width: 130px;
-                  box-sizing: border-box;
-                "
+                  box-sizing: border-box;               "
               >
+
                 <div class="page">
-                  <div style="position: relative">
+                  <div
+                    style="position: relative; cursor: pointer"
+                    @click="btnDropUp"
+                    v-outside="outsidePage"
+                  >
                     <div class="content-page">
                       {{ pageDefault }}
                       <!-- <div class="up-down" @click="btnDropUp"> -->
@@ -256,7 +263,7 @@
                         :class="isShowPage == true ? 'show' : ''"
                         @click="btnDropUp"
                       >
-                        <div class="icon-down-bold"></div>
+                        <div class="icon-down-bold icon"></div>
                       </div>
                       <!-- </div> -->
                     </div>
@@ -401,18 +408,18 @@
     :fixedAssetDetail="assetSelected"
     :fixedAssetIdSelected="fixed_asset_id"
     :newCodeForm="newCode"
-    :FormMode="formode"
+    :FormMode="formMode"
     @loadData="loadData"
   ></Form>
   <ContextMenu
     :posTop="posTop"
     :posLeft="posLeft"
     v-show="isShowContextMenu"
-    @mouseleave="closeContextMenu"
     @clickAdd="onClickAddContextMenu"
     @clickEdit="onClickEditContextMenu"
     @clickDelete="onClickDeleteContextMenu"
     @clickReplication="onClickReplicationContextMenu"
+    @mouseleave="closeContextMenu"
   />
   <Popup
     v-show="isShowPopup"
@@ -425,7 +432,7 @@
     @isDelete="deleted"
     :item="itemDelete"
   ></Popup>
-  <!-- <div v-show="isShowLoad" class="loader"></div> -->
+
   <div id="load" v-show="isShowLoad">
     <div class="lds-ring">
       <div></div>
@@ -451,8 +458,10 @@ import {
   Msg,
   PlaceHolder,
 } from "../../js/common/resource";
+
+import MSFunction from "../../js/common/function";
 import { useToast } from "vue-toastification";
-import { FormDetailMode,CloseST } from "../../js/common/enumeration";
+import { FormDetailMode, CloseST } from "../../js/common/enumeration";
 import {
   URL_FixedAssetPaging,
   URL_Category,
@@ -485,16 +494,16 @@ export default {
       assetSelected: [],
       fixed_asset_id: "",
       tableInfo: Table,
-      items: [], // các item hiển thị trên grid
       name: "",
       selectedItems: [], // các item được chọn
-      formode: 0,
+      formMode: 0,
       totalPage: 0,
       totalRecord: 0,
       pageNumber: 1,
       isActive: "20",
       pageDefault: 20,
       fixedAssets: [],
+      oldData:[],
       place: PlaceHolder,
       newCode: "",
       listFixedAsset: [],
@@ -508,16 +517,17 @@ export default {
       department_name: "",
       department_id: "",
       currentFixedAsset: {},
-      residualValue: 0,
       txtSearch: "",
-      depre: 0,
       placeholderName: "",
       totalQuantity: 0,
       totalCost: 0,
       totalImprover: 0,
       listOnMouseDown: {},
       listOnMouseUp: {},
-      oldKeyDepartment:"",
+      oldKeyDepartment: "",
+      active:null,
+      array:[]
+
     };
   },
   components: {
@@ -528,13 +538,18 @@ export default {
     ContextMenu,
   },
   watch: {
+    /**
+     * thep dõi biến search
+     * AUTHOR: HTTHOA(20/03/2023)
+     */
     txtSearch: function () {
       if (this.txtSearch == "") {
+        this.pageNumber = 1;
         this.getPagingAsset();
       }
     },
-   
-    fixedAsset: function () {
+
+    fixedAssets: function () {
       if (this.fixedAsset.department_id == "") {
         this.getPagingAsset();
       }
@@ -542,6 +557,7 @@ export default {
         this.getPagingAsset();
       }
     },
+   
   },
   created() {
     this.setFocus();
@@ -550,23 +566,30 @@ export default {
     this.getCategory();
   },
   methods: {
-   /**
-     * 
-     * click ctrl 
+  /**
+   * 
+   * format tiền
+   *  AUTHOR: HTTHOA(2/4/2023)
+   */
+    formatMoney(money) {
+      return MSFunction.formatMoney(money);
+    },
+    /**
+     *
+     * click ctrl
      * AUTHOR: HTTHOA(2/4/2023)
      */
-    mousedown(asset) {
+    mouseDown(asset) {
       try {
         // lưu tài sản khi mousedown
         this.listOnMouseDown = asset;
       } catch (err) {
         console.log(err);
       }
-      console.log(this.listOnMouseDown);
     },
     /**
-     * 
-     * chọn trong khoảng đã kéo 
+     *
+     * chọn trong khoảng đã kéo
      * AUTHOR: HTTHOA(2/4/2023)
      */
     selectMultipleItem(item1, item2) {
@@ -580,8 +603,6 @@ export default {
         let startIndex = this.fixedAssets.indexOf(item2);
         //end là vị trí khi up ctrl
         let endIndex = this.fixedAssets.indexOf(item1);
-        console.log(startIndex);
-        console.log(endIndex);
         // kiểm tra vị trí bắt đầu và kết thúc nếu bắt đầu lớn hơn kết thúc thì đổi lại
         if (startIndex > endIndex) {
           let tmp = startIndex;
@@ -602,7 +623,7 @@ export default {
      * up ctrl thả chuột để lấy vị trí cuối cùng chọn
      * AUTHOR: HTTHOA(2/4/2023)
      */
-    mouseup(asset) {
+    mouseUp(asset) {
       try {
         // lưu tài sản khi mouseup
         this.listOnMouseUp = asset;
@@ -621,9 +642,8 @@ export default {
 
     onClickContextMenu(asset, e) {
       e.preventDefault();
-      // alert(asset)
-      console.log(asset);
       this.selectItem(asset);
+    //  lấy vị trí chuột
       this.posTop = e.clientY;
       this.posLeft = e.clientX;
       this.isShowContextMenu = true;
@@ -661,6 +681,7 @@ export default {
     onClickEditContextMenu() {
       this.isShowContextMenu = false;
       this.showFormEdit(this.currentFixedAsset);
+    
     },
     /**
      * click vào thêm trong  chức năng context menu
@@ -670,6 +691,7 @@ export default {
       this.isShowContextMenu = false;
       this.btnAddOnclick();
     },
+
     /**focus vào ô search đầu tiên
      * AUTHOR: HTTHOA(27/03/2023)
      */
@@ -678,67 +700,34 @@ export default {
         this.$refs["search"].focus();
       });
     },
-    /**check dữ liệu bên combobox truyền sang nếu trống thì gọi lại api
-     * AUTHOR: HTTHOA(27/03/2023)
-     */
-    keywordDepartment(value) {
-      this.keywordDep = value;
 
-      if (this.keywordDep == "" ) {
-        this.department_id = " ";
-        this.pageNumber = 1;
-        this.getPagingAsset();
-      }
-    },
-    /**check dữ liệu bên combobox truyền sang nếu trống thì gọi lại api
-     * AUTHOR: HTTHOA(27/03/2023)
-     */
-    keywordCateGo(value) {
-      this.keywordCate = value;
-
-      if (this.keywordCate == "" ) {
-        this.fixed_asset_category_id = " ";
-        this.pageNumber = 1;
-        this.getPagingAsset();
-      }
-    },
     /**
      * lấy thông tin phòng ban
      * AUTHOR: HTTHOA(28/02/2023)
      */
     getDepartments() {
-      try {
-        axios
-          .get(`${URL_Department}`)
-          .then((response) => {
-            this.departments = response.data;
-            console.log(this.departments);
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-      } catch (error) {
-        console.log(error);
-      }
+      axios
+        .get(`${URL_Department}`)
+        .then((response) => {
+          this.departments = response.data;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     },
     /**
      * lấy thông tin bộ phận
      * AUTHOR: HTTHOA(28/02/2023)
      */
     getCategory() {
-      try {
-        axios
-          .get(`${URL_Category}`)
-          .then((response) => {
-            this.fixedAssetCategory = response.data;
-            console.log(this.departments);
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-      } catch (error) {
-        console.log(error);
-      }
+      axios
+        .get(`${URL_Category}`)
+        .then((response) => {
+          this.fixedAssetCategory = response.data;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     },
 
     /**
@@ -746,34 +735,27 @@ export default {
      * AUTHOR: HTTHOA(28/02/2023)
      */
     selectItemCbb(value) {
-      console.log(value.department_name);
       if (value.department_id) {
         this.department_id = value.department_id;
-        this.pageNumber = 1;
-      this.getPagingAsset();
       } else {
         this.department_id = "";
-       
       }
-      
+      this.pageNumber = 1;
+      this.getPagingAsset();
     },
     /**
      * lấy thông tin phòng ban từ combobox
      * AUTHOR: HTTHOA(28/02/2023)
      */
     selectItemCategory(value) {
-      console.log(value.fixed_asset_category_id);
       if (value.fixed_asset_category_id) {
-        this.fixed_asset_category_id = value.fixed_asset_category_id;
-        this.oldKeyDepartment=value.fixed_asset_category_id
-        this.pageNumber = 1;
-      this.getPagingAsset();
+        this.fixed_asset_category_id = value.fixed_asset_category_id;       
       } else {
         this.fixed_asset_category_id = "";
-        this.oldKeyDepartment=""
-       
+        
       }
-    
+      this.pageNumber = 1;
+      this.getPagingAsset();
     },
     /**
      * hiển thị popup
@@ -790,6 +772,8 @@ export default {
       this.isShowPopup = value;
       this.assetSelected = {};
       this.listFixedAsset = [];
+      this.oldData=[]
+    
     },
     /**
      * nhấn nút xóa
@@ -806,14 +790,6 @@ export default {
       }
     },
 
-    /**
-     * hàm click vào số trang
-     * AUTHOR: HTTHOA(15/08/2022)
-     */
-    clickCallback(pageNum) {
-      this.pageNumber = pageNum;
-      this.getPagingAsset();
-    },
     /**
      *
      * Hàm lấy ra số bản ghi trên 1 trang hiện lên input
@@ -842,56 +818,71 @@ export default {
       }
     },
     /**
+     * click outside đóng page
+     * AUTHOR: HTTHOA(06/08/2022)
+     */
+    outsidePage() {
+      this.showPage(false);
+    },
+    /**
+     * sự kiện search
+     * AUTHOR: HTTHOA(11/03/2023)
+     */
+    onClickSearch() {
+      this.pageNumber = 1;
+      this.getPagingAsset();
+    },
+    /**
      * lấy số bản ghi trên 1 trang số trang và tìm kiếm trên api
      * AUTHOR: HTTHOA(11/03/2023)
      */
     getPagingAsset() {
-      try {
-        var me = this;
-        me.depre = 0;
-        me.residualValue = 0;
-        // this.showLoading(true);
-        me.isShowLoad = true;
-
-        axios
-          .get(
-            `${URL_FixedAssetPaging}?keyword=${this.txtSearch}&pageSize=${this.pageDefault}&departmentID=${this.department_id}&fixedAssetCategoryID=${this.fixed_asset_category_id}&pageNumber=${this.pageNumber}`
-          )
-          .then(function (res) {
-            me.isShowLoad = false;
-            me.totalPage = res.data.TotalPages;
-            me.totalRecord = res.data.TotalRecords;
-            me.totalImprover = res.data.TotalImprover;
-            me.totalCost = res.data.TotalCost;
-            me.totalQuantity = res.data.TotalQuantity;
-            me.fixedAssets = res.data.Data;
-            me.listFixedAsset = [];
-            console.log(me.fixedAssets);
-            for (const item of me.fixedAssets) {
-              this.residualValue =
-                parseInt(item.cost) - parseInt(item.impoverishment);
-            }
-          })
-
-          .catch(function () {
-            console.log(1);
-          });
-      } catch (error) {
-        console.log(error);
-      }
+      var me = this;    
+      me.isShowLoad = true;
+      axios({
+        url: `${URL_FixedAssetPaging}?keyword=${this.txtSearch}&pageSize=${this.pageDefault}&departmentID=${this.department_id}&fixedAssetCategoryID=${this.fixed_asset_category_id}&pageNumber=${this.pageNumber}&active=${this.active}`,
+        method: "post",
+        data: [],
+      })
+      // axios
+      //   .post(
+      //     `${URL_FixedAssetPaging}?keyword=${this.txtSearch}&pageSize=${this.pageDefault}&departmentID=${this.department_id}&fixedAssetCategoryID=${this.fixed_asset_category_id}&pageNumber=${this.pageNumber}&active=${this.active}`
+      //   )
+        .then(function (res) {
+          me.isShowLoad = false;
+          me.totalPage = res.data.TotalPages;
+          me.totalRecord = res.data.TotalRecords;
+          me.totalImprover = res.data.TotalImprover;
+          me.totalCost = res.data.TotalCost;
+          me.totalQuantity = res.data.TotalQuantity;        
+          me.fixedAssets = res.data.Data;        
+        }) 
+        .catch(function () {
+          console.log(1);
+        });
     },
     loadData() {
       this.pageNumber = 1;
       this.getPagingAsset();
     },
-    /*
-    lấy mã mới 
-    */
+    /**
+     * hàm click vào số trang
+     * AUTHOR: HTTHOA(15/08/2022)
+     */
+    clickCallback(pageNum) {
+
+      this.pageNumber = pageNum;
+      this.getPagingAsset();
+       
+    },
+    /**
+     * lấy mã mới
+     * AUTHOR: HTTHOA(9/03/2023)
+     */
     getMaxCode() {
       try {
         axios.get(`${URL_GetNewCode}`).then((res) => {
           this.newCode = res.data;
-          console.log(res.data);
         });
       } catch (error) {
         console.log(error);
@@ -906,36 +897,20 @@ export default {
       this.isShowPage = is;
     },
 
-    /**
-     * xử lý checkall
-     * AUTHOR: HTTHOA(28/02/2023)
-     */
-    checkAll() {
-      var listCheck = this.$refs.checkbox;
-
-      var rowCheck = this.$refs.rowCheck;
-      if (this.$refs.checkall.checked) {
-        for (let i = 0; i < listCheck.length; i++) {
-          listCheck[i].checked = true;
-          rowCheck[i].classList.add("rowActive");
-        }
-      } else {
-        for (let i = 0; i < listCheck.length; i++) {
-          listCheck[i].checked = false;
-          rowCheck[i].classList.remove("rowActive");
-        }
-      }
-    },
-
+   
     /**
      * hiển thị form thêm
      * AUTHOR: HTTHOA(28/02/2023)
      */
     btnAddOnclick() {
-      this.formode = FormDetailMode.Add;
+      this.formMode = FormDetailMode.Add;
       this.name = TitlePopup.Add;
       this.showForm();
     },
+    /**
+     * hiển thị form
+     * AUTHOR: HTTHOA(28/02/2023)
+     */
     showForm() {
       this.isShow = true;
     },
@@ -947,54 +922,46 @@ export default {
       this.isShow = false;
       this.loadData();
     },
-    hideForm(value) {
-      this.isShow = value;
-      this.loadData();
-    },
+   
     /**
      * hiển thị form chỉnh sửa
      * AUTHOR: HTTHOA(28/02/2023)
      */
     showFormEdit(asset) {
-      this.formode = FormDetailMode.Edit;
+      this.formMode = FormDetailMode.Edit;
       this.name = TitlePopup.Edit;
       this.isShow = true;
       this.assetSelected = asset;
       this.fixed_asset_id = asset.fixed_asset_id;
+     
     },
     /**
      * hiển thị form nhân bản
      * AUTHOR: HTTHOA(28/02/2023)
      */
     showReplication(asset) {
-      this.formode = FormDetailMode.Replication;
+      this.formMode = FormDetailMode.Replication;
       this.name = TitlePopup.Replication;
       this.isShow = true;
       this.assetSelected = asset;
       this.fixed_asset_id = asset.fixed_asset_id;
     },
     /**
-     * format tiền
-     * AUTHOR: HTTHOA(28/02/2023)
+     * đóng form
+     * AUTHOR: HTTHOA (20/03/2023)
      */
-    formatMoney(money) {
-      if (!isNaN(money)) {
-        var moneyInt = parseInt(money);
-        return moneyInt
-          .toString()
-          .replace(/(\d)(?=(\d{3})+(?:\.\d+)?$)/g, "$1.");
-      } else {
-        return parseInt(money);
-      }
+    hideForm(value) {
+      this.isShow = value;
+      this.loadData();
     },
     /**
-     * thêm phần tử xóa vào mảng xóa
+     * thêm phần tử xóa và bỏ khi đã được chọn 
      * AUTHOR: HTTHOA (20/03/2023)
      */
     selectItemToList(asset) {
       try {
         this.currentFixedAsset = asset;
-
+        
         // this.indexFocus = this.fixedAssets.indexOf(asset);
         if (!this.listFixedAsset.includes(asset)) {
           //thực hiện chọn
@@ -1004,7 +971,7 @@ export default {
           this.listFixedAsset = this.listFixedAsset.filter((a) => {
             return a !== asset;
           });
-
+         
           this.currentFixedAsset =
             this.listFixedAsset[this.listFixedAsset.length - 1];
         }
@@ -1013,14 +980,13 @@ export default {
       }
     },
     /**
-     * hàm chọn 1 item
+     * hàm chọn 1 item thêm vào mảng xóa
      * AUTHOR: HTTHOA(28/02/2023)
      */
     selectItem(asset) {
       this.listFixedAsset = [];
       this.listFixedAsset.push(asset);
       this.currentFixedAsset = asset;
-    
     },
     /**
      * hàm chọn tất cả item
@@ -1038,59 +1004,55 @@ export default {
       }
     },
     /**
-     * xóa 1 bản ghi
+     * gọi api xóa 1 bản ghi
      * AUTHOR: HTTHOA(20/03/2023)
      */
     deleteOne(id) {
-      try {
-        const toast = useToast();
-        console.log(id);
-        var me = this;
-        axios
-          .delete(`${URL_FixedAssetsPut}${id}`)
-          .then(function () {
-            toast.success(Msg.DeleteSucces, { timeout: 2000 });
-            me.getPagingAsset();
-          })
-          .catch(function () {
-            toast.error(Msg.DeleteError, { timeout: 2000 });
-          });
-      } catch (error) {
-        console.log(error);
-      }
+      const toast = useToast();
+      console.log(id);
+      var me = this;
+      axios
+        .delete(`${URL_FixedAssetsPut}${id}`)
+        .then(function () {
+          toast.success(Msg.DeleteSucces, { timeout: 2000 });
+          me.pageNumber=1
+          me.getPagingAsset();
+          me.listFixedAsset=[]
+        })
+        .catch(function () {
+          toast.error(Msg.DeleteError, { timeout: 2000 });
+        });
     },
     /**
-     * xóa nhiều bản ghi
+     * gọi api xóa nhiều bản ghi
      * AUTHOR: HTTHOA(20/03/2023)
      */
     deleteMultiple() {
-      try {
-        const toast = useToast();
-        let listFixedAssetID = [];
-        var me = this;
-        me.listFixedAsset.filter((asset) => {
-          listFixedAssetID.push(asset.fixed_asset_id);
-        });
+      const toast = useToast();
+      let listFixedAssetID = [];
+      var me = this;
+      me.listFixedAsset.filter((asset) => {
+        listFixedAssetID.push(asset.fixed_asset_id);
+      });
 
-        axios({
-          url: `${URL_DELETE}`,
-          method: "delete",
-          data: listFixedAssetID,
+      axios({
+        url: `${URL_DELETE}`,
+        method: "delete",
+        data: listFixedAssetID,
+      })
+        .then(function (res) {
+          console.log(res.data);
+          toast.success(res.data + Msg.DeleteSucces, { timeout: 2000 });
+          me.pageNumber=1
+          me.getPagingAsset();
+          me.listFixedAsset=[]
         })
-          .then(function (res) {
-            console.log(res.data);
-            toast.success(res.data + Msg.DeleteSucces, { timeout: 2000 });
-            me.getPagingAsset();
-          })
-          .catch(function () {
-            toast.error(Msg.DeleteError, { timeout: 2000 });
-          });
-      } catch (error) {
-        console.log(error);
-      }
+        .catch(function () {
+          toast.error(Msg.DeleteError, { timeout: 2000 });
+        });
     },
     /**
-     * kiểm tra xóa 1 hay xóa nhiều khi ấn xóa
+     * kiểm tra xóa 1 hay xóa nhiều khi ấn xóa hiện popup confirm
      * AUTHOR: HTTHOA(20/03/2023)
      */
     onClickDeleteMultiple() {
@@ -1103,14 +1065,19 @@ export default {
           this.closeStatus = CloseST.DeleteCloseNotChoose;
           this.btnName = btnPopup.ClosePop;
         } else if (this.listFixedAsset.length == 1) {
-          //hiển thị confirm
-          //nút confirm
           this.showPopup(true);
+          if(this.listFixedAsset[0].active==0){       
           this.msgDelete = NoticeMsg.ConfirmDelet;
           this.closeStatus = CloseST.DeleteOne;
           this.btnName = btnPopup.Delete;
           this.btnNameLeft = btnPopup.No;
           this.itemDelete = this.listFixedAsset[0].fixed_asset_code;
+          }else{
+          this.msgDelete = "Tài sản có mã  <b>&lt&lt " + this.listFixedAsset[0].fixed_asset_code+ " &gt&gt</b> đã phát sinh chứng từ ghi tăng";
+          this.closeStatus = CloseST.DeleteCloseNotChoose;
+          this.btnName = btnPopup.ClosePop;
+          }
+         
         } else {
           this.showPopup(true);
           this.itemDelete = this.listFixedAsset.length + " tài sản";
@@ -1125,7 +1092,7 @@ export default {
       }
     },
     /**
-     * hàm thực hiện xóa
+     * hàm ktra xem thực hiện xóa 1 hay xóa nhiều
      * AUTHOR: HTTHOA(20/03/2023)
      */
     deleted(value) {
@@ -1144,15 +1111,15 @@ export default {
   },
 };
 </script>
-<style>
-.data{
- 
- 
+<style scope>
+div#table\ {
+    margin-top: 16px !important;
+    
+}
+.data {
   width: 100%;
 }
-.noData{
- 
-  
+.noData {
   height: auto;
   margin: auto auto;
   align-items: center;
@@ -1165,7 +1132,9 @@ export default {
   box-sizing: border-box;
   width: 200px;
 }
-
+li.page-item.disabled {
+  cursor: not-allowed;
+}
 .page-link {
   margin: 5px;
 }

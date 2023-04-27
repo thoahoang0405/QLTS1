@@ -19,6 +19,11 @@
   width: 14px;
   height: 14px;
 }
+.icon-zoomin {
+  background: url("../../assets/icon/qlts-icon.svg") no-repeat -289px -333px;
+	width: 14px;
+	height: 14px;
+}
 
 .icon-more {
   background: url("../../assets/icon/qlts-icon.svg")no-repeat -383px -26px;
@@ -165,7 +170,11 @@
   width: 12px;
   height: 7px;
 }
-
+.icon-down2 {
+  background: url("../../assets/icon/All-icon.svg") no-repeat -686px -29px;
+	width: 12px;
+	height: 7px;
+}
 .icon-down-black {
   background: url("../../assets/icon/qlts-icon.svg") no-repeat -158px -249px;
   width: 12px;
@@ -181,7 +190,7 @@
 .icon-down-bold {
   background: url("../../assets/icon/qlts-icon.svg") no-repeat -72px -338px;
   width: 8px;
-  height: 5px;
+  height: 8px;
   cursor: pointer;
 }
 
@@ -323,4 +332,14 @@
 	width: 8px;
 	height: 5px;
   cursor: pointer;
+}
+.icon-plus {
+  background: url("../../assets/icon/All-icon.svg") no-repeat -903px -111px;
+	width: 18px;
+	height: 18px;
+}
+.icon-minus{
+  background: url("../../assets/icon/qlts-icon.svg") no-repeat -375px -463px;
+  width: 18px;
+	height: 18px;
 }

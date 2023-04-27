@@ -4,6 +4,7 @@
     position: relative;
     border-radius: 3px;
     height: 36px;
+   
     
 }
 
@@ -29,13 +30,7 @@
     padding-left: 38px;
 }
 
-.m-combobox .up-down {
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    justify-content: center;
-}
+
 
 .drop-down {
     width: fit-content;
@@ -51,14 +46,18 @@
     border: 1px solid #e0e0e0;
     height: fit-content;
     max-height: 150px;
-    overflow: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
     margin-top: 8px;
     box-sizing: border-box;
 }
-
+.icon-tick {
+    width: 8px;
+  }
 
 .drop-down::-webkit-scrollbar {
-    width: auto;
+    width: 8px;
+   
 }
 
 .drop-down::-webkit-scrollbar-thumb {
@@ -99,11 +98,11 @@
 .m-combobox-2 .drop-down {
     overflow: unset;
 }
-
+.m-combobox .input,
 .m-combobox-2 .input {
    padding: 0 10px 0 14px;
-    width: 260px;
-    margin-top: 15px;
+    width: 100%;
+    /* margin-top: 15px; */
 }
 
 .m-combobox-2 .input {
@@ -115,21 +114,28 @@
     border-color: #1aa4c8;
 }
 
-.m-combobox-2 .drop-down .drop-down-body {
+/* .m-combobox-2 .drop-down .drop-down-body {
     max-height: 110px;
     height: fit-content;
     overflow: auto;
+} */
+
+/* .m-combobox-2 .drop-down.drop-down-body::-webkit-scrollbar {
+    width: 5px;
 }
 
-.drop-down-body::-webkit-scrollbar {
-    width: 1px;
-}
-
-.drop-down-body::-webkit-scrollbar-thumb {
+.m-combobox-2 .drop-down.drop-down-body::-webkit-scrollbar-thumb {
     background-color: #afafaf;
     border-radius: 5px;
-}
+} */
 
+.input-row-left .m-combobox .up-down[data-v-e9460fa8] {
+    position: absolute;
+    right: 19px;
+    top: 61%;
+    transform: translateY(-50%);
+    justify-content: center;
+}
 
 .m-combobox-2 .drop-down-header {
     /* background-color: #96c6ee;

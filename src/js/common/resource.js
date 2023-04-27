@@ -6,18 +6,20 @@ export const ErrorMsg = {
   AttritionRate: "Tỷ lệ hao mòn phải bằng 1/số năm sử dụng.",
   UsedYear: "Ngày bắt đầu sử dụng không được nhỏ hơn ngày mua.",
   Required: " không được để trống!",
-  LengthError: " phải gồm 2 kí tự chữ và 5 số (VD: TS12345)",
+  LengthError: " quá dài",
   MsgDuplicateLeft: "Mã tài sản <b>&lt&lt",
+  MsgDuplicateIncrement: "Mã chứng từ <b>&lt&lt",
   MsgDuplicateRight: "&gt&gt</b> đã tồn tại trong hệ thống. Vui lòng kiểm tra lại",
   NotChooseProperty:
     "Chưa có tài sản nào được chọn. Vui lòng chọn trước khi thực hiện xóa!",
   AttritionValueLessThanMarkedPrice: "Tỷ lệ hao mòn phải nhỏ hơn nguyên giá",
+  ValidateBE:"Dữ liệu không hợp lệ, vui lòng kiểm tra lại dữ liệu đầu vào!"
   
 };
 export const Msg={
   AddSucces: "Thêm dữ liệu thành công",
   EditSucces: "Sửa dữ liệu thành công",
-  DeleteSucces: " tài sản được xóa thành công",
+  DeleteSucces: " Tài sản được xóa thành công",
   AddError: "Thêm thất bại",
   EditError: "Sửa thất bại",
   DeleteError: "Xóa thất bại",
@@ -28,7 +30,11 @@ export const NoticeMsg = {
     "Thông tin tài sản đã được thay đổi. Bạn có muốn lưu thông tin thay đổi này?",
   ProopertyAdd: "Bạn có muốn hủy bỏ khai báo tài sản này?",
     ConfirmDelet: " được chọn, bạn có chắc chắn muốn xóa không?",
-    ValidateError: "Dữ liệu nhập vào chưa chính xác."
+    ValidateError: "Dữ liệu nhập vào chưa chính xác.",
+    ChooseFixedAsset: "Chọn ít nhất 1 tài sản",
+    IncrementEdited:
+    "Thông tin chứng từ đã được thay đổi. Bạn có muốn lưu thông tin thay đổi này?",
+    IncrementAdd:"Bạn có muốn hủy bỏ khai báo chứng từ này?"
 };
 
 export const TitlePopup = {
@@ -49,5 +55,6 @@ export const btnPopup= {
 };
 export const PlaceHolder={
   PlaceHolderDepartment:"Nhập tên phòng ban",
-  PlaceHolderCategory:"Nhập tên loại tài sản"
+  PlaceHolderCategory:"Nhập tên loại tài sản",
+  PlaceHolderIncreaseSearch:"Tìm kiếm theo số chứng từ, nội dung"
 }

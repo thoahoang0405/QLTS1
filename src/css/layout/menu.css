@@ -109,26 +109,27 @@
 
 .nav-item-childs {
     background-color: #33455b;
-    width: 100%;
+    width: 111%;
     margin: 2px 0;
     border-radius: 3px;
 }
 
 .nav-item-child {
     display: flex;
-    align-items: center;
+    align-items: center;  
     opacity: 0.5;
     padding: 0 10px;
     height: 40px;
-    width: 100%;
+    width: 90%;
     border-radius: 6px;
     border-bottom: 3px solid #33455b;
     cursor: pointer;
     transition: all 0.5s ease;
+    margin-right: 10px ;
 }
 
 .nav-item-child .text {
-    margin-left: 10px;
+    margin-left: 35px;
 }
 
 .nav-item-child .icon-active {

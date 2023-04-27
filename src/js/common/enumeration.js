@@ -13,6 +13,8 @@ export const CloseST={
   DeleteCloseNotChoose:2,
   DeleteOne:4,
   DeleteMulti:3,
+  ValidateBE:8,
+  ChooseFixedAsset:9
 }
 
 
