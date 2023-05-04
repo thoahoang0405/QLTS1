@@ -49,6 +49,7 @@
   </div>
 </template>
 <!-- :class="item[fieldCode] == currentItem[fieldCode] ? 'active' : ''" -->
+
 <script>
 export default {
   props: {
@@ -136,6 +137,7 @@ export default {
       this.placeholder = this.currentItem[this.fieldCode];
       this.isShowCbb = false;
       this.i = 0;
+      this.$el.querySelector(".input").focus();
       // this.$refs.refName.focus();
       this.dataItems = this.items;
     },
@@ -211,7 +213,7 @@ export default {
      */
     onFocus() {
       // khi focus thì select
-      this.$refs.refName.select();
+      // this.$refs.refName.select();
       this.$emit("keyword", this.keyword);
     },
   },
@@ -242,9 +244,11 @@ export default {
      *  AUTHOR:HTTHOA(25/03/2023)
      */
     keyword() {
+      if (this.keyword != this.currentItem[this.fieldCode]) {
       if (this.keyword == "") {
         this.currentItem = "";
         this.$emit("selectedItem", this.currentItem);
+      }
       } else if (this.keyword) {
         // this.isShowCbb=!this.isShowCbb
         this.dataItems.forEach((item) => {
@@ -259,6 +263,9 @@ export default {
     },
   },
   mounted() {
+    this.emitter.on("focus", () => {
+      this.$el.querySelector(".input").focus();
+    });
     // xét giá trị ban đầu cho combobox
     this.currentItem[this.fieldCode] = this.code;
 

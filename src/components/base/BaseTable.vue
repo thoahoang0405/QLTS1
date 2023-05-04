@@ -79,13 +79,15 @@
     </div>
     <!-- <div class="main-table">
                </div> -->
-    <table class="tb-footer">
+    <table class="tb-footer"  style="
+          height: 30px;
+          ">
       <thead>
         <tr
           style="
             background: #f5f5f5;
             border-bottom: 1px solid #e2e2e2;
-            height: 45px;
+            box-sizing: border-box;
           "
         >
           <td colspan="1" style="width: 242px; box-sizing: border-box">
@@ -429,10 +431,10 @@ export default {
   width: 130px !important;
 }
 .table {
-  height: calc(100% - 95px);
+  height: calc(100% - 85px);
 }
 .main-table {
-  height: calc(100% - 90px);
+  height: calc(100% - 85px);
 }
 .th-width-150 {
   min-width: 130px;

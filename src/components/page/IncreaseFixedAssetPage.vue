@@ -76,7 +76,7 @@
           <div class="item-header">
             <h3>{{ info.detail }}</h3>
             <div
-              style="margin-top: 10px"
+              style="margin-top: 10px; margin-bottom: 10px;"
               class="icon"
               :class="!fullDetail ? 'icon-zoomout' : 'icon-zoomin'"
               @click="detailFullSize"
@@ -422,10 +422,17 @@ export default {
 /* .body-item-bottom .item-header .ic{
 
 } */
-.body-item-top #table,
-.body-item-bottom #table {
+.item-header[data-v-45ea0361] {
+    margin-top: 10px;
+    margin-bottom: 16px;
+}
+.body-item-top #table{
   position: relative;
-  height: calc(100% - 30px);
+  height: calc(100% - 70px);
+}
+.body-item-bottom .table {
+  position: relative;
+  height: calc(100% - 25px);
 }
 .body-item-bottom .table {
   height: calc(100% - 74px);

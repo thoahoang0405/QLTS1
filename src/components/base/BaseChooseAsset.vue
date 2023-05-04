@@ -10,7 +10,7 @@
       </div>
       <div class="form-body">
         <div class="body-item-bottom">
-          <div class="item-header">
+          <div class="item-header"  style="margin-bottom: 16px">
             <div class="input">
               <input
                 type="text"

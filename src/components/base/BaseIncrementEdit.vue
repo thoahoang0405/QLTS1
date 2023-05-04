@@ -38,6 +38,7 @@
             >
               <div class="input-row-left">
                 <Combobox
+                @onBlur="validate(index)"
                   class="item-input check-input"
                   style="margin-top: 14px"
                   :items="budgets"
@@ -46,32 +47,36 @@
                   :fieldName="'budget_name'"
                   :value="budget.budget_name"
                   v-model="budgetsArray.budget_name"
+
                   :border="
-                    this.budgetErrorName.includes(index) ? 'border-red' : ''
+                   budget.errorMsg !='' ? 'border-red' : ''
                   "
                   @selectedItem="
                     (item) => (budget.budget_name = item.budget_name)
                   "
                 />
-                <p class="error" v-if="this.budgetErrorName.includes(index)">
+                <p class="error" v-if="budget.errorMsg !=''">
                   <!-- <span>{{ formInfo.department_code }} </span -->
 
-                  {{ msgError }}
+                  {{ budget.errorMsg }}
                 </p>
               </div>
               <div class="input-row-right">
                 <input
                   class="input-right text-right"
-                  @blur="changeTotal"
+                  @blur="validateMount(index)"
+                  @change="changeTotal"
                   v-model="budget.mount"
                   v-number="number"
                   type="text"
                   :class="
-                    this.budgetErrorMount.includes(index) ? 'border-red' : ''
+                    budget.errorMount !='' ? 'border-red' : ''
                   "
                 />
-                <p class="error" v-if="this.budgetErrorMount.includes(index)">
-                  Không được để trống
+                <p class="error" v-if="budget.errorMount !=''">
+                  <!-- <span>{{ formInfo.department_code }} </span -->
+
+                  {{ budget.errorMount }}
                 </p>
               </div>
               <div class="function-controll">
@@ -160,10 +165,7 @@ export default {
         prefix: "",
         precision: 2,
       },
-      error: {
-        budget_name: "",
-        mount: "",
-      },
+      error:[],
       rules: {
         budget_name: { Required: true },
         mount: { Required: true },
@@ -186,6 +188,7 @@ export default {
     console.log(this.idSelected);
     this.getFixedAsset();
     this.getBudget();
+  
 
     // for (const item of this.budgetsArray) {
     //   item.mount=this.formatMoney(item.mount)
@@ -219,60 +222,50 @@ export default {
       }
     },
   },
-
+mounted(){
+  this.setFocus();
+},
   methods: {
-    // validateRequired(){
-    //   // this.sValid=true
-    //   for(var i=0; i< this.budgetsArray.length; i++){
-    //    if(this.budgetsArray[i].budget_name ==""){
-    //     if(this.budgetErrorName.includes(i)) return ;
-    //       this.budgetErrorName.push(i)
-    //       this.msgError="Không được để trống!"
-    //       this.isValid=false
-    //    }else{
-    //     if(this.budgetErrorName.includes(i)){
-    //       this.msgError=""
-    //    this.budgetErrorName.splice(this.budgetErrorName.indexOf(i), 1);
-    //    this.isValid=true
-    //     }
-    //    }
-    //    if(this.budgetsArray[i].mount <=0){
-    //     if(this.budgetErrorMount.includes(i)) return ;
-    //       this.budgetErrorMount.push(i)
-    //       this.isValid=false
-    //    }else{
-    //     if(this.budgetErrorMount.includes(i)){
-    //    this.budgetErrorMount.splice(this.budgetErrorMount.indexOf(i), 1);
-    //    this.isValid=true
-    //     }
-    //    }
-    //   }
-    //  },
-    // validateDuplicate(){
-    //  for(var i=0; i<this.budgetsArray.length; i++){
-    //   for(var j=0; j< this.budgetsArray.length; i++){
-    //     if(this.budgetsArray[i].budget_name!="" && this.budgetsArray[j].budget_name!=""){
-    //       if(this.budgetsArray[i].budget_name==this.budgetsArray[j].budget_name){
-    //         this.budgetErrorName.push(i)
-    //         this.budgetErrorName.push(j)
-    //         this.isValid=false
-    //         this.msgError="Tên nguồn hình thành không được trùng!"
-    //       }else{
-    //         if(this.budgetErrorName.includes(i)){
-    //         this.budgetErrorName.splice(this.budgetErrorName.indexOf(i), 1);
-    //          this.isValid=true
-    //          this.msgError=" "
-    //     }
-    //     if(this.budgetErrorName.includes(j)){
-    //         this.budgetErrorName.splice(this.budgetErrorName.indexOf(j), 1);
-    //          this.isValid=true
-    //          this.msgError=" "
-    //     }
-    //       }
-    //     }
-    //   }
-    //  }
-    // },
+    setFocus() {
+      this.$nextTick(function () {
+        this.emitter.emit("focus");
+      });
+    },
+    validateMount(index){
+      const item = this.budgetsArray[index];
+      if(item.mount=="" || item.mount== 0){
+        item.errorMount="Giá trị không được bỏ trống"
+       
+      }else{
+        item.errorMount=""
+      }
+    },
+    validate(index) {
+      console.log(index);
+      const item = this.budgetsArray[index];
+      if(item.budget_name=="" || item.budget_name== undefined){
+        item.errorMsg="Nguồn hình thành không được bỏ trống"
+       
+      }else{
+        item.errorMsg=""
+        for(var j=0; j<this.budgetsArray.length; j++){
+        const item2 = this.budgetsArray[j];
+        if( item.budget_name==item2.budget_name){
+          item2.errorMsg="Nguồn hình thành không được trùng nhau"
+          item.errorMsg="Nguồn hình thành không được trùng nhau"
+          
+        }else{
+          item.errorMsg=""
+         item2.errorMsg=""
+         console.log(item);
+        }
+      }
+        
+      }
+    
+ 
+    },
+  
     /**
      * lấy tài sản theo id
      * AUTHOR: HTTHOA(25/04/2023)
@@ -287,9 +280,17 @@ export default {
           me.fixedAssetName = me.itemSelect.fixed_asset_name;
           me.departmentName = me.itemSelect.department_name;
           if (me.itemSelect.total_cost == null) {
-            me.budgetsArray = [{ budget_name: "", mount: 0 }];
+            me.budgetsArray = [{ budget_name: "", mount: 0 ,errorMsg:"", errorMount:""}];
           } else {
+        
+       
             me.budgetsArray = JSON.parse(me.itemSelect.total_cost);
+            console.log( me.budgetsArray.errorMsg);
+            for(var item of me.budgetsArray){
+
+              item.errorMsg=""
+            item.errorMount=""
+            }
           }
         })
         .catch(function (error) {
@@ -326,7 +327,48 @@ export default {
       this.$emit("costEdit", this.itemSelect.cost);
       this.itemSelect.total_cost = JSON.stringify(this.budgetsArray);
       console.log(this.itemSelect);
-      this.editData();
+
+      for(var i=0; i< this.budgetsArray.length; i++){
+      const item = this.budgetsArray[i];
+       if(item.budget_name=="" || item.budget_name== undefined){
+        item.errorMsg="Nguồn hình thành không được bỏ trống"
+        if(item.mount=="" || item.mount== 0){
+        item.errorMount="Giá trị không được bỏ trống"
+        }else{
+          item.errorMount=""
+        }
+       
+      }
+     else {
+      item.errorMsg=""
+    
+      for(var j=0; j<this.budgetsArray.length; j++){
+        const item2 = this.budgetsArray[j];
+        if(item2.budget_name!=="" && item2.budget_name!== undefined && item.budget_name==item2.budget_name){
+          item2.errorMsg="Nguồn hình thành không được trùng nhau"
+          item.errorMsg="Nguồn hình thành không được trùng nhau"
+          
+        }else{
+         item2.errorMsg=""
+          item.errorMsg=""
+        }
+      }
+        if(item.mount=="" || item.mount== 0){
+        item.errorMount="Giá trị không được bỏ trống"
+        }else{
+          item.errorMount=""
+        }
+       
+       
+      }
+     
+      }
+      for(var item of this.budgetsArray){
+        if( item.errorMount=="" && item.errorMsg==""){
+
+          // this.editData();
+        }
+      }
       // }
     },
     /**
@@ -384,7 +426,7 @@ export default {
     addBudget() {
       try {
         if (this.budgetsArray.length < 4) {
-          this.budgetsArray.push({ budget_name: "", mount: 0 });
+          this.budgetsArray.push({ budget_name: "", mount: 0 , errorMsg:"", errorMount:"" });
           this.getBudget();
         }
       } catch (error) {
@@ -399,6 +441,7 @@ export default {
       try {
         if (this.budgetsArray.length > 1) {
           this.budgetsArray.splice(this.budgetsArray.indexOf(item), 1);
+          this.changeTotal()
         }
       } catch (error) {
         console.log(error);

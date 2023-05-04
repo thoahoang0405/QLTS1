@@ -1,5 +1,5 @@
 <template>
-  <div id="table">
+  <div id="table" :style="mode == 1 || mode == 0 ? { height: 91 + '%', marginTop: 16+'px' }: {height: 118 + '%'}">
     <div class="table">
       <table>
         <thead>

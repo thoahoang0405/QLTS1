@@ -223,6 +223,7 @@ export default {
       voucher: {},
       listAssetOldEdit:[],
       listID:[],
+      listAssetOld:[],
       incrementsInsert: {
         voucher_id: "00000000-0000-0000-0000-000000000000",
         voucher_code: "",
@@ -235,8 +236,8 @@ export default {
         created_date: new Date().toISOString().slice(0, 10),
         modified_by: "",
         modified_date: new Date().toISOString().slice(0, 10),
-        listFixedAssetID: [],
         listFixedAssetIdDelete:[],
+        listFixedAssetID: [],
       },
       error: {
         voucher_code: "",
@@ -254,8 +255,10 @@ export default {
     this.setFocus();
   },
   created() {
-    this.formMode = this.modeDetail;
+    this.getByVoucher();
 
+    this.formMode = this.modeDetail;
+    console.log(this.incrementsInsert);
     this.formTitle = this.title;
     this.mode = this.modeDetail;
     /**
@@ -265,8 +268,8 @@ export default {
       this.id=this.itemSelect.voucher_id
       console.log(this.id);
       this.incrementsInsert = this.itemSelect;
-      this.getByVoucher();
       this.oldData = { ...this.itemSelect };
+
     }
     if (this.formMode == FormDetailMode.Add) {
       this.getNewCode();
@@ -278,7 +281,7 @@ export default {
     listFixedAssetChose: function (data) {
       console.log(data);
       this.oldAsset=data
-    
+      console.log(this.oldAsset);
       this.mode = 0;
       this.cost = 0;
       this.depreciation = 0;
@@ -293,6 +296,7 @@ export default {
     listRemovedAsset: function (data) {
       this.oldAsset=data
       this.listID=[]
+      console.log(this.oldAsset);
       console.log(data);
       this.listRemovedAsset = data;
       this.listRemovedAsset.filter((a)=>{
@@ -308,7 +312,6 @@ export default {
     },
     costEdit: function(data){
       console.log(data);
-      console.log(this.oldAsset);
       this.listFixedAssetChose = this.oldAsset;
       console.log(this.listFixedAssetChose);
       for (const item of this.listFixedAssetChose) {
@@ -379,12 +382,13 @@ export default {
           `${URL_FixedAssetDetail}/Detail?listId=${this.itemSelect.voucher_id}`
         )
         .then(function (res) {
+          me.listAssetOld = res.data;
           me.listRemovedAsset=res.data
+          me.listFixedAssetChose=res.data
           me.oldAsset = res.data;
-          if(me.formMode==FormDetailMode.Edit){
-            me.listAssetOldEdit=res.data
-          }
+          
           me.getTotal(me.oldAsset);
+            
         })
         .catch(function (error) {
           console.log(error);
@@ -435,59 +439,48 @@ export default {
      * HTTHOA(20/04/2023)
      */
     editIncrement() {
-      console.log(this.listFixedAssetChose);
-      if(this.listFixedAssetChose.length>0){
-
-        for (const item of this.listFixedAssetChose) {  
-            if(!this.listAssetOldEdit.includes(item)){
-              this.incrementsInsert.listFixedAssetID.push(item.fixed_asset_id)
-            }
-        }
-      }
-      this.listAssetOldEdit.filter((asset)=>{
-        if(!this.listFixedAssetChose.includes(asset)){
-          this.incrementsInsert.listFixedAssetIdDelete.push(asset.fixed_asset_id)
-        }
-      })
+      
+      const toast = useToast();
       console.log(this.incrementsInsert);
-      // const toast = useToast();
-      // console.log(this.incrementsInsert);
-      // this.incrementsInsert.total_price=this.cost
-      // var me = this;
-      // axios({
-      //   url: `${URL_FixedAssetIncrements}?incrementID=${this.incrementsInsert.voucher_id}`,
-      //   method: "put",
-      //   data: this.incrementsInsert,
-      // })
-      //   .then(function (res) {
-      //     console.log(res);
-      //     toast.success(Msg.EditSucces, { timeout: 2000 });
-      //     me.closeFormAdd();
-      //     me.$emit("loadData");
-      //   })
-      //   .catch(function (res) {
-      //     if (res.response.data.ErrorCode == CloseST.DuplicateCode) {
-      //       me.isShowPopup = true;
-      //       me.closeStatus = CloseST.DuplicateCode;
-      //       me.msgError =
-      //         ErrorMsg.MsgDuplicateIncrement +
-      //         me.incrementsInsert.voucher_code +
-      //         ErrorMsg.MsgDuplicateRight;
-      //       me.btnName = btnPopup.Agree;
-      //       me.focusToInputError();
-      //     } else {
-      //       me.isShowPopup = true;
-      //       me.closeStatus = CloseST.DuplicateCode;
-      //       me.btnName = btnPopup.Agree;
-      //       me.msgError = res.response.data.Message;
-      //     }
-      //   });
+      this.incrementsInsert.total_price=this.cost
+      var me = this;
+      axios({
+        url: `${URL_FixedAssetIncrements}?incrementID=${this.incrementsInsert.voucher_id}`,
+        method: "put",
+        data: this.incrementsInsert,
+      })
+        .then(function (res) {
+          console.log(res);
+          toast.success(Msg.EditSucces, { timeout: 2000 });
+          me.incrementsInsert.listFixedAssetID = [];
+            me.incrementsInsert.listFixedAssetIdDelete=[]
+          me.closeFormAdd();
+          me.$emit("loadData");
+        })
+        .catch(function (res) {
+          if (res.response.data.ErrorCode == CloseST.DuplicateCode) {
+            me.isShowPopup = true;
+            me.closeStatus = CloseST.DuplicateCode;
+            me.msgError =
+              ErrorMsg.MsgDuplicateIncrement +
+              me.incrementsInsert.voucher_code +
+              ErrorMsg.MsgDuplicateRight;
+            me.btnName = btnPopup.Agree;
+            me.focusToInputError();
+          } else {
+            me.isShowPopup = true;
+            me.closeStatus = CloseST.DuplicateCode;
+            me.btnName = btnPopup.Agree;
+            me.msgError = NoticeMsg.ValidateError;
+          }
+        });
     },
     /**
      * thêm chứng từ
      * HTTHOA(20/04/2023)
      */
     addIncrement() {
+      this.incrementsInsert.listFixedAssetIdDelete=[]
       const toast = useToast();
       var me = this;
       axios({
@@ -519,11 +512,12 @@ export default {
           }
         });
     },
+   
     /**
      * ấn nút lưu
      * HTTHOA(20/04/2023)
      */
-    saveIncrement() {
+   async saveIncrement() {
       this.incrementsInsert.listFixedAssetID = [];
       if (this.validateAll()) {
         if (this.formMode == FormDetailMode.Add) {
@@ -534,14 +528,41 @@ export default {
             this.addIncrement();
           }
         } else {
-          // if (this.newAsset.length > 0) {
-          //   //xem lại chỗ này
-          //   for (const item of this.newAsset) {
-          //     this.incrementsInsert.listFixedAssetID.push(item.fixed_asset_id);
-          //   }
-          // } else {
-          //   this.incrementsInsert.listFixedAssetID = [];
-          // }
+         // lấy danh sách tài sản được thêm vào
+          if (this.listFixedAssetChose.length > 0) {
+            //xem lại chỗ này
+            for (const item of this.listFixedAssetChose) {
+              if(!this.listAssetOld.some(obj=>obj.fixed_asset_id===item.fixed_asset_id)){
+                this.incrementsInsert.listFixedAssetID.push(item.fixed_asset_id)
+               }
+            }
+          } else {
+            this.incrementsInsert.listFixedAssetID = [];
+           
+          }
+          console.log(this.incrementsInsert.listFixedAssetID);
+          console.log(this.oldAsset);
+          console.log(this.listAssetOld);
+          console.log(this.listFixedAssetChose);
+          this.incrementsInsert.listFixedAssetIdDelete=[]
+          // lấy danh sách tài sản bị xóa
+          if (this.listAssetOld.length > 0) {
+          
+              for (const item of this.listAssetOld){
+               if(!this.listFixedAssetChose.some(obj=>obj.fixed_asset_id===item.fixed_asset_id)){
+                this.incrementsInsert.listFixedAssetIdDelete.push(item.fixed_asset_id)
+               }
+          
+            }
+            //xem lại chỗ này
+          }else{
+            this.incrementsInsert.listFixedAssetIdDelete=[]
+          }
+        
+          console.log(this.incrementsInsert.listFixedAssetIdDelete);
+          console.log(this.incrementsInsert);
+        //  await this.getListOld(this.incrementsInsert.voucher_id)
+        
           this.editIncrement();
         }
       } else {
@@ -723,17 +744,19 @@ export default {
      */
     listChoose(value) {
       console.log(value);
+      console.log(this.oldAsset);
       if (this.formMode == FormDetailMode.Edit) {
+        // this.listAssetOld=this.oldAsset
         this.newAsset = value;
-        this.newAsset.filter((a) => {
-          if (!this.oldAsset.includes(a)) {
-            this.oldAsset.push(a);
-          }
-        });
-        this.listFixedAssetChose = this.oldAsset;
+   
+        // for (const item of value) {
+        //   if (!this.oldAsset.includes(item)) {
+        //     this.oldAsset.push(item);
+        //   }
+        // }
+        this.listFixedAssetChose = [...this.oldAsset,...this.newAsset];
       } else {
         if(this.oldAsset.length==0){
-
           this.listFixedAssetChose = value;
         }else{
           this.newAsset = value;
@@ -751,13 +774,16 @@ export default {
       
         this.listID.push(a.fixed_asset_id)
       })
-      console.log(this.listID);
+      console.log(this.listFixedAssetChose);
       this.getTotal(this.listFixedAssetChose);
     },
   },
 };
 </script>
 <style scoped>
+.title[data-v-45ea0361]{
+  margin-top: 0px;
+}
 .body-item-top #table,
 .body-item-bottom #table {
   position: relative;
@@ -819,13 +845,13 @@ label span {
 .title {
   font-size: 15px;
   margin: 8px 0px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .titleDetail {
   margin: 8px 0px;
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .btn-choose:hover {
