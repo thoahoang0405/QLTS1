@@ -218,6 +218,7 @@ export default {
     },
   },
   created() {
+    
     // this.placeholder = this.label;
     this.$emit("onFocusCbb");
     this.keyword = this.value;
@@ -263,8 +264,12 @@ export default {
     },
   },
   mounted() {
+    
+    var i= this.$refs.refName
+    console.log(i);
     this.emitter.on("focus", () => {
-      this.$el.querySelector(".input").focus();
+      this.$el.querySelector(".input").focus()
+        // this.$el.querySelector(".input").focus();
     });
     // xét giá trị ban đầu cho combobox
     this.currentItem[this.fieldCode] = this.code;

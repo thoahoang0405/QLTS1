@@ -13,8 +13,12 @@ export const ErrorMsg = {
   NotChooseProperty:
     "Chưa có tài sản nào được chọn. Vui lòng chọn trước khi thực hiện xóa!",
   AttritionValueLessThanMarkedPrice: "Tỷ lệ hao mòn phải nhỏ hơn nguyên giá",
-  ValidateBE:"Dữ liệu không hợp lệ, vui lòng kiểm tra lại dữ liệu đầu vào!"
-  
+  ValidateBE:"Dữ liệu không hợp lệ, vui lòng kiểm tra lại dữ liệu đầu vào!",
+  RequiredSource: "Nguồn hình thành không được để trống",
+  RequiredCost:"Giá trị không được trống",
+  DuplicateSource:"Nguồn hình thành không được trùng nhau",
+  CantDelete:"tài sản được chọn không thể xóa. Vui lòng kiểm tra lại trước khi thực hiện xóa",
+  Incremented:"đã phát sinh chứng từ ghi tăng"
 };
 export const Msg={
   AddSucces: "Thêm dữ liệu thành công",
@@ -56,5 +60,6 @@ export const btnPopup= {
 export const PlaceHolder={
   PlaceHolderDepartment:"Nhập tên phòng ban",
   PlaceHolderCategory:"Nhập tên loại tài sản",
-  PlaceHolderIncreaseSearch:"Tìm kiếm theo số chứng từ, nội dung"
+  PlaceHolderIncreaseSearch:"Tìm kiếm theo số chứng từ, nội dung",
+  PlaceHolderSource:"Tên nguồn hình thành"
 }

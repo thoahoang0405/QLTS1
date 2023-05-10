@@ -74,6 +74,8 @@
     padding: 15px 20px;
     max-height: 80vh;
     overflow: auto;
+    margin-top: 0px;
+    margin-bottom: 0px;
 }
 
 .navbar::-webkit-scrollbar {

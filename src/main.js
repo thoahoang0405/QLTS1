@@ -15,7 +15,7 @@ app.use(router);
 app.use(ElementPlus, {
   locale: vi,
 });
-app.use(VueNumberFormat, {precision: 4})
+app.use(VueNumberFormat, {precision: 8})
 const emitter= mitt();
 app.directive("outside", clickOutside)
 app.use(Toast, {

@@ -1,5 +1,5 @@
 <template>
-  <div id="form" @keyup.esc="onClickBtnCancel" tabindex="0">
+  <div id="form" @keyup.esc="onClickBtnCancel" tabindex="0"  @keydown.ctrl.s.stop.prevent="saveIncrement">
     <div class="form increment-form">
       <div class="form-header">
         <h2 id="hd-form">{{ formTitle }}</h2>
@@ -27,6 +27,8 @@
                   @blur="validate('voucher_code')"
                   style="margin-top: 0px"
                   type="text"
+                  tabindex="0"
+                  @focus="$refs.voucher_code.select()"
                 />
                 <p class="error" v-if="error.voucher_code != ''">
                   {{ formInfo.voucherCode }} {{ error.voucher_code }}
@@ -133,7 +135,7 @@
           <div class="tooltipSave">Ctrl + S</div>
         </button>
 
-        <button class="cancel btn-hover-outline" @click="onClickBtnCancel">
+        <button class="cancel btn-hover-outline" @click="onClickBtnCancel" @blur="setFocusFirst">
           {{ formInfo.btnCancel }}
         </button>
       </div>
@@ -155,12 +157,12 @@
    
   ></FormEdit>
   <Popup
-    v-show="isShowPopup"
+    v-if="isShowPopup"
     :msg="msgError"
     :name="btnName"
     :btnLeft="btnLeftName"
     :close="closeStatus"
-    @hidePopup="isShowPopup = false"
+    @hidePopup="closePopup"
     @hidePopupAndForm="hidePopupForm"
     @saveAndHideForm="saveAndHide"
   ></Popup>
@@ -179,7 +181,7 @@ import {
 } from "../../js/common/urlAsset";
 import axios from "axios";
 import { ErrorMsg, Msg, btnPopup, NoticeMsg } from "../../js/common/resource";
-import { CloseST, FormDetailMode } from "../../js/common/enumeration";
+import { CloseST, FormDetailMode,ErrorCode } from "../../js/common/enumeration";
 import { useToast } from "vue-toastification";
 import Popup from "./BasePopup.vue";
 export default {
@@ -224,6 +226,7 @@ export default {
       listAssetOldEdit:[],
       listID:[],
       listAssetOld:[],
+      listDeleted:[],
       incrementsInsert: {
         voucher_id: "00000000-0000-0000-0000-000000000000",
         voucher_code: "",
@@ -255,8 +258,6 @@ export default {
     this.setFocus();
   },
   created() {
-    this.getByVoucher();
-
     this.formMode = this.modeDetail;
     console.log(this.incrementsInsert);
     this.formTitle = this.title;
@@ -269,15 +270,20 @@ export default {
       console.log(this.id);
       this.incrementsInsert = this.itemSelect;
       this.oldData = { ...this.itemSelect };
-
+      this.getByVoucher();
     }
-    if (this.formMode == FormDetailMode.Add) {
+    else { 
       this.getNewCode();
       this.id=""
     }
    
   },
   watch: {
+    /**
+     * 
+     * theo dõi ds tài sản được chọn
+     * HTTHOA(5/5/2023)
+     */
     listFixedAssetChose: function (data) {
       console.log(data);
       this.oldAsset=data
@@ -293,6 +299,11 @@ export default {
         this.resi += impoverishment;
       }
     },
+    /**
+     * 
+     * theo dõi ds tài sản xóa
+     * HTTHOA(5/5/2023)
+     */
     listRemovedAsset: function (data) {
       this.oldAsset=data
       this.listID=[]
@@ -305,6 +316,11 @@ export default {
       })
       console.log(this.listID);
     },
+    /**
+     * 
+     * theo dõi biến đê search
+     * HTTHOA(5/5/2023)
+     */
     keyword: function (data) {
       if (data == "") {
         this.listFixedAssetChose = this.listBeforeSearch;
@@ -323,10 +339,19 @@ export default {
     }
   },
   methods: {
+   /**
+     * 
+     * focus vào ô đầu tiên
+     * HTTHOA(5/5/2023)
+     */
     setFocus() {
       this.$nextTick(function () {
         this.$refs["voucher_code"].focus();
       });
+    },
+    closePopup(){
+      this.isShowPopup=false
+      this.$refs["voucher_code"].focus();
     },
     /**
      * tìm kiếm tài sản ở form thêm
@@ -354,6 +379,11 @@ export default {
       }
       this.getTotal(this.listFixedAssetChose);
     },
+    /**
+     * 
+     * tính tổng 
+     * HTTHOA(5/5/2023)
+     */
     getTotal(data) {
       this.mode = 0;
       this.cost = 0;
@@ -400,6 +430,7 @@ export default {
      */
     hidePopupForm() {
       this.isShowPopup = false;
+      this.incrementsInsert={}
       this.closeFormAdd();
     },
     /**
@@ -455,10 +486,10 @@ export default {
           me.incrementsInsert.listFixedAssetID = [];
             me.incrementsInsert.listFixedAssetIdDelete=[]
           me.closeFormAdd();
-          me.$emit("loadData");
+        
         })
         .catch(function (res) {
-          if (res.response.data.ErrorCode == CloseST.DuplicateCode) {
+          if (res.response.data.ErrorCode == ErrorCode.DuplicateCode) {
             me.isShowPopup = true;
             me.closeStatus = CloseST.DuplicateCode;
             me.msgError =
@@ -466,13 +497,9 @@ export default {
               me.incrementsInsert.voucher_code +
               ErrorMsg.MsgDuplicateRight;
             me.btnName = btnPopup.Agree;
-            me.focusToInputError();
-          } else {
-            me.isShowPopup = true;
-            me.closeStatus = CloseST.DuplicateCode;
-            me.btnName = btnPopup.Agree;
-            me.msgError = NoticeMsg.ValidateError;
-          }
+          
+         
+          } 
         });
     },
     /**
@@ -495,7 +522,7 @@ export default {
           // me.$emit("loadData")
         })
         .catch(function (res) {
-          if (res.response.data.ErrorCode == CloseST.DuplicateCode) {
+          if (res.response.data.ErrorCode == ErrorCode.DuplicateCode) {
             me.isShowPopup = true;
             me.closeStatus = CloseST.DuplicateCode;
             me.msgError =
@@ -517,7 +544,11 @@ export default {
      * ấn nút lưu
      * HTTHOA(20/04/2023)
      */
-   async saveIncrement() {
+    saveIncrement() {
+     console.log(this.listDeleted);
+      if(this.showFormChooseAsset|| this.isShowFormEdit) return;
+      console.log(this.listFixedAssetChose);
+      console.log(this.listAssetOld);
       this.incrementsInsert.listFixedAssetID = [];
       if (this.validateAll()) {
         if (this.formMode == FormDetailMode.Add) {
@@ -526,8 +557,14 @@ export default {
           });
           if (this.incrementsInsert.listFixedAssetID.length > 0) {
             this.addIncrement();
+          }else{
+            this.isShowPopup = true;
+            this.closeStatus = CloseST.ChooseFixedAsset;
+            this.btnName = btnPopup.ClosePop;
+            this.msgError = NoticeMsg.ChooseFixedAsset;
           }
         } else {
+          
          // lấy danh sách tài sản được thêm vào
           if (this.listFixedAssetChose.length > 0) {
             //xem lại chỗ này
@@ -540,36 +577,21 @@ export default {
             this.incrementsInsert.listFixedAssetID = [];
            
           }
-          console.log(this.incrementsInsert.listFixedAssetID);
-          console.log(this.oldAsset);
-          console.log(this.listAssetOld);
-          console.log(this.listFixedAssetChose);
           this.incrementsInsert.listFixedAssetIdDelete=[]
           // lấy danh sách tài sản bị xóa
-          if (this.listAssetOld.length > 0) {
-          
-              for (const item of this.listAssetOld){
-               if(!this.listFixedAssetChose.some(obj=>obj.fixed_asset_id===item.fixed_asset_id)){
-                this.incrementsInsert.listFixedAssetIdDelete.push(item.fixed_asset_id)
-               }
-          
-            }
-            //xem lại chỗ này
+          console.log(this.listFixedAssetChose);
+         
+          if(this.listDeleted.length>0){
+            this.listDeleted.filter(item=> this.incrementsInsert.listFixedAssetIdDelete.push(item.fixed_asset_id))
           }else{
             this.incrementsInsert.listFixedAssetIdDelete=[]
           }
-        
           console.log(this.incrementsInsert.listFixedAssetIdDelete);
-          console.log(this.incrementsInsert);
-        //  await this.getListOld(this.incrementsInsert.voucher_id)
-        
           this.editIncrement();
         }
-      } else {
-        this.isShowPopup = true;
-        this.closeStatus = CloseST.ChooseFixedAsset;
-        this.btnName = btnPopup.ClosePop;
-        this.msgError = NoticeMsg.ChooseFixedAsset;
+      } else{
+        var error=this.$el.querySelectorAll('.border-red')
+        error[0].focus()
       }
     },
     /**
@@ -580,6 +602,8 @@ export default {
       console.log(valueDeleted);
       this.listFixedAssetChose = value;
       this.listRemovedAsset = value;
+
+      this.listDeleted=valueDeleted.filter(item=>item.voucher_id==this.id)
       this.listID=[]
       this.listRemovedAsset.filter((a)=>{
       
@@ -587,6 +611,7 @@ export default {
       })
       this.oldAsset=value
       console.log(value);
+      console.log(this.listAssetOld);
       // if(this.formMode==FormDetailMode.Edit){
       //      this.incrementsInsert.listFixedAssetID=valueDeleted
       // }
@@ -744,17 +769,15 @@ export default {
      */
     listChoose(value) {
       console.log(value);
-      console.log(this.oldAsset);
+    
       if (this.formMode == FormDetailMode.Edit) {
         // this.listAssetOld=this.oldAsset
         this.newAsset = value;
    
-        // for (const item of value) {
-        //   if (!this.oldAsset.includes(item)) {
-        //     this.oldAsset.push(item);
-        //   }
-        // }
-        this.listFixedAssetChose = [...this.oldAsset,...this.newAsset];
+       
+       let listEdit = [...this.oldAsset,...this.newAsset];
+       this.listFixedAssetChose=listEdit
+        
       } else {
         if(this.oldAsset.length==0){
           this.listFixedAssetChose = value;
@@ -774,6 +797,7 @@ export default {
       
         this.listID.push(a.fixed_asset_id)
       })
+      
       console.log(this.listFixedAssetChose);
       this.getTotal(this.listFixedAssetChose);
     },

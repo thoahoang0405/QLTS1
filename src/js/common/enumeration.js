@@ -6,6 +6,7 @@ export const FormDetailMode = {
   
 };
 export const CloseST={
+  IncrementedCode:7,
   DuplicateCode:5,
   EditClose:6,
   ValiDate:7,
@@ -16,6 +17,10 @@ export const CloseST={
   ValidateBE:8,
   ChooseFixedAsset:9
 }
-
+export const ErrorCode={
+  IncrementedCode:7,
+  DuplicateCode:5,
+  DuplicateSource:6
+}
 
 

@@ -3,6 +3,7 @@
     <div class="table">
       <table>
         <thead>
+          
           <tr>
             <th class="stt">
               {{ inforTable.numeric }}
@@ -23,6 +24,15 @@
           </tr>
         </thead>
         <tbody>
+          <tr style="border: none" class="data" v-if="fixedAsset.length == 0">
+
+            <td colspan="7" class="noData">
+              <div class="no-data">
+                <div class="icon-noData"></div>   
+                <h3>Không có dữ liệu</h3>    
+              </div>
+            </td>
+            </tr>
           <tr v-for="(item, index) in fixedAsset" :key="index">
             <td class="text-center">{{ index + 1 }}</td>
 
@@ -84,6 +94,14 @@
           </tr>
         </tfoot> -->
       </table>
+      <div id="load" v-show="isShowLoad && (mode != 1 && mode != 0)" >
+    <div class="lds-ring">
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
+  </div>
     </div>
     <table class="tb-footer" style="background-color: #efefef;" v-if="mode == 1 || mode == 0">
       <thead style="display: none;">
@@ -108,8 +126,8 @@
         </thead>
         <tbody>
 
-          <tr>
-                 <td style="min-width: 460px; max-width: 470px; box-sizing: border-box" colspan="4"></td>
+          <tr style="cursor: auto;">
+                 <td style="min-width: 460px; max-width: 470px; box-sizing: border-box" colspan="4"> <strong>Tổng:</strong>  </td>
                  <td class=" text-right" style="min-width:130px; max-width: 130px; box-sizing: border-box" colspan="1"> 
                   <strong>{{ formatMoney(totalCost) }}</strong> </td>
                  <td class=" text-right" style="min-width: 147px; max-width: 147px; box-sizing: border-box" colspan="1">
@@ -123,8 +141,9 @@
            
         </tbody>
     </table>
+    
   </div>
-
+  
   <FormEdit
     style="margin-top: -100px"
     v-if="isShowFormEdit"
@@ -132,6 +151,7 @@
     :fixedAssetSelected="itemEditSelected"
     @costEdit="totalCostFixedAsset"
   ></FormEdit>
+ 
   <!-- 
    
     @hideFormEdit="showFormEdit"
@@ -158,6 +178,7 @@ export default {
     "depreciationValue",
     "totalPrice",
     "totalCostEdit",
+    "keySearch"
   ],
   data() {
     return {
@@ -168,6 +189,7 @@ export default {
       newDataEdit: [],
       formMode: FormDetailMode.Add,
       itemChoose: [],
+      isShowLoad:false,
       listA: [],
       totalCost: 0,
       totalDep: 0,
@@ -183,6 +205,11 @@ export default {
     this.emitter.on("loadFixedAsset", () => {});
   },
   watch: {
+    keySearch:function(data){
+      console.log(data);
+      this.fixedAsset=[]
+      // this.getByVoucher();
+    },
     /**
      *
      * theo dõi giá tài sản
@@ -213,9 +240,7 @@ export default {
     modeForm: function (data) {
       this.formMode = data;
     },
-    // fixedAsset: function(data){
-    //   this.$emit("ItemRemoved", data)
-    // },
+   
     modeTable: function (data) {
       this.mode = data;
     },
@@ -247,7 +272,7 @@ export default {
   methods: {
     deleteItem(item) {
       this.fixedAsset.splice(this.fixedAsset.indexOf(item), 1);
-      this.itemDeleted.push(item.fixed_asset_id)
+      this.itemDeleted.push(item)
       console.log(this.fixedAsset);
       this.$emit("ItemRemoved", this.fixedAsset,this.itemDeleted);
 
@@ -278,12 +303,14 @@ export default {
      * AUTHOR: HTTHOA(18/4/2023)
      */
     getByVoucher() {
+      this.isShowLoad=true
       var me = this;
       axios
         .get(`${URL_FixedAssetDetail}/Detail?listId=${this.listSelectedId}`)
         .then(function (res) {
           me.fixedAsset = res.data;
           me.newDataEdit = me.fixedAsset;
+          me.isShowLoad=false
         })
         .catch(function (error) {
           console.log(error);
@@ -293,6 +320,13 @@ export default {
 };
 </script>
 <style scoped>
+#load{
+  width: 100% !important;
+  height: 100% !important;
+  top: 0px;
+  left:0px;
+  position:absolute !important;
+}
 .function-table {
   position: absolute;
   right: 8px;

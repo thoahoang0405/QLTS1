@@ -39,7 +39,7 @@
     <splitpanes
       style="height: calc(100% - 30px)"
       horizontal
-      :class="masterSize == 0 || masterSize == 100 ? 'hide' : ''"
+    
     >
       <pane :size="masterSize" min-size="0" max-size="100">
         <div class="body-item-top">
@@ -55,7 +55,10 @@
               <div class="icon-search icon"></div>
             </div>
             <div class="icon-function">
-              <div v-if="listIncrement.length > 1" @click="onClickDeleteMultiple" class="icon icon-delete"></div>
+              <div v-if="listIncrement.length > 1" class="btn-deleted">
+                <div  @click="onClickDeleteMultiple" class="icon icon-delete"></div>
+                <div class="delete">Xóa</div>
+              </div>
               <div class="icon icon-print"></div>
               <div class="icon icon-more"></div>
             </div>
@@ -67,11 +70,12 @@
             :txtSearch="search"
             @idSelected="IdVoucher"
             @load="loadInrement"
+            @search="keySearchRequired"
           ></Table>
         </div>
       </pane>
 
-      <pane :size="detailSize" min-size="0" max-size="100">
+      <pane :size="detailSize" min-size="0" max-size="100"> 
         <div class="body-item-bottom">
           <div class="item-header">
             <h3>{{ info.detail }}</h3>
@@ -82,11 +86,12 @@
               @click="detailFullSize"
             ></div>
           </div>
-          <TableBottom :listSelected="idSelected"></TableBottom>
+          <TableBottom :listSelected="idSelected" :keySearch="key"></TableBottom>
         </div>
       </pane>
     </splitpanes>
   </div>
+ 
   <FormAdd
     v-if="isShowFormAdd"
     :idVoucherSelect="idSelected"
@@ -97,7 +102,7 @@
     @hideFormAdd="closeFormAdd"
   ></FormAdd>
   <Popup
-    v-show="isShowPopup"
+    v-if="isShowPopup"
     @hidePopup="hidePopup"
     :msg="msgDelete"
     @loadData="loadData"
@@ -107,6 +112,7 @@
     @isDelete="deleted"
     :item="itemDelete"
   ></Popup>
+  
 </template>
 <script>
 import Table from "../base/BaseTable.vue";
@@ -166,6 +172,7 @@ export default {
       incrementSelect: {},
       idSeletedDetele: {},
       listIdAsset: [],
+      key:"",
       listDelete:{
         listIncrementDeleted:[],
         listFixedAssetUpdate:[],
@@ -194,6 +201,9 @@ export default {
       this.btnNameLeft = btnPopup.No;
       this.itemDelete = value.voucher_code;
       this.getByVoucher(value);
+    },
+    keySearchRequired(value){
+      this.key=value
     },
      /**
      * mở popup xóa
@@ -227,7 +237,7 @@ export default {
         if(this.listIncrement.length>1){
           this.deleteMulti()
         }else{
-          if(this.idSeletedDetele.length==1){
+          if(this.idSeletedDetele){
 
             const toast = useToast();
             var me = this;
@@ -345,7 +355,12 @@ export default {
      * AUTHOR: HTTHOA(18/4/2023)
      */
     IdVoucher(value) {
-      this.idSelected = value;
+      if(value ==""){
+        this.idSelected=""
+      }else{
+
+        this.idSelected = value;
+      }
       if (this.detailSize == 0) {
         this.detailSize = 35;
         this.masterSize = 67;
@@ -422,6 +437,7 @@ export default {
 /* .body-item-bottom .item-header .ic{
 
 } */
+
 .item-header[data-v-45ea0361] {
     margin-top: 10px;
     margin-bottom: 16px;

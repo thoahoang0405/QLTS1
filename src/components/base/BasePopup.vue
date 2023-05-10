@@ -1,5 +1,6 @@
 <template>
-  <div id="popup" @keyup.enter="keypressEnter">
+  <div id="popup" @keyup.enter="keypressEnter" tabindex="0"
+>
     <div class="popup" :style="closeStatus == 9? {width: 390 + 'px',minHeight: 170 + 'px' }: {}">
       <div class="popup-body">
         <div class="icon-popup">
@@ -9,10 +10,10 @@
         <div  class="content-popup">
           <span>
             <strong v-if="closeStatus == 3 || closeStatus == 4">{{
-              item
+              item1
             }}</strong>
           </span>
-          <span v-html="msg"></span>
+          <span v-html="msg1"></span>
         </div>
       
       </div>
@@ -28,7 +29,7 @@
           class="no btn-hover-outline"
           @click="onClickBtnNo"
         >
-          {{ btnLeft }}
+          {{ btnLeft1 }}
         </button>
         <button
           ref="noSave"
@@ -41,9 +42,9 @@
         <button
           class="cancel btn-hover-blue"
           @click="onClickCancel"
-      
+          ref="btn"
         >
-          {{ name }}
+          {{ name1 }}
         </button>
       </div>
     </div>
@@ -55,16 +56,35 @@ export default {
   data() {
     return {
       closeStatus: 0,
+      msg1:'',
+      btnLeft1:'',
+      name1:'',
+      item1:'',
+
     };
+  },
+  mounted() {
+    this.setFocus();
   },
   watch: {
     close: function (value) {
       this.closeStatus = value;
     },
   },
+  created(){
+this.msg1=this.msg
+this.name1=this.name
+this.closeStatus=this.close
+this.item1=this.item
+this.btnLeft1=this.btnLeft
+  },
   props: ["msg", "name", "close", "item", "btnLeft"],
   methods: {
-   
+    setFocus() {
+      this.$nextTick(function () {
+        this.$refs["btn"].focus();
+      });
+    },
     keypressEnter() {
     
       if (this.closeStatus == CloseST.EditClose) {

@@ -343,3 +343,14 @@
   width: 18px;
 	height: 18px;
 }
+.icon-noData{
+  background: url("../../assets/icon/bg_report_nodata.76e50bd8.svg") no-repeat 0 0;
+  width: 132px;
+	height: 76px;
+}
+.no-data{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}

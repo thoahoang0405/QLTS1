@@ -33,7 +33,7 @@ const MisaFunction= {
             let year = date.getFullYear();
             newDate = newDate < 10 ? `0${newDate}` : newDate;
             month = month < 10 ? `0${month}` : month;
-            return `${newDate}-${month}-${year}`;
+            return `${newDate}/${month}/${year}`;
           }
         } catch (error) {
           return "";
@@ -46,6 +46,20 @@ const MisaFunction= {
         } else {
           return true;
         }
+      },
+      formatActive(active) {
+        switch (active) {
+          case 0:
+            active = "Chưa sử dụng";
+            break;
+          case 1:
+            active = "Đã sử dụng";
+            break;
+          
+          default:
+            active = "";
+        }
+        return active;
       },
     
 }

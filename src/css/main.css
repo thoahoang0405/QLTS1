@@ -120,7 +120,7 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    z-index: 1000;
+    z-index: 2;
     background-color: rgba(90, 88, 88, 0.116);
     display: flex;
     margin: auto;
@@ -216,6 +216,10 @@
   .input {
     position: relative;
     margin-right: 8px;
+  }
+
+input[disabled]:hover{
+   border-color:  #afafaf;
   }
   input[type="checkbox"]{
     cursor: pointer;

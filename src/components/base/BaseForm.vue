@@ -156,6 +156,7 @@
               @focus="focusInput('quantity')"
               ref="quantity"
               v-model="fixedAsset.quantity"
+              v-number="number"
               :min="1"
               :max="100000"
               controls-position="right"
@@ -178,6 +179,7 @@
               ref="cost"
               @focus="focusInput('cost')"
               v-model="fixedAsset.cost"
+              v-number="number"
               type="text"
               @change="formatCost"
               id="price"
@@ -226,6 +228,7 @@
               class="text-right"
               ref="depreciation_rate"
               v-model="fixedAsset.depreciation_rate"
+          
               disabled
             />
 
@@ -244,6 +247,7 @@
               disabled
               tabindex="-1"
               v-model="fixedAsset.depreciation_value"
+              v-number="number"
               id="amorYear"
               type="text"
               class="check-input item-input text-right"
@@ -322,7 +326,7 @@
       </div>
     </div>
     <Popup
-      v-show="isShowPopup"
+      v-if="isShowPopup"
       @hidePopup="hidePopupm"
       @saveAndHideForm="saveAndHide"
       :btnLeft="btnLeftName"
@@ -344,9 +348,10 @@ import { DateConfig } from "../../js/common/config";
 import { Form } from "../../js/common/form";
 import Popup from "../base/BasePopup.vue";
 import { ErrorMsg, btnPopup, Msg, NoticeMsg } from "../../js/common/resource";
-import { FormDetailMode, CloseST } from "../../js/common/enumeration";
+import { FormDetailMode, CloseST,ErrorCode } from "../../js/common/enumeration";
 import { useToast } from "vue-toastification";
 import MSFunction from "../../js/common/function";
+import { directive as VNumber } from "@coders-tm/vue-number-format";
 import {
   URL_FixedAssets,
   URL_Category,
@@ -385,6 +390,16 @@ export default {
       msgError: "",
       oldDatta: {},
       date: "",
+      number: {
+        decimal: ",",
+        separator: ".",
+        prefix: "",
+        suffix: "",
+        precision: 2,
+        nullValue: "",
+        masked: false,
+        reverseFill: false
+      },
       currentTabindex: 1,
       fixedAsset: {
         production_year: 2023,
@@ -415,7 +430,9 @@ export default {
       },
     };
   },
-
+  directives: {
+    number: VNumber,
+  },
   components: {
     Combobox,
     ElDatePicker,
@@ -499,6 +516,7 @@ export default {
             this.closeStatus = CloseST.DuplicateCode;
            this.btnName = btnPopup.Agree;
            this.msgError =ErrorMsg.ValidateBE
+
         }
       
     },
@@ -544,7 +562,7 @@ export default {
 
         .catch(function (res) {
           console.log(res.response.data.ErrorCode);
-          if (res.response.data.ErrorCode == CloseST.DuplicateCode) {
+          if (res.response.data.ErrorCode == ErrorCode.DuplicateCode) {
             me.isShowPopup = true;
             me.closeStatus = CloseST.DuplicateCode;
             me.msgError =
@@ -580,7 +598,7 @@ export default {
           me.$emit("loadData");
         })
         .catch(function (res) {
-          if (res.response.data.ErrorCode == CloseST.DuplicateCode) {
+          if (res.response.data.ErrorCode == ErrorCode.DuplicateCode) {
             me.isShowPopup = true;
             me.closeStatus = CloseST.DuplicateCode;
             me.msgError =
@@ -912,6 +930,8 @@ export default {
      */
     hidePopupm(value) {
       this.isShowPopup = value;
+      let error=this.$el.querySelectorAll('.border-red')
+        error[0].focus()
     },
     /**
      * đóng popup, form
@@ -962,6 +982,7 @@ export default {
   },
 
   created() {
+   
     this.formMode = this.FormMode;
     /**
      * khi ấn nút thêm mở form
@@ -983,7 +1004,7 @@ export default {
      */
     if (this.formMode == FormDetailMode.Edit) {
       this.fixedAsset = this.fixedAssetDetail;
-
+      console.log(this.fixedAsset.depreciation_rate);
       this.fixedAsset.cost = this.formatMoney(this.fixedAssetDetail.cost);
       this.fixedAsset.depreciation_value = this.formatMoney(
         this.fixedAssetDetail.depreciation_value

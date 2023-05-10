@@ -7,7 +7,7 @@
             <th class="text-center width-fit">
               <input
                 type="checkbox"
-                :checked="listIncrementSelected.length == incrementList.length"
+                :checked="listIncrementSelected?.length == incrementList?.length && incrementList?.length!=0"
                 @click="selectedAllItem"
               />
             </th>
@@ -31,9 +31,20 @@
           </tr>
         </thead>
         <tbody>
+          <tr style="border: none;" class="data" v-if="totalRecord == 0" >
+            <td colspan="8" class="noData">
+              <div class="no-data">
+                <div class="icon-noData"></div>   
+                <h3>Không có dữ liệu</h3>    
+              </div>
+            </td>
+          </tr>
           <tr
             v-for="(increment, index) of incrementList"
             :key="increment.voucher_id"
+            @mousedown.prevent.ctrl="mouseDown(increment)"
+            @mouseup.prevent.ctrl="mouseUp(increment)"
+            @dblclick="showFormEdit(increment)"
             :class="
               listIncrementSelected.includes(increment) ||
               selectIdItem == increment.voucher_id
@@ -63,7 +74,7 @@
             <td class="th-width-min">
               <div class="function-table">
                 <div class="icon icon-edit" @click="showFormEdit(increment)">
-                  <div class="tooltip">Nhân bản</div>
+                  <div class="tooltip">Sửa</div>
                 </div>
                 <div
                   class="icon icon-delete"
@@ -79,9 +90,7 @@
     </div>
     <!-- <div class="main-table">
                </div> -->
-    <table class="tb-footer"  style="
-          height: 30px;
-          ">
+    <table class="tb-footer" style="height: 30px">
       <thead>
         <tr
           style="
@@ -103,7 +112,7 @@
               <div
                 style="position: relative; cursor: pointer"
                 @click="btnDropUp"
-                v-outside="outsidePage"
+               
               >
                 <div class="content-page">
                   {{ pageDefault }}
@@ -166,12 +175,7 @@
               </div>
             </div>
           </td>
-          <!-- <td
-                colspan="1"
-                style="
-                  width: 150px;
-                  box-sizing: border-box;               "
-              ></td> -->
+
           <td colspan="1" style="width: 150px; box-sizing: border-box">
             <div>
               <Paginate
@@ -247,6 +251,9 @@ export default {
       formModeEdit: FormDetailMode.Edit,
       titleFormEdit: TableIncrease.titleEdit,
       modeTable: FormDetailMode.Replication,
+      listOnMouseDown: {},
+      listOnMouseUp: {},
+      lastClickTime: null,
     };
   },
   watch: {
@@ -262,6 +269,9 @@ export default {
     txtSearch: function (data) {
       this.keyword = data;
       this.getPagingAsset();
+      if (this.totalRecord == 0) {
+        this.$emit("search", "");
+      }
     },
   },
   created() {
@@ -274,7 +284,69 @@ export default {
     });
   },
   methods: {
+    /**
+     *
+     * click ctrl
+     * AUTHOR: HTTHOA(2/4/2023)
+     */
+    mouseDown(increment) {
+      try {
+        // lưu tài sản khi mousedown
+        this.listOnMouseDown = increment;
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    /**
+     *
+     * chọn trong khoảng đã kéo
+     * AUTHOR: HTTHOA(2/4/2023)
+     */
+    selectMultipleItem(item1, item2) {
+      //đoạn này là lấy những tài sản khi kéo giữ chuột
+      if (
+        this.incrementList.includes(item1) &&
+        this.incrementList.includes(item2)
+      ) {
+        // lấy vị trí của 2 item trong mảng fixedAsset
+        //start là vị trí đầu khi down ctrl
+        let startIndex = this.incrementList.indexOf(item2);
+        //end là vị trí khi up ctrl
+        let endIndex = this.incrementList.indexOf(item1);
+        // kiểm tra vị trí bắt đầu và kết thúc nếu bắt đầu lớn hơn kết thúc thì đổi lại
+        if (startIndex > endIndex) {
+          let tmp = startIndex;
+          startIndex = endIndex;
+          endIndex = tmp;
+        }
+
+        // thêm các item chưa có trong mảng xóa từ vị trí bắt đầu đến kết thúc
+        for (let i = startIndex; i <= endIndex; i++) {
+          //nếu trong danh sách chưa gồm tài sản đó thì push vào danh sách
+          if (!this.listIncrementSelected.includes(this.incrementList[i])) {
+            this.listIncrementSelected.push(this.incrementList[i]);
+          }
+        }
+      }
+      this.$emit("listIncrement", this.listIncrementSelected);
+    },
+    /**
+     * up ctrl thả chuột để lấy vị trí cuối cùng chọn
+     * AUTHOR: HTTHOA(2/4/2023)
+     */
+    mouseUp(increment) {
+      try {
+        // lưu tài sản khi mouseup
+        this.listOnMouseUp = increment;
+        this.selectMultipleItem(this.listOnMouseDown, this.listOnMouseUp);
+        this.listOnMouseDown = {};
+        this.listOnMouseUp = {};
+      } catch (err) {
+        console.log(err);
+      }
+    },
     showFormEdit(increment) {
+      this.lastClickTime = null;
       this.$emit(
         "modeEdit",
         FormDetailMode.Edit,
@@ -282,6 +354,11 @@ export default {
         increment
       );
     },
+    /**
+     *
+     * xóa 1 chứng
+     * AUTHOR: HTTHOA(9/5/2023)
+     */
     deleteIncrement(increment) {
       this.$emit("deleteOne", increment);
     },
@@ -291,8 +368,20 @@ export default {
      * AUTHOR: HTTHOA(18/4/2023)
      */
     selectItemID(increment) {
+      this.isShowLoad=true
+      if (
+        this.lastClickTime &&
+        new Date().getTime() - this.lastClickTime < 250
+      ) {
+        // Click occurred within 250 milliseconds of last click - treat as double click
+        this.lastClickTime = null;
+        return;
+      }
+      // Single click - handle as normal
+      this.lastClickTime = new Date().getTime();
       this.selectIdItem = increment.voucher_id;
       this.$emit("idSelected", this.selectIdItem);
+      this.isShowLoad=false
     },
     /**
      * thêm phần tử xóa và bỏ khi đã được chọn
@@ -392,7 +481,11 @@ export default {
           me.totalRecord = res.data.TotalRecords;
           me.totalCost = res.data.TotalCost;
           me.incrementList = res.data.Data;
-          me.selectItemID(res.data.Data[0]);
+          if(me.totalRecord>0){
+            me.selectItemID(res.data.Data[0]);
+          }else{
+            me.selectItemID({});
+          }
         })
         .catch(function (res) {
           console.log(res);
@@ -410,23 +503,37 @@ export default {
      * lấy số bản ghi trên 1 trang
      * AUTHOR: HTTHOA(18/4/2023)
      */
+     showPage(is) {
+      this.isShowPage = is;
+    },
     getPageDefault(e) {
       this.isActive = e.target.getAttribute("pageSize");
       this.pageDefault = e.target.getAttribute("pageSize");
-      this.isShowPage = false;
+      this.showPage(false)
       this.pageNumber = 1;
       this.getPagingAsset();
-      if (this.pageDefault > this.totalRecord) {
-        this.pageDefault = this.totalRecord;
-      }
+    
     },
-    showPage(is) {
-      this.isShowPage = is;
-    },
+   
   },
 };
 </script>
 <style scoped>
+.noData{
+  width: 100%;
+  /* padding-left: 50%; */
+    /* display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center; */
+    /* position: absolute;
+    row-gap: 20px;
+    column-gap: 15px;
+    top: 42px;
+    left: 250px;
+    bottom: 42px;
+    cursor: unset !important; */
+}
 .pagination {
   width: 130px !important;
 }

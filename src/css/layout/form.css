@@ -111,9 +111,13 @@
     border-radius: 3px;
     outline: none;
   }
+  button{
+    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
+  }
   .form .cancel {
     background-color: #fff;
     margin-right: 10px;
+    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
   }
   .btn-hover-blue{
   position: relative;

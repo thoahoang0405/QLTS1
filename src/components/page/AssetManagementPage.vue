@@ -52,10 +52,9 @@
             </div>
           </a>
         </button>
-        <button class="btn-excel">
-          <div class="icon icon-delete" @click="onClickDeleteMultiple">
-            <div class="tooltip-delete">{{ tableInfo.btnDeleteTooltip }}</div>
-          </div>
+        <button class="btn-delete">
+          <div class="delete">{{ tableInfo.btnDeleteTooltip }}</div>
+          <div class="icon icon-delete" @click="onClickDeleteMultiple"></div>
         </button>
       </div>
     </div>
@@ -68,7 +67,7 @@
                 <input
                   type="checkbox"
                   @click="selectedAllItem"
-                  :checked="listFixedAsset.length == fixedAssets.length"
+                  :checked="listFixedAsset.length == fixedAssets.length && listFixedAsset.length!=0"
                   ref="checkall"
                 />
               </th>
@@ -91,52 +90,50 @@
                 </div>
               </th>
               <th class="text-right">{{ tableInfo.residualValue }}</th>
+              <th >{{ tableInfo.active }}</th>
               <th>{{ tableInfo.function }}</th>
             </tr>
           </thead>
+
           <tbody>
             <tr style="border: none" class="data" v-if="totalRecord == 0">
-              <td colspan="1" class="noData"></td>
-              <td colspan="1" class="noData"></td>
-              <td colspan="1" class="noData"></td>
-              <td colspan="1" class="noData"></td>
-              <td colspan="1" class="noData"></td>
-              <td colspan="2" class="noData text-center">Không có dữ liệu</td>
-              <td colspan="1" class="noData"></td>
-              <td colspan="1" class="noData"></td>
-              <td colspan="1" class="noData"></td>
-              <td colspan="1" class="noData"></td>
+             
+              <td colspan="11" class="noData">
+              <div class="no-data">
+                <div class="icon-noData"></div>   
+                <h3>Không có dữ liệu</h3>    
+              </div>
+            </td>
+
             </tr>
 
             <tr
               ref="rowCheck"
-              v-for="(asset, index) of fixedAssets"             
+              v-for="(asset, index) of fixedAssets"
               :key="asset.fixed_asset_id"
               :class="listFixedAsset.includes(asset) ? 'active' : ''"
-              @dblclick="showFormEdit(asset)"          
+              @dblclick="showFormEdit(asset)"
               @contextmenu="onClickContextMenu(asset, $event)"
               @mousedown.prevent.ctrl="mouseDown(asset)"
               @mouseup.prevent.ctrl="mouseUp(asset)"
               style="max-height: 38px; box-sizing: border-box"
             >
-
               <td
                 style="min-width: 47px; max-width: 47px; box-sizing: border-box"
                 class="text-center"
               >
                 <input
                   type="checkbox"
-                  ref="checkbox" 
+                  ref="checkbox"
                   :checked="listFixedAsset.includes(asset)"
                   @click="selectItemToList(asset)"
                 />
-          
               </td>
               <td
                 style="min-width: 45px; max-width: 45px; box-sizing: border-box"
                 class="text-center"
               >
-              {{ index + 1 }}
+                {{ index + 1 }}
               </td>
               <td
                 style="min-width: 82px; max-width: 82px; box-sizing: border-box"
@@ -144,7 +141,6 @@
                 {{ asset.fixed_asset_code }}
               </td>
               <td
-            
                 style="
                   min-width: 130px;
                   max-width: 130px;
@@ -160,7 +156,6 @@
                   box-sizing: border-box;
                 "
               >
-            
                 {{ asset.fixed_asset_category_name }}
               </td>
               <td
@@ -209,6 +204,17 @@
                 {{ formatMoney(asset.cost - asset.impoverishment) }}
               </td>
               <td
+                style="
+                  min-width: 104px;
+                  max-width: 104px;
+                  box-sizing: border-box;
+                  
+                "
+               
+              >
+                {{ formatActive(asset.active) }}
+              </td>
+              <td
                 style="min-width: 90px; max-width: 90px; box-sizing: border-box"
               >
                 <div class="function-table">
@@ -237,7 +243,8 @@
               >
                 <div>
                   <div class="total-record">
-                    Tổng số: <strong>{{ formatMoney(totalRecord) }}</strong> bản ghi
+                    Tổng số: <strong>{{ formatMoney(totalRecord) }}</strong> bản
+                    ghi
                   </div>
                 </div>
               </td>
@@ -246,9 +253,9 @@
                 style="
                   min-width: 130px;
                   max-width: 130px;
-                  box-sizing: border-box;               "
+                  box-sizing: border-box;
+                "
               >
-
                 <div class="page">
                   <div
                     style="position: relative; cursor: pointer"
@@ -422,7 +429,7 @@
     @mouseleave="closeContextMenu"
   />
   <Popup
-    v-show="isShowPopup"
+    v-if="isShowPopup"
     @hidePopup="hidePopup"
     :msg="msgDelete"
     @loadData="loadData"
@@ -461,7 +468,7 @@ import {
 
 import MSFunction from "../../js/common/function";
 import { useToast } from "vue-toastification";
-import { FormDetailMode, CloseST } from "../../js/common/enumeration";
+import { FormDetailMode, CloseST,ErrorCode } from "../../js/common/enumeration";
 import {
   URL_FixedAssetPaging,
   URL_Category,
@@ -469,6 +476,7 @@ import {
   URL_FixedAssetsPut,
   URL_Department,
   URL_GetNewCode,
+  URL_FixedAssetIncrements
 } from "@/js/common/urlAsset";
 export default {
   data() {
@@ -503,7 +511,7 @@ export default {
       isActive: "20",
       pageDefault: 20,
       fixedAssets: [],
-      oldData:[],
+      oldData: [],
       place: PlaceHolder,
       newCode: "",
       listFixedAsset: [],
@@ -525,9 +533,9 @@ export default {
       listOnMouseDown: {},
       listOnMouseUp: {},
       oldKeyDepartment: "",
-      active:null,
-      array:[]
-
+      active: null,
+      array: [],
+      voucher_code:""
     };
   },
   components: {
@@ -557,7 +565,6 @@ export default {
         this.getPagingAsset();
       }
     },
-   
   },
   created() {
     this.setFocus();
@@ -566,13 +573,16 @@ export default {
     this.getCategory();
   },
   methods: {
-  /**
-   * 
-   * format tiền
-   *  AUTHOR: HTTHOA(2/4/2023)
-   */
+    /**
+     *
+     * format tiền
+     *  AUTHOR: HTTHOA(2/4/2023)
+     */
     formatMoney(money) {
       return MSFunction.formatMoney(money);
+    },
+    formatActive(active){
+      return MSFunction.formatActive(active)
     },
     /**
      *
@@ -643,7 +653,7 @@ export default {
     onClickContextMenu(asset, e) {
       e.preventDefault();
       this.selectItem(asset);
-    //  lấy vị trí chuột
+      //  lấy vị trí chuột
       this.posTop = e.clientY;
       this.posLeft = e.clientX;
       this.isShowContextMenu = true;
@@ -681,7 +691,6 @@ export default {
     onClickEditContextMenu() {
       this.isShowContextMenu = false;
       this.showFormEdit(this.currentFixedAsset);
-    
     },
     /**
      * click vào thêm trong  chức năng context menu
@@ -749,10 +758,9 @@ export default {
      */
     selectItemCategory(value) {
       if (value.fixed_asset_category_id) {
-        this.fixed_asset_category_id = value.fixed_asset_category_id;       
+        this.fixed_asset_category_id = value.fixed_asset_category_id;
       } else {
         this.fixed_asset_category_id = "";
-        
       }
       this.pageNumber = 1;
       this.getPagingAsset();
@@ -772,8 +780,7 @@ export default {
       this.isShowPopup = value;
       this.assetSelected = {};
       this.listFixedAsset = [];
-      this.oldData=[]
-    
+      this.oldData = [];
     },
     /**
      * nhấn nút xóa
@@ -801,9 +808,7 @@ export default {
       this.showPage(false);
       this.pageNumber = 1;
       this.getPagingAsset();
-      if (this.pageDefault > this.totalRecord) {
-        this.pageDefault = this.totalRecord;
-      }
+    
     },
 
     /**
@@ -837,26 +842,27 @@ export default {
      * AUTHOR: HTTHOA(11/03/2023)
      */
     getPagingAsset() {
-      var me = this;    
+      var me = this;
       me.isShowLoad = true;
       axios({
         url: `${URL_FixedAssetPaging}?keyword=${this.txtSearch}&pageSize=${this.pageDefault}&departmentID=${this.department_id}&fixedAssetCategoryID=${this.fixed_asset_category_id}&pageNumber=${this.pageNumber}&active=${this.active}`,
         method: "post",
         data: [],
       })
-      // axios
-      //   .post(
-      //     `${URL_FixedAssetPaging}?keyword=${this.txtSearch}&pageSize=${this.pageDefault}&departmentID=${this.department_id}&fixedAssetCategoryID=${this.fixed_asset_category_id}&pageNumber=${this.pageNumber}&active=${this.active}`
-      //   )
+        // axios
+        //   .post(
+        //     `${URL_FixedAssetPaging}?keyword=${this.txtSearch}&pageSize=${this.pageDefault}&departmentID=${this.department_id}&fixedAssetCategoryID=${this.fixed_asset_category_id}&pageNumber=${this.pageNumber}&active=${this.active}`
+        //   )
         .then(function (res) {
           me.isShowLoad = false;
           me.totalPage = res.data.TotalPages;
           me.totalRecord = res.data.TotalRecords;
           me.totalImprover = res.data.TotalImprover;
           me.totalCost = res.data.TotalCost;
-          me.totalQuantity = res.data.TotalQuantity;        
-          me.fixedAssets = res.data.Data;        
-        }) 
+          me.totalQuantity = res.data.TotalQuantity;
+          me.fixedAssets = res.data.Data;
+         
+        })
         .catch(function () {
           console.log(1);
         });
@@ -870,10 +876,8 @@ export default {
      * AUTHOR: HTTHOA(15/08/2022)
      */
     clickCallback(pageNum) {
-
       this.pageNumber = pageNum;
       this.getPagingAsset();
-       
     },
     /**
      * lấy mã mới
@@ -897,7 +901,6 @@ export default {
       this.isShowPage = is;
     },
 
-   
     /**
      * hiển thị form thêm
      * AUTHOR: HTTHOA(28/02/2023)
@@ -922,7 +925,7 @@ export default {
       this.isShow = false;
       this.loadData();
     },
-   
+
     /**
      * hiển thị form chỉnh sửa
      * AUTHOR: HTTHOA(28/02/2023)
@@ -933,7 +936,6 @@ export default {
       this.isShow = true;
       this.assetSelected = asset;
       this.fixed_asset_id = asset.fixed_asset_id;
-     
     },
     /**
      * hiển thị form nhân bản
@@ -955,13 +957,13 @@ export default {
       this.loadData();
     },
     /**
-     * thêm phần tử xóa và bỏ khi đã được chọn 
+     * thêm phần tử xóa và bỏ khi đã được chọn
      * AUTHOR: HTTHOA (20/03/2023)
      */
     selectItemToList(asset) {
       try {
         this.currentFixedAsset = asset;
-        
+
         // this.indexFocus = this.fixedAssets.indexOf(asset);
         if (!this.listFixedAsset.includes(asset)) {
           //thực hiện chọn
@@ -971,7 +973,7 @@ export default {
           this.listFixedAsset = this.listFixedAsset.filter((a) => {
             return a !== asset;
           });
-         
+
           this.currentFixedAsset =
             this.listFixedAsset[this.listFixedAsset.length - 1];
         }
@@ -1015,9 +1017,9 @@ export default {
         .delete(`${URL_FixedAssetsPut}${id}`)
         .then(function () {
           toast.success(Msg.DeleteSucces, { timeout: 2000 });
-          me.pageNumber=1
+          me.pageNumber = 1;
           me.getPagingAsset();
-          me.listFixedAsset=[]
+          me.listFixedAsset = [];
         })
         .catch(function () {
           toast.error(Msg.DeleteError, { timeout: 2000 });
@@ -1042,13 +1044,37 @@ export default {
       })
         .then(function (res) {
           console.log(res.data);
-          toast.success(res.data + Msg.DeleteSucces, { timeout: 2000 });
-          me.pageNumber=1
+          if (me.listFixedAsset.length > 1) {
+            toast.success(res.data + Msg.DeleteSucces, { timeout: 2000 });
+          } else {
+            toast.success(Msg.DeleteSucces, { timeout: 2000 });
+          }
+          me.pageNumber = 1;
           me.getPagingAsset();
-          me.listFixedAsset=[]
+          me.listFixedAsset = [];
         })
-        .catch(function () {
-          toast.error(Msg.DeleteError, { timeout: 2000 });
+        .catch(function (res) {
+          console.log(res);
+          if (res.response.data.ErrorCode == ErrorCode.IncrementedCode) {
+            me.showPopup(true);
+            if (me.listFixedAsset.length < 10) {
+              me.msgDelete =
+                "<b> 0" +
+                me.listFixedAsset.length +
+                " </b> " +
+                ErrorMsg.CantDelete;
+            } else {
+              me.msgDelete =
+                "<b> " +
+                me.listFixedAsset.length +
+                " </b> " +
+                ErrorMsg.CantDelete;
+            }
+            me.closeStatus = CloseST.DeleteCloseNotChoose;
+            me.btnName = btnPopup.ClosePop;
+          } else {
+            toast.error(Msg.DeleteError, { timeout: 2000 });
+          }
         });
     },
     /**
@@ -1066,30 +1092,71 @@ export default {
           this.btnName = btnPopup.ClosePop;
         } else if (this.listFixedAsset.length == 1) {
           this.showPopup(true);
-          if(this.listFixedAsset[0].active==0){       
-          this.msgDelete = NoticeMsg.ConfirmDelet;
-          this.closeStatus = CloseST.DeleteOne;
-          this.btnName = btnPopup.Delete;
-          this.btnNameLeft = btnPopup.No;
-          this.itemDelete = this.listFixedAsset[0].fixed_asset_code;
-          }else{
-          this.msgDelete = "Tài sản có mã  <b>&lt&lt " + this.listFixedAsset[0].fixed_asset_code+ " &gt&gt</b> đã phát sinh chứng từ ghi tăng";
-          this.closeStatus = CloseST.DeleteCloseNotChoose;
-          this.btnName = btnPopup.ClosePop;
+          if (this.listFixedAsset[0].active == 0) {
+            this.msgDelete = NoticeMsg.ConfirmDelet;
+            this.closeStatus = CloseST.DeleteOne;
+            this.btnName = btnPopup.Delete;
+            this.btnNameLeft = btnPopup.No;
+            this.itemDelete = this.listFixedAsset[0].fixed_asset_code;
+          } else {
+            console.log(this.listFixedAsset[0]);
+            // this.getByVoucher(this.listFixedAsset[0].voucher_id)
+            this.msgDelete =
+              "Tài sản có mã  <b>&lt&lt " +
+              this.listFixedAsset[0].fixed_asset_code +
+              " &gt&gt</b> đã phát sinh chứng từ ghi tăng";
+            this.closeStatus = CloseST.DeleteCloseNotChoose;
+            this.btnName = btnPopup.ClosePop;
           }
-         
         } else {
+          console.log(this.listFixedAsset);
           this.showPopup(true);
-          this.itemDelete = this.listFixedAsset.length + " tài sản";
-          this.msgDelete = NoticeMsg.ConfirmDelet;
-          this.closeStatus = CloseST.DeleteMulti;
-          this.btnNameLeft = btnPopup.No;
-          this.btnName = btnPopup.Delete;
+          let isDelete = true;
+          for (const item of this.listFixedAsset) {
+            if (item.active == 1) {
+              isDelete = false;
+            }
+          }
+          if (isDelete == false) {
+            if (this.listFixedAsset.length < 10) {
+              this.msgDelete =
+                "<b> 0" +
+                this.listFixedAsset.length +
+                " </b> tài sản được chọn không thể xóa. Vui lòng kiểm tra lại trước khi thực hiện xóa" 
+            } else {
+              this.msgDelete =
+                "<b> " +
+                this.listFixedAsset.length +
+                " </b>  tài sản được chọn không thể xóa. Vui lòng kiểm tra lại trước khi thực hiện xóa" 
+             
+            }
+            this.closeStatus = CloseST.DeleteCloseNotChoose;
+            this.btnName = btnPopup.ClosePop;
+          } else {
+            this.itemDelete = this.listFixedAsset.length + " tài sản";
+            this.msgDelete = NoticeMsg.ConfirmDelet;
+            this.closeStatus = CloseST.DeleteMulti;
+            this.btnNameLeft = btnPopup.No;
+            this.btnName = btnPopup.Delete;
+          }
         }
-        console.log(this.listFixedAsset);
       } catch (err) {
         console.log(err);
       }
+    },
+    getByVoucher(id) {
+      
+      var me = this;
+      axios
+        .get(`${URL_FixedAssetIncrements}/${id}`)
+        .then(function (res) {
+         
+          me.voucher_code=res.data.voucher_code
+          console.log(me.voucher_code);
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
     },
     /**
      * hàm ktra xem thực hiện xóa 1 hay xóa nhiều
@@ -1099,29 +1166,35 @@ export default {
       console.log(value);
       this.isShowPopup = value;
       console.log(this.listFixedAsset.length);
-
-      if (this.listFixedAsset.length == 1) {
-        var id = this.listFixedAsset[0].fixed_asset_id;
-        console.log(id);
-        this.deleteOne(id);
-      } else {
-        this.deleteMultiple();
-      }
+      this.deleteMultiple();
+      // if (this.listFixedAsset.length == 1) {
+      //   var id = this.listFixedAsset[0].fixed_asset_id;
+      //   console.log(id);
+      //   this.deleteOne(id);
+      // } else {
+      //   this.deleteMultiple();
+      // }
     },
   },
 };
 </script>
 <style scope>
 div#table\ {
-    margin-top: 16px !important;
-    
+  margin-top: 16px !important;
+}
+.table table tbody .data:hover {
+  background-color: #fff !important;
+}
+tr .data:hover {
+  background-color: #fff;
 }
 .data {
   width: 100%;
+  height: 100px;
 }
 .noData {
   height: auto;
-  margin: auto auto;
+  margin: auto 48%;
   align-items: center;
 }
 .pagination {
@@ -1296,7 +1369,7 @@ li.page-item.disabled {
 
 .content-page {
   width: 60px;
-  border: 1px solid;
+  border: 1px solid #bbb;
   height: 30px;
   display: flex;
   justify-content: space-between;

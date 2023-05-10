@@ -1,6 +1,10 @@
 <template>
-  <div id="form"  @keyup.esc="hideFormEdit"
-    tabindex="0">
+  <div
+    id="form"
+    @keyup.esc="hideFormEdit"
+    @keydown.ctrl.s.prevent="save"
+    tabindex="0"
+  >
     <div class="form increment-form">
       <div class="form-header">
         <h2 id="hd-form">Sửa tài sản {{ fixedAssetName }}</h2>
@@ -38,7 +42,7 @@
             >
               <div class="input-row-left">
                 <Combobox
-                @onBlur="validate(index)"
+                  @onBlur="validate(index)"
                   class="item-input check-input"
                   style="margin-top: 14px"
                   :items="budgets"
@@ -47,15 +51,19 @@
                   :fieldName="'budget_name'"
                   :value="budget.budget_name"
                   v-model="budgetsArray.budget_name"
-
-                  :border="
-                   budget.errorMsg !='' ? 'border-red' : ''
-                  "
+                  :placeholder="place.PlaceHolderSource"
+                  ref="budget_name"
+                  @onFocusCbb="setFocus"
+                  :border="budget.errorMsg != '' ? 'border-red' : ''"
                   @selectedItem="
-                    (item) => (budget.budget_name = item.budget_name)
+                    (item) => (
+                      (budget.budget_name = item.budget_name),
+                      (currentItem = item.budget_name),(budget.errorMsg='')
+                     
+                    )
                   "
                 />
-                <p class="error" v-if="budget.errorMsg !=''">
+                <p class="error" v-if="budget.errorMsg != ''">
                   <!-- <span>{{ formInfo.department_code }} </span -->
 
                   {{ budget.errorMsg }}
@@ -68,14 +76,13 @@
                   @change="changeTotal"
                   v-model="budget.mount"
                   v-number="number"
+                  ref="mount"
+                  @focus="onFocusInput(index)"
                   type="text"
-                  :class="
-                    budget.errorMount !='' ? 'border-red' : ''
-                  "
+                  :class="budget.errorMount != '' ? 'border-red' : ''"
                 />
-                <p class="error" v-if="budget.errorMount !=''">
-                  <!-- <span>{{ formInfo.department_code }} </span -->
-
+                <p class="error" v-if="budget.errorMount != ''">
+                  
                   {{ budget.errorMount }}
                 </p>
               </div>
@@ -133,23 +140,39 @@
     v-if="showFormChooseAsset"
     @closeChooseAsset="closeFormChoose"
   ></ChooseAsset>
+  <Popup
+      v-if="isShowPopup"
+      @hidePopup="hidePopupm"
+      :msg="msgError"
+      :name="btnName"
+      :close="closeStatus"
+    ></Popup>
 </template>
 <script>
 import { FormIncrement } from "../../js/common/form";
 import Combobox from "./BaseCombobox.vue";
+import Popup from "../base/BasePopup.vue";
 import ChooseAsset from "../base/BaseChooseAsset.vue";
 import axios from "axios";
 import { useToast } from "vue-toastification";
 import MSFunction from "../../js/common/function";
-import { Msg } from "../../js/common/resource";
-
+import { Msg, ErrorMsg,btnPopup,PlaceHolder } from "../../js/common/resource";
+import { CloseST,ErrorCode } from "../../js/common/enumeration";
 import { directive as VNumber } from "@coders-tm/vue-number-format";
-import { URL_Budget, URL_FixedAssetsPut,URL_FixedAssets } from "@/js/common/urlAsset";
+import {
+  URL_Budget,
+  URL_FixedAssetsPut,
+  URL_FixedAssets,
+} from "@/js/common/urlAsset";
 export default {
   data() {
     return {
+      isShowPopup: false,
       formInfo: FormIncrement,
       showFormChooseAsset: false,
+      btnName:"",
+      closeStatus:0,
+      msgError:"",
       budgetsArray: [],
       fixedAssetName: "",
       departmentName: "",
@@ -159,20 +182,22 @@ export default {
       arrayCost: [],
       total_Price: 0,
       isValid: true,
+      place:PlaceHolder,
+      currentItem: "",
       number: {
         decimal: ",",
         separator: ".",
         prefix: "",
         precision: 2,
       },
-      error:[],
+      error: [],
       rules: {
         budget_name: { Required: true },
         mount: { Required: true },
       },
       budgetErrorName: [],
       budgetErrorMount: [],
-      msgError: "",
+     
     };
   },
   directives: {
@@ -182,13 +207,14 @@ export default {
   components: {
     ChooseAsset,
     Combobox,
+    Popup,
   },
+  
   created() {
     this.idSelected = this.fixedAssetSelected;
     console.log(this.idSelected);
     this.getFixedAsset();
     this.getBudget();
-  
 
     // for (const item of this.budgetsArray) {
     //   item.mount=this.formatMoney(item.mount)
@@ -217,55 +243,65 @@ export default {
       // handler() {
       this.total_Price = 0;
       for (const budget of data) {
+      
         budget.mount = parseInt(budget.mount);
         this.total_Price += budget.mount;
       }
+      
     },
   },
-mounted(){
-  this.setFocus();
-},
+  mounted() {
+    // var refCbb=this.$refs.budget_name
+    // console.log(refCbb);
+
+    this.setFocus(0);
+  },
   methods: {
+    
+    /**
+     * 
+     * focus vào ô đầu
+     * HTTHOA(5/5/2023)
+     */
     setFocus() {
       this.$nextTick(function () {
-        this.emitter.emit("focus");
+        var firstCombobox = this.$refs.budget_name;
+        firstCombobox[0].$el.querySelector("input").focus();
       });
     },
-    validateMount(index){
+    onFocusInput(index){
+      let listInput=this.$refs.mount
+        this.budgetsArray[index].errorMount=''
+        listInput[index].select();
+     
+    },
+    /**
+     * 
+     * validate giá
+     * HTTHOA(5/5/2023)
+     */
+    validateMount(index) {
       const item = this.budgetsArray[index];
-      if(item.mount=="" || item.mount== 0){
-        item.errorMount="Giá trị không được bỏ trống"
-       
-      }else{
-        item.errorMount=""
+      if (item.mount == "" || item.mount == 0) {
+        item.errorMount = ErrorMsg.RequiredCost;
+      } else {
+        item.errorMount = "";
       }
     },
+    /**
+     * 
+     * validate nguồn hình thành
+     * HTTHOA(5/5/2023)
+     */
     validate(index) {
       console.log(index);
       const item = this.budgetsArray[index];
-      if(item.budget_name=="" || item.budget_name== undefined){
-        item.errorMsg="Nguồn hình thành không được bỏ trống"
-       
-      }else{
-        item.errorMsg=""
-        for(var j=0; j<this.budgetsArray.length; j++){
-        const item2 = this.budgetsArray[j];
-        if( item.budget_name==item2.budget_name){
-          item2.errorMsg="Nguồn hình thành không được trùng nhau"
-          item.errorMsg="Nguồn hình thành không được trùng nhau"
-          
-        }else{
-          item.errorMsg=""
-         item2.errorMsg=""
-         console.log(item);
-        }
-      }
-        
-      }
-    
- 
+      item.errorMsg = "";
+      if (item.budget_name == "" || item.budget_name == undefined) {
+        item.errorMsg = ErrorMsg.RequiredSource;
+      } 
     },
-  
+
     /**
      * lấy tài sản theo id
      * AUTHOR: HTTHOA(25/04/2023)
@@ -280,16 +316,15 @@ mounted(){
           me.fixedAssetName = me.itemSelect.fixed_asset_name;
           me.departmentName = me.itemSelect.department_name;
           if (me.itemSelect.total_cost == null) {
-            me.budgetsArray = [{ budget_name: "", mount: 0 ,errorMsg:"", errorMount:""}];
+            me.budgetsArray = [
+              { budget_name: "", mount: 0, errorMsg: "", errorMount: "" },
+            ];
           } else {
-        
-       
             me.budgetsArray = JSON.parse(me.itemSelect.total_cost);
-            console.log( me.budgetsArray.errorMsg);
-            for(var item of me.budgetsArray){
-
-              item.errorMsg=""
-            item.errorMount=""
+            console.log(me.budgetsArray.errorMsg);
+            for (var item of me.budgetsArray) {
+              item.errorMsg = "";
+              item.errorMount = "";
             }
           }
         })
@@ -308,10 +343,19 @@ mounted(){
         this.total_Price += this.convertNumber(budget.mount);
       }
     },
-
+    /**
+     * 
+     * chuyển sang dạng số
+     * HTTHOA(5/5/2023)
+     */
     convertNumber(data) {
       return MSFunction.convertMoneyToNum(data);
     },
+    /**
+     * 
+     * chuyển sang dạng tiền
+     * HTTHOA(5/5/2023)
+     */
     formatMoney(data) {
       return MSFunction.formatMoney(data);
     },
@@ -319,57 +363,58 @@ mounted(){
      * click nút lưu
      * AUTHOR: HTTHOA(25/04/2023)
      */
+  
     save() {
+      var valid=true
+    
       for (const budget of this.budgetsArray) {
         budget.mount = this.convertNumber(budget.mount);
       }
       this.itemSelect.cost = this.convertNumber(this.itemSelect.cost);
       this.$emit("costEdit", this.itemSelect.cost);
       this.itemSelect.total_cost = JSON.stringify(this.budgetsArray);
-      console.log(this.itemSelect);
-
-      for(var i=0; i< this.budgetsArray.length; i++){
-      const item = this.budgetsArray[i];
-       if(item.budget_name=="" || item.budget_name== undefined){
-        item.errorMsg="Nguồn hình thành không được bỏ trống"
-        if(item.mount=="" || item.mount== 0){
-        item.errorMount="Giá trị không được bỏ trống"
-        }else{
-          item.errorMount=""
+      // this.editData();
+      for (var i = 0; i < this.budgetsArray.length; i++) {
+        const item = this.budgetsArray[i];
+        if (item.budget_name == "" || item.budget_name == undefined) {
+          item.errorMsg = ErrorMsg.RequiredSource;
+          if (item.mount == "" || item.mount == 0) {
+            item.errorMount = ErrorMsg.RequiredCost;
+            valid=false
+          } else {
+            item.errorMount = "";
+            valid=true
+          }
+        } else {
+          item.errorMsg = "";
+          item.errorMount = "";
+          valid=true
+          for (var j = 0; j < i; j++) {
+            const item2 = this.budgetsArray[j];
+            if (
+              item.budget_name == item2.budget_name
+            ) {
+              item.errorMsg = ErrorMsg.DuplicateSource;  
+              console.log(item);
+              valid=false
+            } 
+          }
+          if (item.mount == "" || item.mount == 0) {
+            item.errorMount = ErrorMsg.RequiredCost;
+            valid=false
+          } 
         }
-       
       }
-     else {
-      item.errorMsg=""
-    
-      for(var j=0; j<this.budgetsArray.length; j++){
-        const item2 = this.budgetsArray[j];
-        if(item2.budget_name!=="" && item2.budget_name!== undefined && item.budget_name==item2.budget_name){
-          item2.errorMsg="Nguồn hình thành không được trùng nhau"
-          item.errorMsg="Nguồn hình thành không được trùng nhau"
-          
-        }else{
-         item2.errorMsg=""
-          item.errorMsg=""
+      console.log(valid);
+      
+      // for (var item of this.budgetsArray) {
+        if (valid==true) {
+          this.editData();
         }
-      }
-        if(item.mount=="" || item.mount== 0){
-        item.errorMount="Giá trị không được bỏ trống"
-        }else{
-          item.errorMount=""
-        }
-       
-       
-      }
      
-      }
-      for(var item of this.budgetsArray){
-        if( item.errorMount=="" && item.errorMsg==""){
-
-          // this.editData();
-        }
-      }
-      // }
+    },
+    hidePopupm(value){
+      this.isShowPopup=value
     },
     /**
      * sửa nguồn  tài sản
@@ -379,10 +424,7 @@ mounted(){
       var me = this;
       const toast = useToast();
       axios
-        .put(
-          `${URL_FixedAssetsPut}${this.idSelected}`,
-          this.itemSelect
-        )
+        .put(`${URL_FixedAssetsPut}${this.idSelected}`, this.itemSelect)
         .then(function () {
           me.hideFormEdit();
           me.getFixedAsset();
@@ -390,13 +432,21 @@ mounted(){
           me.load();
         })
         .catch(function (res) {
-          console.log(res);
+          if (res.response.data.ErrorCode == ErrorCode.DuplicateSource) {
+            me.isShowPopup = true;
+            me.closeStatus = CloseST.DuplicateCode;
+            me.msgError =
+             "Nguồn hình thành không được trùng nhau"
+            me.btnName = btnPopup.Agree;
+            
+          }
+          
         });
     },
     load() {
       this.emitter.emit("loadFixedAsset");
     },
-   
+
     /**
      * lấy danh sách nguồn ngân sách
      * AUTHOR: HTTHOA(18/4/2023)
@@ -423,16 +473,23 @@ mounted(){
      * thêm hàng ngân sách
      * AUTHOR: HTTHOA(18/4/2023)
      */
-    addBudget() {
-      try {
-        if (this.budgetsArray.length < 4) {
-          this.budgetsArray.push({ budget_name: "", mount: 0 , errorMsg:"", errorMount:"" });
+    addBudget() { 
+           
+          this.budgetsArray.push({
+            budget_name: "",
+            mount: 0,
+            errorMsg: "",
+            errorMount: "",
+          });
           this.getBudget();
-        }
-      } catch (error) {
-        console.log(error);
-      }
+          // this.focusNew()
+       
     },
+    // focusNew(){
+    //   var firstCombobox = this.$refs.budget_name;
+    //   console.log(firstCombobox.length);
+    //     firstCombobox[firstCombobox.length-1].$el.querySelector("input").focus();
+    // },
     /**
      * xóa 1 hàng ngân sách
      * AUTHOR: HTTHOA(18/4/2023)
@@ -441,7 +498,7 @@ mounted(){
       try {
         if (this.budgetsArray.length > 1) {
           this.budgetsArray.splice(this.budgetsArray.indexOf(item), 1);
-          this.changeTotal()
+          this.changeTotal();
         }
       } catch (error) {
         console.log(error);

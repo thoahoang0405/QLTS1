@@ -14,6 +14,7 @@ export const Table ={
     btnAddFixedAsset:"Thêm tài sản",
     btnExcelTooltip:"Xuất ra excel",
     btnDeleteTooltip: "Xóa",
+    active:"Trạng thái",
     searchFixedAsset: "Tìm kiếm tài sản",
     toltipClose: "Đóng (ESC)"
     
@@ -37,7 +38,7 @@ export const TableDetail={
     fixed_asset_name: "Tên tài sản",
     department_name:"Bộ phận sử dụng",
     cost: "Nguyên giá",
-    depreciation_value: "Giá trị hao mòn năm",
+    depreciation_value: "Hao mòn năm",
     residualValue:"Giá trị còn lại",
 
 

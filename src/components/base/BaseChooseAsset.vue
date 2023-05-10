@@ -1,6 +1,6 @@
 <template>
   <div id="form"
-    tabindex="0">
+  tabindex="0"  @keyup.esc="closeFormChoose"  @keydown.ctrl.s.prevent="SaveAssetChose">
     <div class="form increment-form">
       <div class="form-header">
         <h2 id="hd-form">Chọn tài sản ghi tăng</h2>
@@ -9,7 +9,7 @@
         </div>
       </div>
       <div class="form-body">
-        <div class="body-item-bottom">
+        <div class="body-item-bottom" style="height: 100%;">
           <div class="item-header"  style="margin-bottom: 16px">
             <div class="input">
               <input
@@ -17,21 +17,22 @@
                 class="search"
                 v-model="txtSearch"
                 @keypress.enter="onclickSearch"
-
+                ref="search"
                 :placeholder="formInfo.placeholderSearch"
+               
               />
               <div class="icon-search icon"></div>
             </div>
           </div>
-          <div id="table">
-            <div class="table">
+          <div id="table" tabindex="-1">
+            <div class="table" style="height: calc(100% - 58px);">
               <table>
                 <thead>
                   <tr>
                     <td class="text-center">
                       <input
                         type="checkbox"
-                        :checked="listFixedAsset.length == fixedAssets.length"
+                        :checked="listFixedAsset.length == fixedAssets.length && fixedAssets.length !=0"
                         @click="selectedAllItem"
                       />
                     </td>
@@ -62,9 +63,19 @@
                   </tr>
                 </thead>
                 <tbody>
+                  <tr style="border: none" class="data" v-if="totalRecord == 0" >                         
+                    <td colspan="8" class="noData">
+              <div class="no-data">
+                <div class="icon-noData"></div>   
+                <h3>Không có dữ liệu</h3>    
+              </div>
+            </td>
+            </tr>
                   <tr
                     v-for="(asset, index) in fixedAssets"
                     :class="listFixedAsset.includes(asset) ? 'active' : ''"
+                    @mousedown.prevent.ctrl="mouseDown(asset)"
+              @mouseup.prevent.ctrl="mouseUp(asset)"
                     :key="index"
                   >
                     <td class="text-center">
@@ -205,15 +216,23 @@
         </div>
       </div>
       <div class="form-footer">
-        <button class="save btn-hover-blue" @click="SaveAssetChose">
+        <button class="save btn-hover-blue"   tabindex="1"  @click="SaveAssetChose">
           {{ formInfo.btnAgree }}
           <div class="tooltipSave">Ctrl + S</div>
         </button>
-
+ 
         <button class="cancel btn-hover-outline" @click="closeFormChoose" >
           {{ formInfo.btnCancelClose }}
         </button>
       </div>
+    </div>
+  </div>
+  <div id="load" v-show="isShowLoad">
+    <div class="lds-ring">
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
     </div>
   </div>
 </template>
@@ -235,6 +254,7 @@ export default {
       totalPage: 0,
       totalRecord: 0,
       pageNumber: 1,
+      isShowLoad:false,
       isActive: "20",
       pageDefault: 20,
       fixedAssets: [],
@@ -246,10 +266,15 @@ export default {
       currentFixedAsset: {},
       listFixedAsset: [],
      listFixedAssetID :[],
+     listOnMouseDown: {},
+      listOnMouseUp: {},
      voucherIdEdit:"",
      oldItem:[],
     };
   },
+  // mounted() {
+  //   this.setFocus();
+  // },
   created() {
     console.log(this.removedList);
     this.listFixedAssetID=this.removedList
@@ -261,10 +286,6 @@ export default {
   
   },
   watch: {
-    // listSelected: function(data){
-    //   console.log(data);
-    //   this.voucherIdEdit=data.voucher_id
-    // },
     txtSearch: function(data){
       if(data==""){
         this.getPagingAsset()
@@ -272,6 +293,72 @@ export default {
     }
   },
   methods: {
+    setFocus() {
+      this.$nextTick(function () {
+        this.$refs["search"].focus();
+      });
+    },
+    
+     /**
+     *
+     * click ctrl
+     * AUTHOR: HTTHOA(2/4/2023)
+     */
+     mouseDown(asset) {
+      try {
+        // lưu tài sản khi mousedown
+        this.listOnMouseDown = asset;
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    /**
+     *
+     * chọn trong khoảng đã kéo
+     * AUTHOR: HTTHOA(2/4/2023)
+     */
+    selectMultipleItem(item1, item2) {
+      //đoạn này là lấy những tài sản khi kéo giữ chuột
+      if (
+        this.fixedAssets.includes(item1) &&
+        this.fixedAssets.includes(item2)
+      ) {
+        // lấy vị trí của 2 item trong mảng fixedAsset
+        //start là vị trí đầu khi down ctrl
+        let startIndex = this.fixedAssets.indexOf(item2);
+        //end là vị trí khi up ctrl
+        let endIndex = this.fixedAssets.indexOf(item1);
+        // kiểm tra vị trí bắt đầu và kết thúc nếu bắt đầu lớn hơn kết thúc thì đổi lại
+        if (startIndex > endIndex) {
+          let tmp = startIndex;
+          startIndex = endIndex;
+          endIndex = tmp;
+        }
+
+        // thêm các item chưa có trong mảng xóa từ vị trí bắt đầu đến kết thúc
+        for (let i = startIndex; i <= endIndex; i++) {
+          //nếu trong danh sách chưa gồm tài sản đó thì push vào danh sách
+          if (!this.listFixedAsset.includes(this.fixedAssets[i])) {
+            this.listFixedAsset.push(this.fixedAssets[i]);
+          }
+        }
+      }
+    },
+    /**
+     * up ctrl thả chuột để lấy vị trí cuối cùng chọn
+     * AUTHOR: HTTHOA(2/4/2023)
+     */
+    mouseUp(asset) {
+      try {
+        // lưu tài sản khi mouseup
+        this.listOnMouseUp = asset;
+        this.selectMultipleItem(this.listOnMouseDown, this.listOnMouseUp);
+        this.listOnMouseDown = {};
+        this.listOnMouseUp = {};
+      } catch (err) {
+        console.log(err);
+      }
+    },
     onclickSearch(){
       this.pageNumber=1
       this.getPagingAsset()
@@ -281,7 +368,7 @@ export default {
      * AUTHOR: HTTHOA(18/4/2023)
      */
     SaveAssetChose(){
-   
+
       console.log(this.oldItem);
      this.$emit("listFixedAsset",this.listFixedAsset)
      console.log(this.listFixedAsset);
@@ -362,21 +449,13 @@ export default {
      * AUTHOR: HTTHOA(18/4/2023)
      */
     getPagingAsset() {
-    
-      // if(this.listFixedAsset.length > 0) {
-      //   for (const asset of this.listFixedAsset) {
-      //   this.listFixedAssetID.push(asset.fixed_asset_id);
-      // }
-      // }
-       
+    this.isShowLoad=true
       console.log(this.listFixedAssetID);
       var me = this;
       me.isShowLoad = true;
-      // https://localhost:44371/api/FixedAlssets/FilterFixedAsetChoose?keyword=a&pageSize=10&voucherId=f6074325-ff9c-450b-8347-26950a21f524&pageNumber=1&active=0
+      
       axios({
         url: `${URL_FixedAssets}/FilterFixedAsetChoose?keyword=${this.txtSearch}&pageSize=${this.pageDefault}&voucherId=${this.voucherIdEdit}&pageNumber=${this.pageNumber}&active=${this.active}`,
-        // url: `${URL_FixedAssets}/FilterFixedAsetChoose?keyword=a&pageSize=10&voucherId=f6074325-ff9c-450b-8347-26950a21f524&pageNumber=1&active=0`,
-      
         method: "post",
         data: this.listFixedAssetID,
       })
@@ -384,8 +463,8 @@ export default {
           me.isShowLoad = false;
           me.totalPage = res.data.TotalPages;
           me.totalRecord = res.data.TotalRecords;
-           me.fixedAssets = res.data.Data;
-          console.log(me.fixedAssets);
+          me.fixedAssets = res.data.Data;
+          me.isShowLoad=false
         })
         .catch(function () {
           console.log(1);
@@ -402,9 +481,7 @@ export default {
       this.showPage(false);
       this.pageNumber = 1;
       this.getPagingAsset();
-      if (this.pageDefault > this.totalRecord) {
-        this.pageDefault = this.totalRecord;
-      }
+      
     },
 
     /**
@@ -549,5 +626,8 @@ input[type="checkbox"] {
   height: 18px;
   content: "";
   display: inline-block;
+}
+.item-up div{
+  cursor: pointer;
 }
 </style>
